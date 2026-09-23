@@ -1,5 +1,7 @@
 # 09 · 成果验证与消融：证明有用，不强迫正结果
 
+A3/A4 的当前模型是托管 Featherless SimpleJev；生产付费调用按[用户决定](../execution/USER_DECISIONS.md)暂缓。免费 demo 或 replay 只能证明限定的协议与图应用，不算完整消融。
+
 ## 首先防止循环验证
 
 把已输入的“封闭道路列表”再预测出来只能验证转换与约束执行；不是预测成功。把“哪些公交受影响”的官方名单先写入KG又当标签，会泄漏。把SUMO结果用作graph seeds，再用同SUMO结果证明Qwen System-One“发现影响”，最多是受控检索评估，不能声称独立现实准确率。
@@ -26,9 +28,9 @@ Synthetic：至少12个有独立答案的拓扑母题（双路、单桥、孤区
 | A0 | 相同 | 无检索KG | 直接可达性/几何候选 | 无 | 纯GIS已能解决多少 |
 | A1 | 相同 | typed KG | bounded reachability/explicit rule | 无 | 语义关系的增量 |
 | A2 | 相同 | 同一KG | fixed typed PPR | 无 | diffusion增量 |
-| A3 | 相同 | 同一KG | Qwen-System-One-conditioned typed PPR | 真实本地冻结policy | Qwen System-One增量 |
-| A4 | 相同 | 同一候选事实 | 固定候选的Qwen System-One相关性排序，无PPR | 真实本地 | 是否其实不需要PPR |
-| A5 | 相同 | 同一KG | neutral / permuted type weights PPR | 重用同一冻结policy，不重复本地推理 | 是否权重语义真的有效 |
+| A3 | 相同 | 同一KG | SimpleJev-conditioned typed PPR | 经授权的真实托管 policy 冻结 | System-One 增量 |
+| A4 | 相同 | 同一候选事实 | 固定候选的 SimpleJev 相关性排序，无 PPR | 重用 A3 的同一冻结真实 policy | 是否其实不需要 PPR |
+| A5 | 相同 | 同一KG | neutral / permuted type weights PPR | 重用同一冻结 policy，不重复付费调用 | 是否权重语义真的有效 |
 
 primary contrast A2→A3；A0→A1、A1→A2、A4→A3为解释对照。不要对48scenario×所有alpha×多模型×城市全排列。先一个冻结profile+seed，再只对dev最敏感参数做有限敏感性（alpha0.7/0.85/0.95；epsilon0.1与0.25），test只跑选定配置一次；更改后新版本有记录。
 
@@ -38,14 +40,14 @@ primary contrast A2→A3；A0→A1、A1→A2、A4→A3为解释对照。不要�
 检索：Recall@10/20（有不足候选时同时报N与K）、MRR/nDCG仅有独立graded labels时，coverage按节点类型分层；topK为空/全负样本定义清楚。
 固定网络：路径长度/时间与独立oracle误差、不可达precision/recall。
 SUMO：paired travel-time delta、arrived/unfinished、队列变化，分别表明synthetic或measured。
-Qwen System-One：有效响应率、本地模型调用量、输入长度/forward passes/实际wall-time与显存、cache hit、重复性；概率校准只在充分独立标签上诊断。
+SimpleJev：有效响应率、真实调用次数与预算、请求大小/服务返回 usage、实际 wall-time、cache hit、同一请求的漂移检查；托管权重/服务器版本未知时明确标注，概率校准只在充分独立标签上诊断。不臆造本地 GPU/显存或 forward-pass 指标。
 工程：wall time、CPU、peak RSS、artifact大小、冷/热缓存；图只跑一次却每模式重复计费是不允许的。
 
 按scenario/group输出原始指标，使用paired difference和按scenario聚类的区间；小样本只报告描述性区间，不吹统计显著。地区/低数据类型的漏检也报告，不能只报全局平均。
 
 ## 不操纵效果阈值
 
-工程必须：A3真正用到Qwen System-One；数学和功能正确；本地compute有账本；A0–A5可重复。
+工程必须：A3 真正用到经授权的托管 SimpleJev；数学和功能正确；调用/费用与本地计算分开记账；A0–A5 可重复。生产调用未获授权时不得把本条判为已通过。
 研究不强制：A3必须优于A2。如果A3无增益/变差，默认UI可保留A2，A3作为明确experimental选项，完整功能仍保留并如实写报告。不能为了漂亮PR删难案例或扩大prompt直到命中test。
 
 ## 真场景检验模板

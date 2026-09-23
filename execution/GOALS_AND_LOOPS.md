@@ -39,7 +39,7 @@
 - **G301** 真实typed temporal KG投影：跨道路/公交/设施、provenance、方向和窗口审计
 - **G302** CSR PPR及独立oracle：mass/residual/dangling/alpha，dense+NetworkX一致
 - **G303** paired delta可比较：相同U/s/alpha/policy hashes，no-op=0
-- **G304** 真实Qwen System-One协议与pipeline：Score批量→合法policy→真实图PPR，缓存/本地endpoint/model revision/calibration/性能记录
+- **G304** 真实托管 SimpleJev 协议与 pipeline：Score 批量→合法 policy→真实图 PPR；记录固定 API origin、模型 ID、客户端契约、请求/响应哈希、缓存与性能，未公开的服务器/权重 revision 和校准明确标 unknown
 - **G305** 解释路径和类型内显示：路径引用真实edge，attention不伪装risk
 - **G306** 防装饰消融钩子：neutral/permute/no-PPR modes及单relation取消反例
 
@@ -85,7 +85,7 @@
 
 ## 六个Loop
 
-L0证据获取，L1纵向实现，L2有限修复，L3真实本地Qwen System-One，L4冻结消融，L5集成发布。详见docs/10_EXECUTION.md。
+L0证据获取，L1纵向实现，L2有限修复，L3经授权的真实托管 SimpleJev 集成，L4冻结消融，L5集成发布。详见docs/10_EXECUTION.md。
 
 
 ## Operational Ontology / benchmark 新增验收目标（handoff-3）

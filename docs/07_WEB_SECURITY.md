@@ -1,5 +1,7 @@
 # 07 · Web 插件与本地数据原则
 
+当前 System-One 使用托管 Featherless SimpleJev classifier；仅在另行授权的范围内，由后端发送抽象关系定义与目标。城市数据、KG、坐标和物理结果仍留在部署者环境。旧“本地 Qwen/不需外部 API”要求已由[用户决定](../execution/USER_DECISIONS.md)覆盖，具体调用边界见 [adapter 文档](../adapters/system_one/README.md)。
+
 ## 两个真实宿主验收
 
 1. MapLibre reference host：道路、设施、闭合区、before/after、时间轴、影响表、解释面板。
@@ -9,7 +11,7 @@
 
 ## GIS UI验收
 
-成功、空数据、不可达、缺历史feed、Qwen System-One禁用/失败/本地模型不可用、图未收敛、SUMO未完成、取消都有不同状态。结果卡区分`computed fact`、`simulation estimate`、`attention`、`assumed`。无模型依据的指标卡不显示0，而显示not available。
+成功、空数据、不可达、缺历史feed、SimpleJev 未授权/不可用/失败、图未收敛、SUMO未完成、取消都有不同状态。结果卡区分`computed fact`、`simulation estimate`、`attention`、`assumed`。无模型依据的指标卡不显示0，而显示not available。
 
 颜色只是辅助；图例带单位和范围。比较图使用相同色标/分母，不以两张独立自动色域夸大变化。table可回连map，导出保留所有限制/来源字段。没有在线底图也能用本地roads+districts完成演示。
 
@@ -27,4 +29,4 @@
 
 ## BYOK
 
-默认off。用户显式开启Qwen System-One后由本地Core调用，前端显示使用的字段类别；不上传整张KG，不要求外部API。便宜LLM不能作为“错误自动修复者”操作服务器；只输出schema草案且经过同等校验。
+默认关闭。只有在用户明确授权出网范围、调用次数和费用后，部署者后端才能调用托管 SimpleJev；前端显示送出的字段类别及实际 provider mode。请求只含抽象 objective 和关系定义，不上传整张 KG、坐标、原始城市数据或物理结果；浏览器不持有 API key，也不直连模型服务。免费 demo、生产 API、缓存 replay、rules 和可选普通 Qwen chat 必须分别标记，不能互相顶替验收。便宜 LLM 不能作为“错误自动修复者”操作服务器；只输出 schema 草案且经过同等校验。

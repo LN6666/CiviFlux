@@ -1,5 +1,7 @@
 # 08 · 代码测试：测试的是计算和失败边界，不是截图有颜色
 
+本页的模型测试以[当前用户决定](../execution/USER_DECISIONS.md)和 [SimpleJev adapter 契约](../adapters/system_one/README.md)为准：托管 API、无本地 Qwen 部署，生产付费调用暂缓。旧本地 Reflex 测试文字不是 release 指令。
+
 当前包已经提供可执行reference tests；生产测试由WP逐包新增。禁止把只有mock的测试目录叫端到端验证。
 
 ## 测试层和运行时机
@@ -8,7 +10,7 @@
 `sumo`: 真binary小网络 before/after，CI必须安装pinned binary；缺binary是BLOCKED，不skip后仍发布。
 `browser`: Playwright真实插件+本地API+真实结果，不用全mock页面替代。
 `data`: frozen Helsinki extract/GTFS与公告匹配，读真实bytes；初次下载网络单独处理。
-`local_system_one`: 手动/有GPU runner的CI，真实本地Qwen推理、真实policy入图、记录model revision/calibration/device/latency；无供应商API。
+`hosted_simplejev`: 离线契约/预算/缓存反例每个 PR 运行；经单独授权的真实 HTTP 测试记录 endpoint、模型 ID、请求/响应哈希、provider mode、usage 与图中 policy/PPR 应用。免费 demo 与生产付费调用分开，托管服务未报告的权重/服务器版本和校准不得臆造；当前生产调用为 `DEFERRED_USER`。
 `outcomes`: synthetic独立oracle、公告核验、可获得独立观测；各level分开。
 `release`: clean checkout重建、全闸门、产物hash、证据路径。
 
@@ -28,7 +30,7 @@ mass conservation、nonnegative、dangling、disconnected、single node、all-ze
 
 ### T-SYSTEM-ONE
 
-每个 question 的 instructions 含 relation 语义；batch key集合检查；Score非整数正确；Noul/Choice/Score按typed contract；probabilities归一/finite；loopback为默认；非loopback必须显式opt-in；server unavailable→BLOCKED_ENVIRONMENT；未知/未pin model fail明确；local response可缓存replay但mode不同；模型revision、Reflex commit、dtype/device/permutations、calibration hash进入provenance；option-order sensitivity与重复运行稳定性有测试；rules fallback不标成local-qwen。浏览器bundle不直接访问模型服务。
+SimpleJev 每个 question 的 instructions 含 relation 语义；完整 batch key 集合、三档有序 rubric、有限且归一的 level 概率、期望索引与 confidence 按服务契约解析；不把分数当现实正确率。只允许已核对的 HTTPS provider origins，请求体不得包含原始城市图、坐标或物理结果；默认禁止出网与调用，生产 key 仅在后端环境变量，调用前持久预算预留，失败计数、无自动重试/重定向/代理。服务不可用、缺 key 或未授权应显式失败；demo、生产 API、缓存 replay、rules 与 mock 的 provenance 不能混用。记录模型 ID、客户端契约、请求/响应哈希和服务实际返回的版本字段；服务器/权重 revision、precision/device、calibration 未报告时标为 unknown。浏览器 bundle 不直接访问模型服务。旧 Reflex 的 Noul/Choice 测试只能作为可选 adapter 契约测试，不能满足 SimpleJev release gate。
 
 
 ### T-ONTOLOGY
@@ -49,7 +51,7 @@ hard closure不允许无绕路车辆穿越；同class例外只来自用户；多
 
 ## 不以覆盖率替代正确性
 
-覆盖率作为遗漏提示，核心network/PPR/contracts可设置branch>=85%为项目目标，但上面关键反例全部必须有assertion。至少对以下mutation做kill测试：反转方向、忽略end时间、把soft closure当hard、删除dangling处理、Qwen System-One不入P、忽略未到达、把mock改成local-qwen-pass。每个mutation必须被相关test挡住。
+覆盖率作为遗漏提示，核心network/PPR/contracts可设置branch>=85%为项目目标，但上面关键反例全部必须有assertion。至少对以下mutation做kill测试：反转方向、忽略end时间、把soft closure当hard、删除dangling处理、SimpleJev policy 不入 P、忽略未到达、把 mock/replay 改成生产 SimpleJev PASS。每个mutation必须被相关test挡住。
 
 ## 独立性
 
