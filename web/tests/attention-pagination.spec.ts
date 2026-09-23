@@ -35,5 +35,8 @@ test('attention search and pages keep a large result browsable',async({page})=>{
   await expect(table).toContainText('object-204');
   await expect(page.getByText('Showing 1–1 of 1 objects')).toBeVisible();
   await expect(page.getByRole('button',{name:'Next attention page'})).toBeDisabled();
-  expect(await page.evaluate(()=>document.querySelector('urban-impact-panel')?.result?.attention?.records?.length)).toBe(205);
+  expect(await page.evaluate(()=>{
+    const panel=document.querySelector('urban-impact-panel') as unknown as {result?:{attention?:{records?:unknown[]}}};
+    return panel?.result?.attention?.records?.length;
+  })).toBe(205);
 });
