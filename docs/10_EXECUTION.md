@@ -1,5 +1,7 @@
 # 10 · Codex 大步推进协议：8 工作包、54 goals、6 有界loops
 
+当前模型执行以 [用户决定](../execution/USER_DECISIONS.md) 和 [SimpleJev adapter](../adapters/system_one/README.md) 为准：Qwen classifier 只通过 Featherless 托管 API 调用，不部署或下载本地模型；生产付费调用仍未授权。
+
 ## 大步的含义
 
 一次交付完整能力而非一次写一个文件。每个WP包括contracts/实现/测试/运行样例/证据，默认直接从一个WP推进下一个可执行WP。不得“先研究几周，再逐个建空目录”。允许WP1数据核查与WP2算法工作并行，WP5前端在API契约冻结后并行。
@@ -17,14 +19,14 @@
 ### L2 — hypothesis-driven repair
 每轮给出failure signature、具体因果假设、最小观测、patch、前后test输出。相同失败最多3轮，第三轮未解决转为缩小复现/独立review并明确阻塞下游；不得清空测试、放宽阈值、无限依赖重装。
 
-### L3 — local Qwen System-One integration
-先检查本地模型缓存/device/Reflex版本pin→启动本地 `/v1/systemone`→一次真实smoke→严格parse→真实图policy→保存model/config/calibration hash→cache replay。默认拒绝非loopback endpoint；模型不可达时继续rules/fixed-PPR目标，但全v1的Qwen gate保持 `BLOCKED_ENVIRONMENT`。不得把mock/replay当真实模型。
+### L3 — hosted SimpleJev Qwen classifier integration
+先核对用户授权的提供商、模型、端点、出网范围与调用预算→严格解析 typed response→真实图 policy/PPR→保存请求、响应、代码契约摘要和运行证据。缓存重放必须标明原响应时间与 `replay`，不能证明当前托管权重未变。生产调用在用户另行授权前保持关闭；免费 demo 的有限 smoke 不能替代生产验收。继续 rules/fixed-PPR 等独立目标，并将生产、版本与校准缺口留在验收表中。
 
 ### L4 — ablation evaluation
 固定data/split/facts→一次计算physical→A0–A5复用→独立评估→只在dev诊断→冻结→test最终一轮→报告正/负结果。相同输入policy cache复用，不循环让模型“优化回答”。
 
 ### L5 — integration/release
-干净环境→build→fast→SUMO→browser→realcity→local-Qwen manifest→ablation→security/export→checksum→gate。证据缺失单独列，全部must gate PASS才engineering_complete；测量验证单独claim。
+干净环境→build→fast→SUMO→browser→realcity→hosted-classifier provenance→ablation→security/export→checksum→gate。证据缺失单独列，全部must gate PASS才engineering_complete；测量验证单独claim。
 
 ## 上下文与token纪律
 
@@ -42,4 +44,4 @@
 
 ## 暂停规则不是半成品借口
 
-本地模型/硬件或源数据阻塞时完成所有不依赖部分；精确列出剩余release gates。恢复后从STATE执行剩余门槛，不重写已经验证的模块。发现scope爆炸先删非v1能力，不删required本地Qwen System-One/graph/fire真实运行。
+托管 API 授权或源数据阻塞时完成所有不依赖部分；精确列出剩余release gates。恢复后从STATE执行剩余门槛，不重写已经验证的模块。发现scope爆炸先删非v1能力，不删required hosted classifier/graph/fire真实运行。
