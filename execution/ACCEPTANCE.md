@@ -1,8 +1,8 @@
 # 54 项目标验收与接手清单
 
-更新：2026-09-24。这是对现有产物和检查记录的逐项核对；本次只更新交接记录，没有新增运行、标签、代码或实验。
+更新：2026-09-24。状态对应 `execution/goals.json`；新补充的验证按具体范围记载，未完成的外部闸门继续保留。
 
-**当前计数：** PASS 38，PARTIAL 14，DEFERRED_USER 1，BLOCKED_EXTERNAL 1；合计 54。不是 54/54 完成。
+**当前计数：** PASS 42，PARTIAL 10，DEFERRED_USER 1，BLOCKED_EXTERNAL 1；合计 54。不是 54/54 完成。
 
 PASS 只覆盖该行写明的验收范围；PARTIAL 表示已有实现/证据但仍有条款未验证；DEFERRED_USER 是用户推迟的付费工作；BLOCKED_EXTERNAL 是来源/独立观测不可得。原始验收文本保留在 [goals.json](goals.json)，每项目标另列 assessment、remaining_steps 和证据。
 
@@ -11,7 +11,7 @@ PASS 只覆盖该行写明的验收范围；PARTIAL 表示已有实现/证据但
 - 以 [USER_DECISIONS.md](USER_DECISIONS.md) 为准：只用远程 Featherless SimpleJev `Qwen3.8-27B-classifier`，禁止本地模型下载/部署；普通 Qwen chat 不能替代 classifier。旧文档中的 local/Reflex gate 已明确覆盖。
 - 免费 demo 共 3 次请求，真实 typed policy 已用于 toy/Helsinki 图，物理事实不变。这是集成证据；生产 paid 调用、独立专家语义标签、校准、模型优越性仍未通过。不要再次消耗免费配额或自动开启 paid。
 - Ontology 仅服务 Road & Fire v1 所需概念、Actions 和投影；不扩展通用城市平台、调度、安全判断或 CFD。PPR 只表示 attention。
-- 207 项 Python 检查通过（包含 66 项原参考检查），6 项真实浏览器检查通过；两类检查不混称产品独立验证。native clean checkout/wheel 通过，Docker 和 image digest 未验收。
+- 当前完整 Python 检查 220 项通过（包含 66 项原参考检查与本轮 SUMO/SBOM 专项检查），真实浏览器套件 10 项通过。两类检查不混称产品独立验证。native clean checkout/wheel 通过，Docker 和 image digest 未验收。
 - Helsinki 仅当前快照 what-if：人工道路/入口核验、历史网络/feed、真实交通观测和真实火场边界仍缺。选择起点的不可达不等于全市设施隔离。
 
 ## 逐项目标
@@ -35,7 +35,7 @@ PASS 只覆盖该行写明的验收范围；PARTIAL 表示已有实现/证据但
 | G202 | 独立可达性与路由比较 | PASS | 边状态 turn-aware 路由与独立枚举 oracle 一致；不可达时间为 null。 [final_python_junit.xml](../evidence/wp7/final_python_junit.xml)、[ablation_report.json](../evidence/wp6/ablation_report.json) |
 | G203 | 火灾外部限制输入 | PASS | 用户明确 polygon/道路及假设确认后创建火灾外部限制；缺范围拒绝，不生成物理火场。 [browser_validation.json](../evidence/wp5/browser_validation.json)、[workflow.spec.ts](../web/tests/workflow.spec.ts) |
 | G204 | 设施与公交影响facts | PASS | 设施入口状态和公交关联分级，全部声明 OD 均检查，未被排名 topK 裁剪。 [final_python_junit.xml](../evidence/wp7/final_python_junit.xml)、[ablation_report.json](../evidence/wp6/ablation_report.json) |
-| G205 | 边界与不完整数据处理 | PARTIAL | 缺失指标保持未知且合成扩大裁剪反例通过；真实 Helsinki 边界稳定性未验证。 **待补：**在扩大真实路网范围后对相同 origin/OD/限制复核结果稳定性；目前只可报告选择起点的局部结果。 [final_python_junit.xml](../evidence/wp7/final_python_junit.xml)、[citypack_audit.json](../evidence/wp1/citypack_audit.json) |
+| G205 | 边界与不完整数据处理 | PARTIAL | 冻结 OSM 字节重建更大 Helsinki 路网；Road/Fire 各 48 个固定 OD 出现 3/8 个阶段差异，3 个候选入口不可配对，故当前小范围边界**未稳定**。未知值仍为 null。 **待补：**选定足够大的正式边界并重跑受影响的城市案例；当前仅可报告有边界的 what-if。 [helsinki_boundary_sensitivity.json](../evidence/wp2/helsinki_boundary_sensitivity.json)、[boundary_sensitivity.py](../scripts/boundary_sensitivity.py) |
 | G206 | oracle和反例全覆盖 | PASS | 单向/桥/转向/平面交叉/no-op/车种反例和独立枚举 oracle 已执行。 [final_python_junit.xml](../evidence/wp7/final_python_junit.xml)、[ablation_report.json](../evidence/wp6/ablation_report.json) |
 | G207 | Road/Fire全部通过typed Actions形成Scenario overlay | PASS | Road/Fire 经 typed Actions 事务提交、记录、重放；失败不部分提交且 baseline 不变。 [final_python_junit.xml](../evidence/wp7/final_python_junit.xml)、[ontology_review.md](../evidence/wp0/ontology_review.md) |
 | G301 | 真实typed temporal KG投影 | PASS | 版本化 typed temporal 投影具来源、方向和有效窗；公交静态依赖与 operational 图分开。 [final_python_junit.xml](../evidence/wp7/final_python_junit.xml)、[ontology_review.md](../evidence/wp0/ontology_review.md) |
@@ -47,13 +47,13 @@ PASS 只覆盖该行写明的验收范围；PARTIAL 表示已有实现/证据但
 | G307 | Ontology ProjectionSpec生成scenario graph | PASS | 显式 ProjectionSpec 包含时间/空间范围/无隐含 hop 截断；audit/run/evidence 默认不进 PPR 并验证 hash。 [final_python_junit.xml](../evidence/wp7/final_python_junit.xml)、[ontology_review.md](../evidence/wp0/ontology_review.md) |
 | G401 | 真实binary安装和adapter | PASS | 真实 SUMO 1.27.1 固定依赖，命令数组、日志和时间/车辆/输出预算已检查。 [validation.json](../evidence/wp4/validation.json)、[uv.lock](../uv.lock) |
 | G402 | network/demand映射 | PASS | 有向 edge 映射、相同 seed/demand 和 synthetic 声明随 paired 运行记录。 [validation.json](../evidence/wp4/validation.json)、[sumo_pair.json](../evidence/wp4/sumo_pair.json) |
-| G403 | hard closure/class运行 | PARTIAL | 真实 hard closure、车种例外和同时封闭通过；尚无独立多 rerouter 循环反例的明确验收证据。 **待补：**核实或补充多个 rerouter 诱发循环的专门反例证据；不能仅由同时封闭测试推定已覆盖。 [validation.json](../evidence/wp4/validation.json)、[test_sumo.py](../test_suite/sumo/test_sumo.py) |
+| G403 | hard closure/class运行 | PASS | 真实 SUMO 1.27.1 在有环合成路网执行两处硬封闭；编译为一个 rerouter，FCD 实际轨迹绕开封闭边且无循环。结论限于该反例与当前编译器。 [rerouter_cycle_validation.json](../evidence/wp4/rerouter_cycle_validation.json)、[test_multi_closure_rerouter.py](../test_suite/sumo/test_multi_closure_rerouter.py) |
 | G404 | before/after metrics | PASS | 真实输出包含 arrived/unfinished/pending/teleported/rejected 及到达均值分母。 [validation.json](../evidence/wp4/validation.json)、[sumo_pair.json](../evidence/wp4/sumo_pair.json) |
 | G405 | 取消和失败隔离 | PASS | 真实进程树取消、输出限额、失败隔离、坏 route 不发布成功产物已有检查。 [validation.json](../evidence/wp4/validation.json)、[final_python_junit.xml](../evidence/wp7/final_python_junit.xml) |
 | G406 | Helsinki代表场景可跑 | PASS | Helsinki 有界代表走廊真实 SUMO pair 已运行，覆盖和未校准 synthetic demand 明示。 [helsinki_sumo_pair.json](../evidence/wp4/helsinki_sumo_pair.json)、[validation.json](../evidence/wp4/validation.json) |
-| G501 | 同一Web Component两宿主 | PARTIAL | 同一构建组件在 MapLibre/vanilla 两宿主真实运行；dispose 实现存在，缺反复 mount/unmount 泄漏验收。 **待补：**补重复挂载/卸载后的订阅、定时器、网络请求和地图资源释放检查。 [browser_validation.json](../evidence/wp5/browser_validation.json)、[panel.ts](../web/src/panel.ts) |
+| G501 | 同一Web Component两宿主 | PASS | 同一构建组件在 vanilla/MapLibre 两宿主经 5/3 次重挂载检查，释放订阅、中止请求、清理轮询和地图画布；未进行 OS/GPU heap profiling。 [browser_lifecycle_cancel.json](../evidence/wp5/browser_lifecycle_cancel.json)、[lifecycle-cancel.spec.ts](../web/tests/lifecycle-cancel.spec.ts) |
 | G502 | 地图→scenario→运行 | PASS | 地图选择道路和导入显式火灾 polygon 均调用真实 Actions；时间/车种/assumption 确认可见。 [browser_validation.json](../evidence/wp5/browser_validation.json)、[workflow.spec.ts](../web/tests/workflow.spec.ts) |
-| G503 | 进度取消失败体验 | PARTIAL | 真实 job 进度、失败和模型不可用显示已跑；API 取消持久化通过，浏览器取消流程未有专门 E2E。 **待补：**在运行中的真实 browser job 点击 Cancel，验证终态与无完成结果；保留已有 API/native 取消证据。 [browser_validation.json](../evidence/wp5/browser_validation.json)、[final_python_junit.xml](../evidence/wp7/final_python_junit.xml) |
+| G503 | 进度取消失败体验 | PASS | 在受控同步点运行真实 RunService，浏览器点击 Cancel 后持久状态为 cancelled、结果端点 409，UI 无完成事件、结果请求或导出；模型出网关闭。 [browser_lifecycle_cancel.json](../evidence/wp5/browser_lifecycle_cancel.json)、[lifecycle-cancel.spec.ts](../web/tests/lifecycle-cancel.spec.ts) |
 | G504 | 事实/attention/证据联动 | PASS | before/after 原始同尺度数值、完整设施 facts、witness 和 provider 状态可关联查看。 [browser_validation.json](../evidence/wp5/browser_validation.json)、[panel.ts](../web/src/panel.ts) |
 | G505 | 导出与重放入口 | PASS | 实际下载 ZIP 包含 scenario/actions/ontology/result/manifest，token 排除和 Action 重放均已验证。 [browser_validation.json](../evidence/wp5/browser_validation.json)、[final_python_junit.xml](../evidence/wp7/final_python_junit.xml) |
 | G506 | local安全/offline | PASS | host/origin/token、路径拒绝、job 隔离和浏览器零外部请求已有检查；首次依赖下载另行标注。 [browser_validation.json](../evidence/wp5/browser_validation.json)、[final_python_junit.xml](../evidence/wp7/final_python_junit.xml) |
@@ -68,16 +68,16 @@ PASS 只覆盖该行写明的验收范围；PARTIAL 表示已有实现/证据但
 | G701 | clean checkout重建 | PARTIAL | 干净 committed HEAD 的 native 固定依赖、toy 和安装 wheel 通过；Docker 尚不可用且镜像未固定 digest。 **待补：**在可用 Docker 环境构建并执行容器 smoke，固定解析后的 base/image digest；不得将 native PASS 扩为容器 PASS。 [clean_checkout.json](../evidence/wp7/clean_checkout.json)、[clean_checkout_offline.json](../evidence/wp7/clean_checkout_offline.json) |
 | G702 | 全部must gates | PARTIAL | contracts/network/graph/PPR/SUMO/web/security 有实际通过；全部 must gates 尚未满足。 **待补：**处理 production SimpleJev/完整消融、人工真实城市映射及容器复现缺口；strict release-check 当前应继续非零。 [current_product_release.json](../evidence/current_product_release.json)、[release_check.log](../evidence/wp7/release_check.log) |
 | G703 | 独立审查与mutation | PASS | 独立子代理审查保留原反例，typed/context/hash/事务/witness/Object View 修复后回归通过；不是人类专家审查。 [ontology_review.md](../evidence/wp0/ontology_review.md)、[final_python_junit.xml](../evidence/wp7/final_python_junit.xml) |
-| G704 | 许可隐私与数据分发 | PARTIAL | 许可证/NOTICE/来源许可、数据分发边界和发布文件秘密扫描完成；未发现机器可读 SBOM 产物。 **待补：**为固定 Python/JS/native 依赖生成并审查 SBOM 与第三方许可证清单；锁文件本身不等于 SBOM。 [LICENSE](../LICENSE)、[NOTICE](../NOTICE) |
+| G704 | 许可隐私与数据分发 | PASS | CycloneDX 1.6 SBOM 包含 47 个 Python、99 个 npm 锁定包及本机 437 个原生文件哈希；机器可读清单保存 116 个许可证/NOTICE 文本，未知许可归属显式列出。架构/锁一致性及篡改反例通过；不作法律兼容性或跨平台原生文件审计结论。 [bom.cdx.json](../evidence/wp7/sbom/bom.cdx.json)、[license_inventory.json](../evidence/wp7/sbom/license_inventory.json)、[unknown_licenses.json](../evidence/wp7/sbom/unknown_licenses.json) |
 | G705 | 完成用户文档和演示 | PASS | 当前 README/runbook/architecture 及截图覆盖本地安装、模式、证据和负结果；旧手交文档以用户决定和当前文档为准。 [README.md](../README.md)、[CURRENT_RUNBOOK.md](../docs/CURRENT_RUNBOOK.md) |
 | G706 | 准确声明完成与缺口 | PASS | 工程部分验收与历史观测声明分开；记录 paid 推迟和已授权 GitHub 发布，不宣称 v1 全部完成。 [STATE.md](../execution/STATE.md)、[USER_DECISIONS.md](../execution/USER_DECISIONS.md) |
-| G707 | Ontology/竞争比较发布审计 | PARTIAL | ontology/action/replay/projection 与外部比较证据齐全，NOTICE 无从属暗示；完整 release artifacts 仍缺容器/SBOM及未过 gates。 **待补：**完成 G701/G702/G704 缺口后再签定完整 v1 发布包；目前交付只能标明部分验收。 [ontology_review.md](../evidence/wp0/ontology_review.md)、[feature_matrix.csv](../comparison/feature_matrix.csv) |
+| G707 | Ontology/竞争比较发布审计 | PARTIAL | ontology/action/replay/projection、外部比较、NOTICE 和 SBOM 已具证据；完整 release artifacts 仍缺容器与未过的外部 gates。 **待补：**完成 G701/G702 后再签完整 v1 发布包；目前交付只能标明部分验收。 [ontology_review.md](../evidence/wp0/ontology_review.md)、[feature_matrix.csv](../comparison/feature_matrix.csv)、[bom.cdx.json](../evidence/wp7/sbom/bom.cdx.json) |
 
 ## 接手顺序
 
 1. 先读本清单与用户决定，再查看 strict [release manifest](../evidence/current_product_release.json)。发布源码已获用户授权，不代表全部 v1 gate 通过。
-2. 可独立补齐：组件反复挂载释放检查、浏览器取消 E2E、多 rerouter 循环专门反例、SBOM；在 Docker 可用环境完成容器构建和 digest 复现。不要因此扩展 ontology 或产品范围。
-3. 真实城市验证需人工确认公告边界/方向和设施入口，并检查扩大 ROI 的稳定性。历史数值验证必须取得合格观测；无数据时维持 NOT_VALIDATED。
+2. 独立专项检查已补齐组件重挂载、浏览器取消、多硬封闭环路反例和 SBOM；在 Docker 可用环境仍需容器构建与 digest 复现。不要因此扩展 ontology 或产品范围。
+3. 扩大真实 Helsinki ROI 后结果不稳定；需选择正式边界并重跑相关案例。人工还须确认公告边界/方向和设施入口。历史数值验证必须取得合格观测；无数据时维持 NOT_VALIDATED。
 4. 生产模型工作保持 DEFERRED_USER；用户明确启用配额后才做真实 A3/A4、冻结 policy/负对照和独立语义评估。专家标签与合成路径 oracle 是不同证据，不可互换。
 5. 复用未变输入/源码的证据；只运行受后续变更影响的检查。更改 ontology 输入或模型策略应建立新 run，保留旧哈希和来源。
 

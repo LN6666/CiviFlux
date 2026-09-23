@@ -11,6 +11,7 @@ export class MapLibreAdapter implements MapAdapter {
   private ids:string[]=[];
   private drawPoints:Position[]|null=null;
   private drawDone:((geometry:Geometry)=>void)|null=null;
+  private disposed=false;
   constructor(container:HTMLElement){
     this.map=new maplibregl.Map({container,center:[24.95,60.18],zoom:12,attributionControl:false,
       style:{version:8,sources:{},layers:[{id:'background',type:'background',paint:{'background-color':'#eef2f0'}}]}});
@@ -59,5 +60,5 @@ export class MapLibreAdapter implements MapAdapter {
   }
   onSelect(callback:(selection:MapSelection)=>void){this.listeners.add(callback);return()=>this.listeners.delete(callback);}
   drawPolygon(callback:(geometry:Geometry)=>void){this.drawPoints=[];this.drawDone=callback;this.map.doubleClickZoom.disable();this.map.getCanvas().style.cursor='crosshair';}
-  dispose(){this.listeners.clear();this.map.remove();}
+  dispose(){if(this.disposed)return;this.disposed=true;this.listeners.clear();this.drawPoints=null;this.drawDone=null;this.map.remove();}
 }

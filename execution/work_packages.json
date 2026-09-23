@@ -155,7 +155,10 @@
         "evidence/wp5/browser_validation.json",
         "evidence/wp1/citypack_audit.json",
         "evidence/wp0/ontology_review.md",
-        "evidence/wp6/ontology_ablation.json"
+        "evidence/wp6/ontology_ablation.json",
+        "test_suite/unit/test_network.py",
+        "evidence/wp2/helsinki_boundary_sensitivity.json",
+        "scripts/boundary_sensitivity.py"
       ],
       "remaining_goal_ids": [
         "G205"
@@ -257,22 +260,22 @@
         "G405",
         "G406"
       ],
-      "status": "PARTIAL",
+      "status": "PASS",
       "prompt": "prompts/05_WP4.md",
       "max_same_failure_repair_iterations": 3,
       "status_counts": {
-        "PASS": 5,
-        "PARTIAL": 1
+        "PASS": 6
       },
       "evidence_files": [
         "evidence/wp4/validation.json",
         "evidence/wp4/sumo_pair.json",
         "evidence/wp4/helsinki_sumo_pair.json",
-        "evidence/wp7/final_python_junit.xml"
+        "evidence/wp7/final_python_junit.xml",
+        "test_suite/sumo/test_sumo.py",
+        "evidence/wp4/rerouter_cycle_validation.json",
+        "test_suite/sumo/test_multi_closure_rerouter.py"
       ],
-      "remaining_goal_ids": [
-        "G403"
-      ],
+      "remaining_goal_ids": [],
       "assessed_at": "2026-09-24",
       "decision_authority": "execution/USER_DECISIONS.md"
     },
@@ -309,24 +312,25 @@
         "G506",
         "G507"
       ],
-      "status": "PARTIAL",
+      "status": "PASS",
       "prompt": "prompts/06_WP5.md",
       "max_same_failure_repair_iterations": 3,
       "status_counts": {
-        "PARTIAL": 2,
-        "PASS": 5
+        "PASS": 7
       },
       "evidence_files": [
         "evidence/wp5/browser_validation.json",
         "evidence/wp7/final_python_junit.xml",
         "evidence/wp6/ontology_ablation.json",
         "evidence/wp7/repository_hygiene.json",
-        "evidence/wp0/ontology_review.md"
+        "evidence/wp0/ontology_review.md",
+        "web/src/panel.ts",
+        "web/src/maplibre-adapter.ts",
+        "evidence/wp5/browser_lifecycle_cancel.json",
+        "web/tests/lifecycle-cancel.spec.ts",
+        "test_suite/integration/test_api.py"
       ],
-      "remaining_goal_ids": [
-        "G501",
-        "G503"
-      ],
+      "remaining_goal_ids": [],
       "assessed_at": "2026-09-24",
       "decision_authority": "execution/USER_DECISIONS.md"
     },
@@ -430,8 +434,8 @@
       "prompt": "prompts/08_WP7.md",
       "max_same_failure_repair_iterations": 3,
       "status_counts": {
-        "PARTIAL": 4,
-        "PASS": 3
+        "PARTIAL": 3,
+        "PASS": 4
       },
       "evidence_files": [
         "evidence/wp7/clean_checkout.json",
@@ -442,12 +446,21 @@
         "evidence/wp7/final_python_junit.xml",
         "evidence/wp7/repository_hygiene.json",
         "evidence/wp5/map-workspace.png",
-        "evidence/wp6/REPORT.md"
+        "evidence/wp6/REPORT.md",
+        "LICENSE",
+        "NOTICE",
+        "data/README.md",
+        "evidence/wp7/sbom/bom.cdx.json",
+        "evidence/wp7/sbom/license_inventory.json",
+        "evidence/wp7/sbom/unknown_licenses.json",
+        "evidence/wp7/sbom/validation.json",
+        "scripts/generate_sbom.py",
+        "test_suite/security/test_sbom.py",
+        "comparison/feature_matrix.csv"
       ],
       "remaining_goal_ids": [
         "G701",
         "G702",
-        "G704",
         "G707"
       ],
       "assessed_at": "2026-09-24",
@@ -457,8 +470,8 @@
   "assessment_date": "2026-09-24",
   "decision_authority": "execution/USER_DECISIONS.md",
   "goal_status_counts": {
-    "PASS": 38,
-    "PARTIAL": 14,
+    "PASS": 42,
+    "PARTIAL": 10,
     "DEFERRED_USER": 1,
     "BLOCKED_EXTERNAL": 1
   },
