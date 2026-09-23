@@ -4,7 +4,7 @@
 
 仓库：[LN6666/CiviFlux](https://github.com/LN6666/CiviFlux)，公开。所有人可读；其他账号贡献时 fork 或创建有权限的分支并提交 PR，由仓库维护者审核。不得假定自己拥有原始账号的 Featherless、GitHub 或本机凭据，也不能自动继承本次 Codex 会话的 goal 状态。`main` 是集成线；开发分支使用 `codex/` 前缀。先读 `git status`、最近提交和 CI，不重做已完成实验，也不改写共享历史。
 
-**交接锚点：**[PR #1](https://github.com/LN6666/CiviFlux/pull/1) 已以 squash 方式合入 `main`（集成提交 `776bf2c`）。当前 `main` 仍为 42 PASS/10 PARTIAL。[PR #2](https://github.com/LN6666/CiviFlux/pull/2) 的 44 PASS/8 PARTIAL、Helsinki 案例边界、历史预检与容器复现尚待审查；[PR #3](https://github.com/LN6666/CiviFlux/pull/3) 的模型缓存修补、[PR #4](https://github.com/LN6666/CiviFlux/pull/4) 的官方入口与道路候选证据、[PR #5](https://github.com/LN6666/CiviFlux/pull/5) 的物理结果与 KG 投影绑定也未合并。以各 PR 的最新提交和 CI 状态为准，不把待审内容当成 `main`。
+**交接锚点：**[PR #1](https://github.com/LN6666/CiviFlux/pull/1) 已以 squash 方式合入 `main`（集成提交 `776bf2c`）。当前 `main` 仍为 42 PASS/10 PARTIAL。[PR #2](https://github.com/LN6666/CiviFlux/pull/2) 的 44 PASS/8 PARTIAL、Helsinki 案例边界、历史预检与容器复现尚待审查；[PR #3](https://github.com/LN6666/CiviFlux/pull/3) 的模型缓存修补、[PR #4](https://github.com/LN6666/CiviFlux/pull/4) 的官方入口/OSM 建筑冲突与 R1 来源卡片审查、[PR #5](https://github.com/LN6666/CiviFlux/pull/5) 的物理结果绑定和 KG 来源确定性修复也未合并。以各 PR 的最新提交和 CI 状态为准，不把待审内容当成 `main`。
 
 ## 新账户的第一步
 
