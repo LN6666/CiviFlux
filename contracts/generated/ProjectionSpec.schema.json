@@ -42,6 +42,27 @@
       ],
       "title": "ObjectType",
       "type": "string"
+    },
+    "Window": {
+      "additionalProperties": false,
+      "properties": {
+        "start": {
+          "format": "date-time",
+          "title": "Start",
+          "type": "string"
+        },
+        "end": {
+          "format": "date-time",
+          "title": "End",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "Window",
+      "type": "object"
     }
   },
   "additionalProperties": false,
@@ -66,6 +87,20 @@
       "format": "date-time",
       "title": "Analysis Time",
       "type": "string"
+    },
+    "time_window": {
+      "$ref": "#/$defs/Window"
+    },
+    "spatial_scope": {
+      "const": "source_citypack_extent",
+      "default": "source_citypack_extent",
+      "title": "Spatial Scope",
+      "type": "string"
+    },
+    "max_hops": {
+      "default": null,
+      "title": "Max Hops",
+      "type": "null"
     },
     "objective": {
       "title": "Objective",
@@ -107,6 +142,7 @@
     "projection_id",
     "scenario_id",
     "analysis_time",
+    "time_window",
     "objective",
     "allowed_object_types",
     "allowed_link_types",

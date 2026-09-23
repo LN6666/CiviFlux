@@ -6,11 +6,14 @@
     },
     "provider_mode": {
       "enum": [
+        "simplejev_demo",
+        "simplejev_api",
         "rules",
         "local_qwen",
         "replay",
         "mock_test",
-        "qwen_api"
+        "qwen_api",
+        "remote_reflex"
       ]
     },
     "requested_model": {

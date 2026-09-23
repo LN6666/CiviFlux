@@ -288,6 +288,12 @@
       "title": "Schema Version",
       "type": "string"
     },
+    "ontology_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Ontology Version",
+      "type": "string"
+    },
     "scenario_id": {
       "maxLength": 160,
       "minLength": 1,
@@ -384,6 +390,22 @@
     },
     "seed_spec": {
       "$ref": "#/$defs/SeedSpec"
+    },
+    "analysis_vehicle_class": {
+      "default": "passenger",
+      "enum": [
+        "passenger",
+        "bus",
+        "emergency",
+        "delivery",
+        "truck",
+        "bicycle",
+        "pedestrian",
+        "taxi",
+        "motorcycle"
+      ],
+      "title": "Analysis Vehicle Class",
+      "type": "string"
     }
   },
   "required": [

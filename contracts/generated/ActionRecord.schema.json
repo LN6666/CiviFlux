@@ -20,6 +20,12 @@
   },
   "additionalProperties": false,
   "properties": {
+    "ontology_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Ontology Version",
+      "type": "string"
+    },
     "action_id": {
       "maxLength": 160,
       "minLength": 1,

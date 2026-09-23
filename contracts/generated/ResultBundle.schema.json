@@ -160,6 +160,9 @@
     },
     "provider_mode": {
       "enum": [
+        "simplejev_demo",
+        "simplejev_api",
+        "remote_reflex",
         "qwen_api",
         "local_qwen",
         "replay",
