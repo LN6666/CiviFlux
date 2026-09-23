@@ -29,7 +29,7 @@
 - 完整工程复现：Python 3.12、`uv` 0.11.23、Node 22。`make bootstrap`，然后 `make test-fast test-data test-outcomes test-sumo build-web test-browser security-check`。浏览器测试需要 `npx --prefix web playwright install chromium`。测试不会调用付费 API；CI 也将 API 预算强制为零。
 - 当前实证：完整 Python 检查 225 passed（含 66 项原参考检查与新增 SUMO/SBOM/置换专项），浏览器套件先前 10 passed。真实 SUMO、真实 Helsinki what-if、48 场景/192 运行的 A0/A1/A2/A5 工程消融和独立 oracle 留证据。免费 SimpleJev 共 3 请求，0 付费；真实评分经内容寻址缓存应用到 toy 与 Helsinki，物理 facts 保持不变。**这不构成专家校准、历史预测或生产订阅通过。**
 - 本轮独立证据：内圈→第一外圈固定 OD 出现差异；第一外圈→第二外圈对 48 个可配对目标在 1 秒阈值下稳定，已在真实 Action→路由→KG→PPR 链路重跑。另 3 个候选入口无法配对、2 个原生入口会重新吸附，所以不能推广为全城稳定。多封路环路反例、Web 重挂载/取消、软件 SBOM 和冻结模型策略的置换负对照均有证据。历史预检表明尚无可做数值回测的独立观测，见[协议](HISTORICAL_BACKTEST_PROTOCOL.md)。
-- 干净检出：[`evidence/wp7/clean_checkout.json`](../evidence/wp7/clean_checkout.json) 记录冻结依赖、toy 运行、wheel 构建与隔离导入 PASS。Linux GitHub CI 已完成 Docker 构建/inspect，但 smoke 因缺 `libXrender.so.1` 失败；镜像依赖已补，等待 CI 复验，当前容器 gate 仍未过。本机 Docker daemon 不可用。
+- 干净检出：[`evidence/wp7/clean_checkout.json`](../evidence/wp7/clean_checkout.json) 记录冻结依赖、toy 运行、wheel 构建与隔离导入 PASS。[PR #2](https://github.com/LN6666/CiviFlux/pull/2) 的 Linux `core` 通过；Docker 构建/inspect 通过但容器 smoke 依次发现 `libXrender.so.1`、`libatomic.so.1` 缺失。镜像依赖已补，等待 CI 复验；当前容器 gate 仍未过。本机 Docker daemon 不可用。
 - 状态与证据：[`evidence/README.md`](../evidence/README.md) 提供索引；`make release-check` 在必要 gate 未完成时**应返回非零**，这是诚实结果。不要将 CI 测试通过写成 `engineering_complete=true`。
 
 ## 后继工作按依赖推进

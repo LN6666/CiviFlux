@@ -1214,6 +1214,7 @@
         "evidence/wp7/clean_checkout_offline.json",
         "evidence/wp7/container_ci_initial_fail.json",
         "evidence/wp7/container_ci_linker_fail.json",
+        "evidence/wp7/container_ci_atomic_fail.json",
         "deploy/Dockerfile"
       ],
       "loop": "L1",
@@ -1222,7 +1223,7 @@
         "make security-check",
         "make release-check"
       ],
-      "assessment": "干净 committed HEAD 的 native 固定依赖、toy 和安装 wheel 通过；GitHub Linux 已构建固定 base 的镜像并检查 digest/platform，但容器 smoke 因缺 libXrender.so.1 失败，修复待 CI 复验。本机 Docker daemon 不可用。",
+      "assessment": "干净 committed HEAD 的 native 固定依赖、toy 和安装 wheel 通过；GitHub Linux 已构建固定 base 的镜像并检查 digest/platform，但容器 smoke 依次因缺 libXrender.so.1、libatomic.so.1 失败，修复待 CI 复验。本机 Docker daemon 不可用。",
       "remaining_steps": [
         "确认修复后的 Linux 无网络、只读容器真实 API/SUMO smoke 与 digest；不得将 native PASS 扩为容器 PASS。"
       ],

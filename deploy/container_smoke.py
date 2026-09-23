@@ -164,8 +164,13 @@ def check_sumo(workspace: Path) -> dict:
                 "missing_libraries": missing,
                 "output_tail": output[-6000:],
             }
-        if any(item["missing_libraries"] for item in linker.values()):
-            raise RuntimeError(f"SUMO native binary has missing libraries: {json.dumps(linker, sort_keys=True)}")
+        missing = {
+            name: item["missing_libraries"]
+            for name, item in linker.items()
+            if item["missing_libraries"]
+        }
+        if missing:
+            raise RuntimeError(f"SUMO native binaries have missing libraries: {json.dumps(missing, sort_keys=True)}")
     try:
         pair = adapter.run_pair(
             city,

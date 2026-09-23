@@ -19,7 +19,7 @@ The repository has progressed from a specification/reference-test pack to a prod
 - Exhaustively permuted six frozen SimpleJev relation scores (720 orderings) in an offline graph control; the result tests implementation sensitivity, not model quality.
 - Compared three nested Helsinki crops, then replayed the scoped 48-target outer-ring Road/Fire cases through typed Action, routing, KG projection and fixed PPR. Missing and resnapped entrances remain unresolved.
 - Added a source-tiered historical backtest protocol and a read-only evidence preflight. No event-matched observed traffic outcomes are available for numeric validation.
-- Pinned container build inputs and added an offline Linux CI smoke. Two initial runs exposed a missing SUMO native library; added `libxrender1` and ELF linker diagnostics, pending CI confirmation.
+- Pinned container build inputs and added an offline Linux CI smoke. Three initial runs exposed missing SUMO native libraries; added `libxrender1`, `libatomic1` and concise ELF linker diagnostics, pending CI confirmation.
 - After PR #1 was squash-merged, moved subsequent work to a fresh branch/PR path. PR branch pushes now run a single pull-request workflow to avoid duplicate failure notifications.
 
 ## Source pack — 2026-09-23, handoff-3-operational-ontology
