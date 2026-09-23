@@ -63,10 +63,14 @@ def assess(root: Path) -> dict[str, Any]:
     historical_gtfs = bool(event_dates and fire_date) and all(
         coverage.get(date) is True for date in [*event_dates, fire_date]
     )
-    historical_network = missing.get("historical_network") == "VALIDATED_EVENT_DATE"
+    # This generated missing-data report does not register or verify an
+    # event-date network snapshot. A changed status string cannot make one real.
+    historical_network_reported_validated = missing.get("historical_network") == "VALIDATED_EVENT_DATE"
     traffic = missing.get("traffic_counts", {})
     measured_targets = split.get("heldout_measured_targets", [])
-    actual_road_operation_verified = road_review.get("observed_operation_verified") is True
+    # The case-review file is machine-generated. An operation log and its
+    # provenance need a separate validation contract before V1b can advance.
+    actual_road_operation_verified = False
 
     return {
         "schema_version": "1.0",
@@ -76,27 +80,22 @@ def assess(root: Path) -> dict[str, Any]:
         "citypack": {
             "status": audit.get("status"),
             "id": audit.get("citypack_id"),
-            "historical_network_ready": historical_network,
+            "historical_network_ready": False,
+            "generated_network_status_ignored": historical_network_reported_validated,
             "gtfs_covers_both_events": historical_gtfs,
         },
         "R1": {
             "source_fact_kind": road.get("source_status"),
             "planned_not_observed": road.get("source_status") == "planned_notice_web_verified",
             "actual_operated_restriction_verified": actual_road_operation_verified,
+            "generated_operation_flag_ignored": road_review.get("observed_operation_verified") is True,
             "motor_road_fact_count": source_count,
             "candidate_mapped_count": mapped,
             "human_accepted_count": accepted,
             "human_acceptance_basis": mapping_review,
             "generated_case_report_count_ignored": road_review.get("human_accepted_mapping_count", 0),
             "v1_source_transcription": "AVAILABLE" if road.get("facts") and source_count else "MISSING",
-            "v1_historical_reconstruction": (
-                "READY_TO_AUDIT"
-                if accepted == source_count
-                and source_count > 0
-                and historical_network
-                and actual_road_operation_verified
-                else "NOT_VALIDATED"
-            ),
+            "v1_historical_reconstruction": "NOT_VALIDATED",
             "v2_independent_operations": "NOT_REGISTERED",
             "v3_measured_numeric": "NOT_VALIDATED",
         },

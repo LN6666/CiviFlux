@@ -22,6 +22,8 @@ REVIEW_FIELDS = frozenset(
         "source_card_sha256",
         "candidate_report_sha256",
         "candidate_csv_sha256",
+        "candidate_map_sha256",
+        "case_geometry_sha256",
         "reviewer",
         "reviewed_at",
         "facts",
@@ -49,14 +51,18 @@ def candidate_snapshot(root: Path) -> dict:
     source_path = root / "cases/helsinki_cityrun_2026/case_evidence.json"
     report_path = root / "evidence/wp1/case_review.json"
     csv_path = root / "evidence/wp1/directed_road_mapping.csv"
+    map_path = root / "evidence/wp1/directed_road_review.html"
+    geometry_path = root / "evidence/wp1/case_geometry.geojson"
     card = json.loads(source_path.read_text())
     report = json.loads(report_path.read_text())
     road = report["road_case"]
     source_hash = _sha256(source_path)
-    if road["source_card"]["sha256"] != source_hash:
-        raise ValueError("candidate report has a different source card")
     source_facts = {fact["fact_id"]: fact for fact in card["facts"]}
     groups = {group["fact_id"]: group for group in road["mapping"]}
+    if len(source_facts) != len(card["facts"]) or len(groups) != len(road["mapping"]):
+        raise ValueError("duplicate source fact or candidate mapping fact ID")
+    if road["source_card"]["sha256"] != source_hash:
+        raise ValueError("candidate report has a different source card")
     if set(groups) != ROAD_FACT_IDS or not ROAD_FACT_IDS <= set(source_facts):
         raise ValueError("candidate fact IDs do not match the road source card")
     candidates = {}
@@ -87,6 +93,8 @@ def candidate_snapshot(root: Path) -> dict:
         "source_card_sha256": source_hash,
         "candidate_report_sha256": _sha256(report_path),
         "candidate_csv_sha256": _sha256(csv_path),
+        "candidate_map_sha256": _sha256(map_path),
+        "case_geometry_sha256": _sha256(geometry_path),
         "candidates": candidates,
     }
 
@@ -100,6 +108,8 @@ def review_template(root: Path) -> dict:
         "source_card_sha256": snapshot["source_card_sha256"],
         "candidate_report_sha256": snapshot["candidate_report_sha256"],
         "candidate_csv_sha256": snapshot["candidate_csv_sha256"],
+        "candidate_map_sha256": snapshot["candidate_map_sha256"],
+        "case_geometry_sha256": snapshot["case_geometry_sha256"],
         "reviewer": {"id": "", "role": "", "independent_of_candidate_generation": False},
         "reviewed_at": "",
         "facts": [
@@ -122,7 +132,14 @@ def validate_review(root: Path, document: dict) -> dict:
     snapshot = candidate_snapshot(root)
     if not isinstance(document, dict) or set(document) != REVIEW_FIELDS:
         raise ValueError("road mapping review has missing or extra fields")
-    for field in ("case_id", "source_card_sha256", "candidate_report_sha256", "candidate_csv_sha256"):
+    for field in (
+        "case_id",
+        "source_card_sha256",
+        "candidate_report_sha256",
+        "candidate_csv_sha256",
+        "candidate_map_sha256",
+        "case_geometry_sha256",
+    ):
         if document[field] != snapshot[field]:
             raise ValueError(f"road mapping review is stale: {field}")
     if document["schema_version"] != "1.0":

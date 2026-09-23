@@ -12,6 +12,7 @@
     "actual_operated_restriction_verified": false,
     "candidate_mapped_count": 3,
     "generated_case_report_count_ignored": 0,
+    "generated_operation_flag_ignored": false,
     "human_acceptance_basis": {
       "accepted_fact_count": 0,
       "status": "NOT_SUBMITTED"
@@ -34,6 +35,7 @@
     "event-matched measured traffic outcomes and controls not registered"
   ],
   "citypack": {
+    "generated_network_status_ignored": false,
     "gtfs_covers_both_events": false,
     "historical_network_ready": false,
     "id": "helsinki-current-482a4af607e4",

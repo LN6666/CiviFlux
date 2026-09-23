@@ -20,7 +20,12 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def frozen_review_root(tmp_path: Path) -> Path:
-    for name in (*INPUTS, "evidence/wp1/directed_road_mapping.csv"):
+    for name in (
+        *INPUTS,
+        "evidence/wp1/directed_road_mapping.csv",
+        "evidence/wp1/directed_road_review.html",
+        "evidence/wp1/case_geometry.geojson",
+    ):
         destination = tmp_path / name
         destination.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT / name, destination)
@@ -131,3 +136,57 @@ def test_review_invalidated_when_generated_candidates_change(tmp_path: Path) -> 
     report_path.write_text(json.dumps(report))
     with pytest.raises(ValueError, match="candidate CSV and report"):
         validate_review(root, document)
+
+
+@pytest.mark.parametrize(
+    "artifact",
+    ["evidence/wp1/directed_road_review.html", "evidence/wp1/case_geometry.geojson"],
+)
+def test_review_invalidated_when_review_surface_changes(tmp_path: Path, artifact: str) -> None:
+    root = frozen_review_root(tmp_path)
+    document = completed_review(root)
+    path = root / artifact
+    path.write_bytes(path.read_bytes() + b"\n ")
+    with pytest.raises(ValueError, match="stale"):
+        validate_review(root, document)
+
+
+@pytest.mark.parametrize("duplicate_in", ["source", "candidate"])
+def test_duplicate_fact_ids_are_not_silently_collapsed(tmp_path: Path, duplicate_in: str) -> None:
+    root = frozen_review_root(tmp_path)
+    if duplicate_in == "source":
+        path = root / "cases/helsinki_cityrun_2026/case_evidence.json"
+        value = json.loads(path.read_text())
+        value["facts"].append(value["facts"][0].copy())
+    else:
+        path = root / "evidence/wp1/case_review.json"
+        value = json.loads(path.read_text())
+        value["road_case"]["mapping"].append(value["road_case"]["mapping"][0].copy())
+    path.write_text(json.dumps(value))
+    with pytest.raises(ValueError, match="duplicate source fact or candidate mapping"):
+        candidate_snapshot(root)
+
+
+def test_generated_operation_and_network_flags_cannot_claim_historical_reconstruction(
+    tmp_path: Path,
+) -> None:
+    root = frozen_review_root(tmp_path)
+    (root / REVIEW_RELATIVE_PATH).write_text(json.dumps(completed_review(root)))
+    report_path = root / "evidence/wp1/case_review.json"
+    report = json.loads(report_path.read_text())
+    report["road_case"]["observed_operation_verified"] = True
+    report_path.write_text(json.dumps(report))
+    missing_path = root / "evidence/wp1/missing_data_report.json"
+    missing = json.loads(missing_path.read_text())
+    missing["historical_network"] = "VALIDATED_EVENT_DATE"
+    missing_path.write_text(json.dumps(missing))
+    # The submitted review is bound to the original report and must be reissued.
+    with pytest.raises(ValueError, match="stale"):
+        assess(root)
+    (root / REVIEW_RELATIVE_PATH).write_text(json.dumps(completed_review(root)))
+    result = assess(root)
+    assert result["R1"]["generated_operation_flag_ignored"] is True
+    assert result["citypack"]["generated_network_status_ignored"] is True
+    assert result["R1"]["actual_operated_restriction_verified"] is False
+    assert result["citypack"]["historical_network_ready"] is False
+    assert result["R1"]["v1_historical_reconstruction"] == "NOT_VALIDATED"
