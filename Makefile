@@ -2,7 +2,7 @@ SHELL := /bin/bash
 export PYTHONPATH := $(CURDIR)/core:$(CURDIR)
 PY := uv run --frozen python
 PYTEST := uv run --frozen pytest
-.PHONY: bootstrap contracts test-contracts test-unit test-ontology test-actions test-network test-scenarios test-graph test-ppr test-systemone-contract test-systemone-local systemone-preflight test-sumo test-cancel demo-toy demo-road-fire demo-ranking demo-sumo-pair citypack-fetch citypack-build case-review test-data build-web test-web test-browser test-object-view demo-local demo-offline test-reference test-api test-fast test-all
+.PHONY: bootstrap contracts test-contracts test-unit test-ontology test-actions test-network test-scenarios test-graph test-ppr test-systemone-contract test-systemone-local systemone-preflight test-sumo test-cancel demo-toy demo-road-fire demo-ranking demo-sumo-pair citypack-fetch citypack-build case-review test-data build-web test-web test-browser test-object-view demo-local demo-offline test-reference test-api test-fast test-all sbom-check sbom-host-check
 bootstrap:
 	uv sync --frozen
 	npm --prefix web ci
@@ -73,6 +73,14 @@ release-check:
 
 security-check:
 	$(PY) scripts/check_repository.py
+	$(PY) scripts/generate_sbom.py --check-locks
+	$(PYTEST) -q test_suite/security
 	npm --prefix web audit --audit-level=high
+sbom-check:
+	$(PY) scripts/generate_sbom.py --check-locks
+	$(PYTEST) -q test_suite/security
+sbom-host-check:
+	$(PY) scripts/generate_sbom.py --out .runtime/sbom-host
+	$(PY) scripts/generate_sbom.py --check --out .runtime/sbom-host
 clean-checkout-test:
 	$(PY) scripts/clean_checkout.py

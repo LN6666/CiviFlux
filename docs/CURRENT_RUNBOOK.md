@@ -50,6 +50,8 @@ uv run --frozen python -m pytest -q test_suite/sumo/test_sumo.py
 
 Web 检查在 `web/` 运行 `npm run build` 和 `npm test`。实际 browser 测试需要可用的 Playwright 浏览器；缺少浏览器属于环境阻塞，不能记成 PASS。检查当前 Makefile 可用的工作包命令，常用入口包括 `make test-network`、`make test-sumo`、`make build-web`、`make test-browser`、`make demo-local`。
 
+软件依赖清单由冻结锁文件离线生成。`make sbom-check` 对仓库保存的 CycloneDX、许可证文本及锁文件做跨平台一致性检查；`make sbom-host-check` 在当前机器的 `.runtime/sbom-host/` 重建并再次核查原生文件哈希。已保存的 macOS 原生文件清单不表示 Linux 二进制经过审查；Linux CI 会另生成本机清单作为运行产物。未知原生文件许可归属保留为待审，不能从父包许可证自动推断。
+
 原工程包独立检查使用：
 
 ```bash
@@ -88,6 +90,14 @@ uv run --frozen python scripts/data_pipeline.py review
 `evidence/wp1/road_scenario.json` 和 `fire_scenario.json` 是带证据标签的案例情景。设施入口未经核验、道路/公交 shape 几何关联、公告时间和假设限制不能升级为观察到的因果或历史交通真值。
 
 `evidence/wp1/case_review.json` 当前标记 `human_review_status=PENDING`，公告地点到有向道路/事件位置的机器候选仍需独立人工复核；不能把机器生成的 review 页面当作人工已验收。设施全集表示所选 origin 与当前车种/时刻下的全部设施，不能据此宣称全市所有起点都可达或整座城市已经收敛。
+
+扩大 Helsinki 当前路网边界的敏感性检查使用已冻结的 OSM 字节，不再次下载：
+
+```bash
+PYTHONPATH=core:. uv run --frozen python scripts/boundary_sensitivity.py
+```
+
+[实测报告](../evidence/wp2/helsinki_boundary_sensitivity.json)记录相同 origin、限制边与固定候选入口的比较。Road/Fire 各有 48 个可配对 OD，分别有 3/8 个基线或事件阶段结果差异；另有 3 个候选入口不能配对。扩大范围后独立转换会改变部分共有边长度、转向拓扑和旅行时间，所以这是**边界及导入敏感性**，不能宣称原小范围结果稳定、全城有效或历史预测准确。当前 CityPack 继续限定为案例范围；扩大后仍需选定稳定的正式分析边界并重跑相关证据。
 
 ## 6. SimpleJev Qwen classifier 与暂缓的付费 gate
 

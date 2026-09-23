@@ -17,7 +17,7 @@ jobs:
           node-version: '22'
       - run: python -m pip install uv==0.11.23
       - run: make bootstrap
-      - run: make test-fast test-data test-outcomes test-sumo security-check
+      - run: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check
       - run: make build-web
       - run: npx --prefix web playwright install --with-deps chromium
       - run: make test-browser
@@ -32,4 +32,9 @@ jobs:
         with:
           name: browser-evidence
           path: web/test-results/
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0 # v7.0.1
+        if: always()
+        with:
+          name: linux-sbom-evidence
+          path: .runtime/sbom-host/
   # Live API and live data acquisition are explicit local/manual gates; CI has no API credentials.

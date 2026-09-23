@@ -12,6 +12,10 @@ The repository has progressed from a specification/reference-test pack to a prod
 - Added typed graph projections, deterministic PPR, physical-fact reuse and model-provider seams.
 - The user-designated System-One service is Featherless SimpleJev with its Qwen classifier, accessed remotely without local weights/deployment. Ordinary Alibaba International generative Qwen remains a separate optional comparison and cannot substitute for this classifier. Production paid calls are `DEFERRED_USER`; public-demo evidence is labelled separately.
 - Added a browser component/API integration path and current developer documentation. Consult browser/API evidence before claiming their release gates pass.
+- Rebuilt an enlarged Helsinki road crop from frozen OSM bytes and recorded a negative fixed-OD boundary-sensitivity result; current city examples retain their limited scope.
+- Added a real SUMO cyclic-network multi-closure rerouter regression and browser lifecycle/cancellation E2E checks.
+- Added a deterministic CycloneDX 1.6 SBOM, content-addressed license/NOTICE inventory, explicit unknowns, portable lock verification and per-host native-file generation in CI.
+- Updated the 54-goal ledger and cross-account handoff for these bounded validations. Paid model, independent human/historical verification and Docker release gates remain open.
 
 ## Source pack — 2026-09-23, handoff-3-operational-ontology
 

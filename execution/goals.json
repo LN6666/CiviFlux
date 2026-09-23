@@ -429,7 +429,9 @@
       "evidence_files": [
         "evidence/wp7/final_python_junit.xml",
         "evidence/wp1/citypack_audit.json",
-        "test_suite/unit/test_network.py"
+        "test_suite/unit/test_network.py",
+        "evidence/wp2/helsinki_boundary_sensitivity.json",
+        "scripts/boundary_sensitivity.py"
       ],
       "loop": "L1",
       "tests_scope": [
@@ -437,12 +439,12 @@
         "make test-scenarios",
         "make demo-road-fire"
       ],
-      "assessment": "缺失指标保持未知且合成扩大裁剪反例通过；真实 Helsinki 边界稳定性未验证。",
+      "assessment": "已用同一冻结 OSM 字节独立重建更大 Helsinki 路网，并固定 origin、限制边及候选设施入口比较；Road/Fire 各 48 个可配对 OD 分别出现 3/8 个阶段差异，另 3 个候选入口不可配对。不可达仍为 null，不虚构零值。该负结果证明当前小范围边界尚不稳定。",
       "remaining_steps": [
-        "在扩大真实路网范围后对相同 origin/OD/限制复核结果稳定性；目前只可报告选择起点的局部结果。"
+        "选定足以覆盖关键 OD 的正式分析边界并复核稳定性，再重跑受影响的城市案例；当前结果只可作为有边界的 what-if。"
       ],
       "assessed_at": "2026-09-24",
-      "assessment_basis": "Existing produced artifacts and inspected product checks; no new runtime validation during this documentation audit."
+      "assessment_basis": "New bounded product or artifact validation in this branch; scope and unresolved limitations stated explicitly."
     },
     {
       "id": "G206",
@@ -764,11 +766,13 @@
       "work_package": "WP4",
       "title": "hard closure/class运行",
       "acceptance": "禁止soft误用，多rerouter loop反例",
-      "status": "PARTIAL",
+      "status": "PASS",
       "required_for_v1": true,
       "evidence_files": [
         "evidence/wp4/validation.json",
-        "test_suite/sumo/test_sumo.py"
+        "test_suite/sumo/test_sumo.py",
+        "evidence/wp4/rerouter_cycle_validation.json",
+        "test_suite/sumo/test_multi_closure_rerouter.py"
       ],
       "loop": "L1",
       "tests_scope": [
@@ -776,12 +780,10 @@
         "make demo-sumo-pair",
         "make test-cancel"
       ],
-      "assessment": "真实 hard closure、车种例外和同时封闭通过；尚无独立多 rerouter 循环反例的明确验收证据。",
-      "remaining_steps": [
-        "核实或补充多个 rerouter 诱发循环的专门反例证据；不能仅由同时封闭测试推定已覆盖。"
-      ],
+      "assessment": "真实 SUMO 1.27.1 在有环合成路网执行两处同时硬封闭；编译为单一 rerouter，车辆 FCD 实际轨迹绕开封闭边且无循环。已保留车种/原有失败隔离证据；此结论限定该反例与当前编译器。",
+      "remaining_steps": [],
       "assessed_at": "2026-09-24",
-      "assessment_basis": "Existing produced artifacts and inspected product checks; no new runtime validation during this documentation audit."
+      "assessment_basis": "New bounded product or artifact validation in this branch; scope and unresolved limitations stated explicitly."
     },
     {
       "id": "G404",
@@ -856,12 +858,14 @@
       "work_package": "WP5",
       "title": "同一Web Component两宿主",
       "acceptance": "MapLibre+vanilla，真正同build artifact，dispose不泄漏",
-      "status": "PARTIAL",
+      "status": "PASS",
       "required_for_v1": true,
       "evidence_files": [
         "evidence/wp5/browser_validation.json",
         "web/src/panel.ts",
-        "web/src/maplibre-adapter.ts"
+        "web/src/maplibre-adapter.ts",
+        "evidence/wp5/browser_lifecycle_cancel.json",
+        "web/tests/lifecycle-cancel.spec.ts"
       ],
       "loop": "L1",
       "tests_scope": [
@@ -870,12 +874,10 @@
         "make test-browser",
         "make demo-local"
       ],
-      "assessment": "同一构建组件在 MapLibre/vanilla 两宿主真实运行；dispose 实现存在，缺反复 mount/unmount 泄漏验收。",
-      "remaining_steps": [
-        "补重复挂载/卸载后的订阅、定时器、网络请求和地图资源释放检查。"
-      ],
+      "assessment": "同一构建组件在 vanilla/MapLibre 两宿主通过 5/3 次重挂载；订阅、请求中止、轮询与地图画布资源释放经真实 Chromium 检查。未进行 OS/GPU heap profiling。",
+      "remaining_steps": [],
       "assessed_at": "2026-09-24",
-      "assessment_basis": "Existing produced artifacts and inspected product checks; no new runtime validation during this documentation audit."
+      "assessment_basis": "New bounded product or artifact validation in this branch; scope and unresolved limitations stated explicitly."
     },
     {
       "id": "G502",
@@ -905,12 +907,14 @@
       "work_package": "WP5",
       "title": "进度取消失败体验",
       "acceptance": "API真实job，不虚拟输出，不吞Qwen System-One错误",
-      "status": "PARTIAL",
+      "status": "PASS",
       "required_for_v1": true,
       "evidence_files": [
         "evidence/wp5/browser_validation.json",
         "evidence/wp7/final_python_junit.xml",
-        "test_suite/integration/test_api.py"
+        "test_suite/integration/test_api.py",
+        "evidence/wp5/browser_lifecycle_cancel.json",
+        "web/tests/lifecycle-cancel.spec.ts"
       ],
       "loop": "L1",
       "tests_scope": [
@@ -919,12 +923,10 @@
         "make test-browser",
         "make demo-local"
       ],
-      "assessment": "真实 job 进度、失败和模型不可用显示已跑；API 取消持久化通过，浏览器取消流程未有专门 E2E。",
-      "remaining_steps": [
-        "在运行中的真实 browser job 点击 Cancel，验证终态与无完成结果；保留已有 API/native 取消证据。"
-      ],
+      "assessment": "真实后台 RunService 在受控同步点运行，浏览器点击 Cancel 后持久状态 cancelled，结果端点返回 409，UI 无完成事件、结果请求或导出；测试入口禁用付费模型调用。",
+      "remaining_steps": [],
       "assessed_at": "2026-09-24",
-      "assessment_basis": "Existing produced artifacts and inspected product checks; no new runtime validation during this documentation audit."
+      "assessment_basis": "New bounded product or artifact validation in this branch; scope and unresolved limitations stated explicitly."
     },
     {
       "id": "G504",
@@ -1273,13 +1275,19 @@
       "work_package": "WP7",
       "title": "许可隐私与数据分发",
       "acceptance": "source attribution/SBOM/no secret/数据包许可单列",
-      "status": "PARTIAL",
+      "status": "PASS",
       "required_for_v1": true,
       "evidence_files": [
         "LICENSE",
         "NOTICE",
         "data/README.md",
-        "evidence/wp7/repository_hygiene.json"
+        "evidence/wp7/repository_hygiene.json",
+        "evidence/wp7/sbom/bom.cdx.json",
+        "evidence/wp7/sbom/license_inventory.json",
+        "evidence/wp7/sbom/unknown_licenses.json",
+        "evidence/wp7/sbom/validation.json",
+        "scripts/generate_sbom.py",
+        "test_suite/security/test_sbom.py"
       ],
       "loop": "L1",
       "tests_scope": [
@@ -1287,12 +1295,10 @@
         "make security-check",
         "make release-check"
       ],
-      "assessment": "许可证/NOTICE/来源许可、数据分发边界和发布文件秘密扫描完成；未发现机器可读 SBOM 产物。",
-      "remaining_steps": [
-        "为固定 Python/JS/native 依赖生成并审查 SBOM 与第三方许可证清单；锁文件本身不等于 SBOM。"
-      ],
+      "assessment": "CycloneDX 1.6 SBOM 覆盖 47 个 Python、99 个 npm 锁定包与本机 437 个原生文件哈希/归属；机器可读许可证清单保留 116 个内容寻址文本，未知项显式列出。已运行 schema、锁一致性、篡改反例与仓库秘密扫描；不声称已作法律兼容性判断或跨平台原生文件审计。",
+      "remaining_steps": [],
       "assessed_at": "2026-09-24",
-      "assessment_basis": "Existing produced artifacts and inspected product checks; no new runtime validation during this documentation audit."
+      "assessment_basis": "New bounded product or artifact validation in this branch; scope and unresolved limitations stated explicitly."
     },
     {
       "id": "G705",
@@ -1361,18 +1367,18 @@
         "make test-ontology",
         "make compare-neighbors"
       ],
-      "assessment": "ontology/action/replay/projection 与外部比较证据齐全，NOTICE 无从属暗示；完整 release artifacts 仍缺容器/SBOM及未过 gates。",
+      "assessment": "ontology/action/replay/projection、比较来源、NOTICE 与 SBOM 均有证据；容器复现和未过的完整 release gates 仍阻止完整 v1 签发。",
       "remaining_steps": [
-        "完成 G701/G702/G704 缺口后再签定完整 v1 发布包；目前交付只能标明部分验收。"
+        "完成 G701/G702 的外部与环境闸门后再签完整 v1 发布包；当前交付继续标明部分验收。"
       ],
       "assessed_at": "2026-09-24",
-      "assessment_basis": "Existing produced artifacts and inspected product checks; no new runtime validation during this documentation audit."
+      "assessment_basis": "New bounded product or artifact validation in this branch; scope and unresolved limitations stated explicitly."
     }
   ],
   "assessment_date": "2026-09-24",
   "status_counts": {
-    "PASS": 38,
-    "PARTIAL": 14,
+    "PASS": 42,
+    "PARTIAL": 10,
     "DEFERRED_USER": 1,
     "BLOCKED_EXTERNAL": 1
   },
