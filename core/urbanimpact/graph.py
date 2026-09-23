@@ -109,15 +109,16 @@ def project(objects: list[OntologyObject], links: list[Link], spec: ProjectionSp
 
 
 def paired_projection(city: CityPack, scenario: Scenario, facts: dict, policy_hash: str) -> dict:
-    from .network import compile_restrictions
+    from .network import compile_restrictions, physical_context_hash
 
-    # Cached physical results must describe this exact network and operational instant.
+    # Cached physical results must describe this exact network and physical scenario input.
     # Their own checksum proves integrity, but cannot prove that they belong to this run.
     expected_context = {
         "network_hash": digest(city),
         "analysis_at": scenario.analysis_at.isoformat(),
         "vehicle_class": scenario.analysis_vehicle_class,
         "restrictions": sorted(compile_restrictions(city, scenario, scenario.analysis_vehicle_class)),
+        "physical_context_hash": physical_context_hash(city, scenario),
     }
     for field, expected in expected_context.items():
         if facts.get(field) != expected:

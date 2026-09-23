@@ -77,6 +77,40 @@ def test_projection_rejects_physical_facts_from_another_scenario():
         paired_projection(city, open_scenario, stale, digest({}))
 
 
+def test_projection_rejects_stale_routes_after_seed_change():
+    from urbanimpact.contracts import Scenario
+
+    city = toy_city()
+    original = toy_scenario()
+    changed = Scenario.model_validate(
+        {**original.model_dump(mode="json"), "seed_spec": {"entity_ids": ["ad"]}}
+    )
+    stale = Router().compare(city, original)
+    assert stale["origins"] == ["B"]
+    assert Router().compare(city, changed)["origins"] == ["A"]
+    with pytest.raises(ValueError, match="Physical facts physical_context_hash"):
+        paired_projection(city, changed, stale, digest({}))
+
+
+def test_projection_reuses_physical_facts_for_policy_only_ablation():
+    from urbanimpact.contracts import Scenario
+    from urbanimpact.network import physical_context_hash
+
+    city = toy_city()
+    original = toy_scenario()
+    policy_only = Scenario.model_validate(
+        {
+            **original.model_dump(mode="json"),
+            "scenario_id": "toy-road-policy",
+            "ranking": "A1",
+            "objective": "transit_association",
+        }
+    )
+    facts = Router().compare(city, original)
+    assert physical_context_hash(city, original) == physical_context_hash(city, policy_only)
+    paired_projection(city, policy_only, facts, digest({}))
+
+
 @pytest.mark.parametrize(
     ("field", "wrong"),
     [
