@@ -204,8 +204,8 @@
       "prompt": "prompts/04_WP3.md",
       "max_same_failure_repair_iterations": 3,
       "status_counts": {
-        "PASS": 5,
-        "PARTIAL": 2
+        "PASS": 6,
+        "PARTIAL": 1
       },
       "evidence_files": [
         "evidence/wp7/final_python_junit.xml",
@@ -213,13 +213,13 @@
         "evidence/wp2/helsinki_road_product.json",
         "evidence/wp6/benchmark.json",
         "evidence/wp6/ablation_report.json",
+        "evidence/wp6/policy_permutation_control.json",
         "evidence/wp3/simplejev_graph_integration.json",
         "evidence/wp3/systemone_simplejev_relations_policy.json",
         "evidence/wp5/browser_validation.json"
       ],
       "remaining_goal_ids": [
-        "G304",
-        "G306"
+        "G304"
       ],
       "assessed_at": "2026-09-24",
       "decision_authority": "execution/USER_DECISIONS.md",
@@ -470,8 +470,8 @@
   "assessment_date": "2026-09-24",
   "decision_authority": "execution/USER_DECISIONS.md",
   "goal_status_counts": {
-    "PASS": 42,
-    "PARTIAL": 10,
+    "PASS": 43,
+    "PARTIAL": 9,
     "DEFERRED_USER": 1,
     "BLOCKED_EXTERNAL": 1
   },

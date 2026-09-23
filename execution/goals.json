@@ -663,11 +663,14 @@
       "work_package": "WP3",
       "title": "防装饰消融钩子",
       "acceptance": "neutral/permute/no-PPR modes及单relation取消反例",
-      "status": "PARTIAL",
+      "status": "PASS",
       "required_for_v1": true,
       "evidence_files": [
         "evidence/wp6/ablation_report.json",
+        "evidence/wp6/policy_permutation_control.json",
         "test_suite/unit/test_graph_ranking.py",
+        "test_suite/review/test_policy_permutation_control.py",
+        "scripts/offline_policy_permutation.py",
         "core/urbanimpact/pipeline.py"
       ],
       "loop": "L1",
@@ -675,15 +678,14 @@
         "make test-graph",
         "make test-ppr",
         "make test-systemone-contract",
+        "make policy-permutation-control",
         "make demo-ranking",
         "make systemone-preflight"
       ],
-      "assessment": "neutral/no-PPR 分支及单一 relation 权重抵消检查存在；未执行真实模型权重 permutation 负对照。",
-      "remaining_steps": [
-        "在真实冻结 policy 可用且对应实验获准后补 permutation 对照；不能把 A5 neutral 当作完整模型负对照。"
-      ],
+      "assessment": "neutral/no-PPR 分支及单一 relation 权重抵消反例保留；冻结真实免费 SimpleJev 策略的 6! 种离线关系分数置换已执行，物理 facts 固定、每个 policy 内 baseline/event 可比。仅证明敏感性，不是 A3/A4 完整模型消融或模型增益。",
+      "remaining_steps": [],
       "assessed_at": "2026-09-24",
-      "assessment_basis": "Existing produced artifacts and inspected product checks; no new runtime validation during this documentation audit.",
+      "assessment_basis": "New bounded offline product analysis and focused tests; no API inference, paid calls, or model-quality claim.",
       "legacy_tests_scope": [
         "make test-graph",
         "make test-ppr",
@@ -1377,8 +1379,8 @@
   ],
   "assessment_date": "2026-09-24",
   "status_counts": {
-    "PASS": 42,
-    "PARTIAL": 10,
+    "PASS": 43,
+    "PARTIAL": 9,
     "DEFERRED_USER": 1,
     "BLOCKED_EXTERNAL": 1
   },
