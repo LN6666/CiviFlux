@@ -39,6 +39,8 @@ SUMO adapter 将 directed IDs 映射为 native IDs，生成一次网络/route in
 
 图是 ontology 的一个允许列表投影，审计/run/evidence 对象不自动进入排名。baseline/event 对比需同 node universe、seed、alpha 和 relation policy。物理 cache 与 ranking variant 分离，不为每个模型消融重新随机生成需求或改变 travel metrics。
 
+投影前必须核对物理结果的城市快照、完整物理情景输入指纹、分析时刻、车种与生效限制。只改变 objective、ranking 或 scenario ID 的政策消融可共用物理结果；换种子、封路或其他物理输入则不能复用旧路径。这是防止陈旧 cache 污染派生 KG 的运行边界，不把物理结果改写为权威城市事实。
+
 `baseline` / `event` 为物理路由导出的 operational projections；静态公交匹配保存在单独的 `dependency_evidence` projection。Object View 显示两种关系的明确标签，静态匹配不能解释成事件时刻仍可通行的公交路径。选择已完成 run 时，视图读取该 run 保存的 scenario/actions，并核对 snapshot/overlay/history hashes；后来编辑工作区不会改写旧运行的解释。
 
 当前目标是通过远程 API 调用用户指定的 SimpleJev Qwen classifier，保留服务的 typed response 与 provenance；不在本地启动模型。生产付费 gate 为 `DEFERRED_USER`，公开 demo 单独标记。只发送批准的抽象关系定义与 objective，校验 schema、完整 key 集、有限值、服务分数语义与模型 provenance；城市图、坐标和物理输入留在部署者环境。
@@ -54,5 +56,7 @@ API 默认 loopback，同源检查、TrustedHost 和 Bearer session token 保护
 ## 扩展与非目标
 
 增加模型 provider 时实现 `score_relations` 边界并保留证据/预算语义；增加地图宿主时实现小型 `MapAdapter`。新增情景必须注册 typed objects/actions 并保留物理验证，而不是引入通用插件市场框架。
+
+v1 的 KG 按 `analysis_time` 过滤时间有效性，由不可变 CityPack 与可重放的 Action overlay 派生；它不是持续更新的实时图。PPR 的排名证据和 SimpleJev 的语义政策随 ResultBundle 保存，语言模型只能提出待验证的 Action 草案；三者都不能直接修改权威对象或关系。只有可信来源的重新摄取可形成新版 CityPack，或已校验 Action 可形成新情景 overlay。若以后接入可信连续数据源，并出现明确的刷新时限、乱序/撤回更正需求及增量图计算负载，再设计带事件时间、来源版本、重放与快照隔离的动态 KG；该升级不属于 v1 的必要路径。
 
 v1 不提供 CFD、烟热传播、火场半径推断、派车决策、撤离安全证明、机构身份/SSO、代运营 SaaS 或市政高可用设施。部署者负责网络、用户与备份治理；这不能被误写成代码已经提供多租户安全。

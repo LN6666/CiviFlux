@@ -11,6 +11,14 @@ from urbanimpact.contracts import CityPack, Scenario, VehicleClass
 from urbanimpact.util import digest
 
 
+def physical_context_hash(city: CityPack, scenario: Scenario) -> str:
+    """Identify physical inputs using the same field scope as the routing cache."""
+    physical = scenario.model_dump(mode="json")
+    for field in ("ranking", "objective", "scenario_id"):
+        physical.pop(field)
+    return digest({"city": digest(city), "physical": physical})
+
+
 def compile_restrictions(
     city: CityPack, scenario: Scenario, vehicle_class: str = "passenger", at: datetime | None = None
 ) -> frozenset[str]:
@@ -232,6 +240,7 @@ class Router:
                 for f in city.facilities
             ],
             network_hash=digest(city),
+            physical_context_hash=physical_context_hash(city, scenario),
             units={"distance": "m", "travel_time": "s"},
             model="directed_turn_aware_fixed_travel_time",
             limitations=[
