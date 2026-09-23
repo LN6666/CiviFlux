@@ -23,7 +23,7 @@
 
 - 最终 Python 检查207通过（包括66项原参考检查）；浏览器6通过。干净检出、冻结依赖安装和隔离 wheel 运行均通过（7d217b8）。
 - 54 项验收逐项记录在 `execution/ACCEPTANCE.md`：38 PASS、14 PARTIAL、1 DEFERRED_USER、1 BLOCKED_EXTERNAL；strict release manifest 保留四项未过 gate，`engineering_complete=false`。
-- [公开 GitHub 仓库](https://github.com/LN6666/CiviFlux) 的 `main` 已推送；[首次 GitHub Actions](https://github.com/LN6666/CiviFlux/actions/runs/35886546155) 在提交 `5758ff4` 的锁定安装、Python/数据/SUMO/安全、Web 构建及浏览器检查全部通过。后续提交须以对应 run 的实际结果为准。
+- [公开 GitHub 仓库](https://github.com/LN6666/CiviFlux) 的 `main` 已推送；[固定 Actions/Ubuntu 后的 CI](https://github.com/LN6666/CiviFlux/actions/runs/35887411778) 在提交 `d0f91c8` 的锁定安装、Python/数据/SUMO/安全、Web 构建及浏览器检查全部通过。`main` 已启用检查、代码所有者审查、线性历史、禁止强推/删除的保护；后续提交须以对应 run 的实际结果为准。
 
 ## 明确缺口
 

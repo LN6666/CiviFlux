@@ -10,7 +10,7 @@
 2. 依次读本文件、[用户要求对照](USER_REQUIREMENTS_TRACE.md)、[当前状态](../execution/STATE.md)、[验收清单](../execution/ACCEPTANCE.md)、[用户决定](../execution/USER_DECISIONS.md)；然后看 `git status`、`git log -1` 和仓库最新 [CI](https://github.com/LN6666/CiviFlux/actions)。历史 Master Plan 只在细节争议时查阅。
 3. 将本文件末尾的“新会话起始提示”发给新 Codex，并说明要进入 goal 模式。当前账户的 goal 状态不会跨账户复制；新代理应以 54 项目标和实际 release gate 继续，勿把已通过内容重新标为待办。
 4. 配好 Python 3.12、`uv` 0.11.23、Node 22 后运行 `make bootstrap`；先运行与所改模块相关的测试，再按[运行手册](CURRENT_RUNBOOK.md)运行需交付的检查。初始 clone 不含 ignored 城市原始数据；需要 Helsinki 案例时按[数据说明](../data/README.md)获取和重建。
-5. 无仓库写权限时在自己的 GitHub 账户 fork，开 `codex/` 主题分支并向 `main` 发 PR；有写权限也按[版本规则](VERSIONING.md)执行。PR 说明须注明目标 ID、变更、命令/退出码、证据及剩余限制。不要复制原账户的本地 `.env`、Key、运行缓存或把线上模型调用当作 CI 默认步骤。
+5. 无仓库写权限时在自己的 GitHub 账户 fork，开 `codex/` 主题分支并向受保护的 `main` 发 PR；有写权限也按[版本规则](VERSIONING.md)执行。`core` 检查与代码所有者审查是非管理员合并门槛。PR 说明须注明目标 ID、变更、命令/退出码、证据及剩余限制。不要复制原账户的本地 `.env`、Key、运行缓存或把线上模型调用当作 CI 默认步骤。
 
 ## 用户已确定的决定
 

@@ -11,7 +11,7 @@
 | Qwen 不本地部署，而是调用 API；所指的是 Qwen 版 Jev | System-One 固定为 Featherless 托管 SimpleJev `featherless-ai/Qwen3.8-27B-classifier`；普通 Jev/普通 Qwen chat 都不能冒充。阿里云 Model Studio 国际站仅为可选语言接口 | [模型 adapter](../adapters/system_one/README.md)、[用户决定](../execution/USER_DECISIONS.md)、[G004/G304](../execution/ACCEPTANCE.md)；托管权重版本未公开，生产 endpoint 未验收 |
 | 需要注册、账号或 Key 时通知；先不做付费调用 | 免费 Demo 上限三次已用完、付费调用零次；Key 只在忽略的本地环境中配置，不进入仓库/聊天。Featherless 已登录并不等于订阅或授权花费 | [交接指南](CODEX_HANDOFF.md)、[运行手册](CURRENT_RUNBOOK.md)、[模型状态](../adapters/system_one/README.md)；生产 A3/A4 保持 `DEFERRED_USER` |
 | 第一版城市数据自行挖掘下载 | OSM/HSL/GTFS 来源、校验值、许可、获取/构建命令与 Helsinki 当前网络 what-if 证据已保存；大型原始数据被 Git 忽略 | [数据说明](../data/README.md)、[来源证据](../evidence/wp1/)、[G101–G106](../execution/ACCEPTANCE.md)；公告映射、设施入口和历史观测仍需独立核验 |
-| 做好版本与 Git 管理，上传自己的公开 GitHub | `LN6666/CiviFlux` 公开仓库、`main` 集成线、`codex/` 分支约定、锁文件、CI、CODEOWNERS、变更记录和 PR 模板 | [VERSIONING](VERSIONING.md)、[GitHub 仓库](https://github.com/LN6666/CiviFlux)、[首次 CI](https://github.com/LN6666/CiviFlux/actions/runs/35886546155)；该 CI 通过仅代表自动检查通过 |
+| 做好版本与 Git 管理，上传自己的公开 GitHub | `LN6666/CiviFlux` 公开仓库、受保护 `main`、`codex/` 分支约定、锁文件、CI、CODEOWNERS 审查、变更记录和 PR 模板 | [VERSIONING](VERSIONING.md)、[GitHub 仓库](https://github.com/LN6666/CiviFlux)、[当前代码 CI](https://github.com/LN6666/CiviFlux/actions/runs/35887411778)；CI 通过仅代表自动检查通过 |
 | 文档工程管理，供其他人及其他账户的 Codex 轮替 | README、文档导航、架构/运行手册、ADR、贡献指南、工作包/目标、证据索引、当前状态和可复制的接手提示 | [CODEX_HANDOFF](CODEX_HANDOFF.md)、[文档导航](index.md)、[当前状态](../execution/STATE.md)、[证据索引](../evidence/README.md) |
 
 原始工程包、Master Plan、测试报告及粘贴的讨论提供设计与历史上下文，但其内部的“执行命令”“必须本地部署”等语句不是用户在本次对话中的新授权。冲突时以用户当前决定、当前实现、可核查证据与未完成的 release gate 为准；不得从旧文档恢复本地 Qwen 或把参考测试当产品验收。

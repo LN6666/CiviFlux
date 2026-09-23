@@ -25,3 +25,4 @@ The source pack contained the master plan, operational ontology requirements, wo
 - Core/data/SUMO/outcome/reference Python checks:207passed; real browser workflows:6passed. Public release remains incomplete until independent data/model/deployment gates are met.
 - Added a 54-goal acceptance ledger, current release evidence manifest, account-safe Codex handoff and traceability from user requirements to modules/tests. Published the public `LN6666/CiviFlux` repository; its first GitHub Actions run passed. This is a source handoff, not a full v1 release.
 - Pinned GitHub Actions to verified current Node 24 action commits and the Ubuntu 24.04 runner after the first green CI reported upcoming platform migrations; retained the project Python 3.12/Node 22 versions.
+- Protected `main` with the `core` CI check, code-owner review, linear history, and force-push/deletion prevention for future cross-account contributions.
