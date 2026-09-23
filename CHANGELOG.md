@@ -24,4 +24,4 @@ The source pack contained the master plan, operational ontology requirements, wo
 - SimpleJev Qwen3.8-27B free hosted API: three requests total, zero paid calls; genuine policy applied to toy and Helsinki via recorded cache replay without changing physical facts. This is not calibration or production acceptance.
 - Core/data/SUMO/outcome/reference Python checks:207passed; real browser workflows:6passed. Public release remains incomplete until independent data/model/deployment gates are met.
 - Added a 54-goal acceptance ledger, current release evidence manifest, account-safe Codex handoff and traceability from user requirements to modules/tests. Published the public `LN6666/CiviFlux` repository; its first GitHub Actions run passed. This is a source handoff, not a full v1 release.
-- Pinned GitHub Actions to verified current Node 24 action commits after the first green CI run reported Node 20 deprecation; retained the project Python 3.12/Node 22 versions.
+- Pinned GitHub Actions to verified current Node 24 action commits and the Ubuntu 24.04 runner after the first green CI reported upcoming platform migrations; retained the project Python 3.12/Node 22 versions.
