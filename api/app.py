@@ -16,8 +16,8 @@ from pydantic import BaseModel, ConfigDict, Field
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 from urbanimpact.actions import ActionError
 from urbanimpact.contracts import MANIFEST, ActionRequest, CityPack, Scenario
-from urbanimpact.fixtures import toy_city
 
+from .citypacks import load_local_citypacks
 from .services import RunService
 
 
@@ -59,13 +59,13 @@ class BodyLimit:
         return await self.app(scope, replay, send)
 
 
-def create_app(root: Path | None = None, cities=None, policy_backend=None):
+def create_app(root: Path | None = None, cities=None, policy_backend=None, data_root: Path | None = None):
     root = root or Path(os.environ.get("CIVIFLUX_WORKSPACE", ".runtime/app"))
+    formal_scope = {}
     if cities is None:
-        cities = [toy_city()]
-        real = Path("data/citypacks/helsinki-current/citypack.json")
-        if real.is_file() and os.environ.get("CIVIFLUX_TOY_ONLY") != "1":
-            cities.append(CityPack.model_validate_json(real.read_bytes()))
+        cities, formal_scope = load_local_citypacks(
+            data_root or Path.cwd(), toy_only=os.environ.get("CIVIFLUX_TOY_ONLY") == "1"
+        )
     if policy_backend is None:
         from adapters.system_one.simplejev import SimpleJevBackend, SimpleJevConfig
 
@@ -85,6 +85,12 @@ def create_app(root: Path | None = None, cities=None, policy_backend=None):
     app.state.token = token
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost", "testserver", "[::1]"])
     app.add_middleware(BodyLimit)
+
+    def citypack_warnings(city: CityPack) -> list[str]:
+        warnings = list(city.warnings)
+        if scope := formal_scope.get(city.citypack_id):
+            warnings.append(scope)
+        return warnings
 
     @app.middleware("http")
     async def security(request: Request, call_next):
@@ -170,7 +176,7 @@ def create_app(root: Path | None = None, cities=None, policy_backend=None):
                 "citypack_id": c.citypack_id,
                 "network_temporality": c.network_temporality,
                 "transit_temporality": c.transit_temporality,
-                "warnings": c.warnings,
+                "warnings": citypack_warnings(c),
                 "edge_count": len(c.edges),
                 "facility_count": len(c.facilities),
             }
@@ -222,7 +228,7 @@ def create_app(root: Path | None = None, cities=None, policy_backend=None):
             "citypack_id": cid,
             "network_temporality": city.network_temporality,
             "transit_temporality": city.transit_temporality,
-            "warnings": city.warnings,
+            "warnings": citypack_warnings(city),
             "geojson": geo,
             **geo,
         }
