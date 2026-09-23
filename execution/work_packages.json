@@ -1,0 +1,290 @@
+{
+  "version": "1.1-operational-ontology",
+  "stop_at": "Road & Fire GIS v1 engineering gates satisfied; historical measured claims separately gated",
+  "work_packages": [
+    {
+      "id": "WP0",
+      "title": "一次打通工程骨架、契约、toy运行与Qwen System-One预检",
+      "depends_on": [],
+      "owners": [
+        "integrator"
+      ],
+      "docs": [
+        "docs/00_PRODUCT.md",
+        "docs/01_ARCHITECTURE.md",
+        "docs/03_CONTRACTS.md",
+        "docs/05_QWEN_SYSTEM_ONE.md",
+        "docs/14_OPERATIONAL_ONTOLOGY.md"
+      ],
+      "commands": [
+        "make bootstrap",
+        "make test-contracts",
+        "make test-unit",
+        "make demo-toy",
+        "make systemone-preflight",
+        "make test-ontology"
+      ],
+      "artifact": "evidence/wp0/walking_skeleton.json",
+      "goal_ids": [
+        "G001",
+        "G002",
+        "G003",
+        "G004",
+        "G005",
+        "G006",
+        "G007"
+      ],
+      "status": "NOT_STARTED",
+      "prompt": "prompts/01_WP0.md",
+      "max_same_failure_repair_iterations": 3
+    },
+    {
+      "id": "WP1",
+      "title": "Helsinki真实citypack与两个事件证据落地",
+      "depends_on": [
+        "WP0"
+      ],
+      "owners": [
+        "data"
+      ],
+      "docs": [
+        "docs/02_DATA_CASES.md",
+        "docs/03_CONTRACTS.md"
+      ],
+      "commands": [
+        "make citypack-fetch",
+        "make citypack-build",
+        "make test-data",
+        "make case-review"
+      ],
+      "artifact": "evidence/wp1/citypack_audit.json",
+      "goal_ids": [
+        "G101",
+        "G102",
+        "G103",
+        "G104",
+        "G105",
+        "G106"
+      ],
+      "status": "NOT_STARTED",
+      "prompt": "prompts/02_WP1.md",
+      "max_same_failure_repair_iterations": 3
+    },
+    {
+      "id": "WP2",
+      "title": "Road & Fire确定性GIS影响引擎完成",
+      "depends_on": [
+        "WP0"
+      ],
+      "owners": [
+        "core"
+      ],
+      "docs": [
+        "docs/03_CONTRACTS.md",
+        "docs/06_ROAD_FIRE_SUMO.md",
+        "docs/08_TESTING.md",
+        "docs/14_OPERATIONAL_ONTOLOGY.md"
+      ],
+      "commands": [
+        "make test-network",
+        "make test-scenarios",
+        "make demo-road-fire",
+        "make test-actions"
+      ],
+      "artifact": "evidence/wp2/network_comparison.json",
+      "goal_ids": [
+        "G201",
+        "G202",
+        "G203",
+        "G204",
+        "G205",
+        "G206",
+        "G207"
+      ],
+      "status": "NOT_STARTED",
+      "prompt": "prompts/03_WP2.md",
+      "max_same_failure_repair_iterations": 3
+    },
+    {
+      "id": "WP3",
+      "title": "typed KG + 固定PPR + 真Qwen-System-One-PPR完成",
+      "depends_on": [
+        "WP0",
+        "WP2"
+      ],
+      "owners": [
+        "graph"
+      ],
+      "docs": [
+        "docs/04_KG_PPR.md",
+        "docs/05_QWEN_SYSTEM_ONE.md",
+        "docs/09_VALIDATION_ABLATION.md",
+        "docs/14_OPERATIONAL_ONTOLOGY.md"
+      ],
+      "commands": [
+        "make test-graph",
+        "make test-ppr",
+        "make test-systemone-contract",
+        "make test-systemone-local",
+        "make demo-ranking",
+        "make test-ontology"
+      ],
+      "artifact": "evidence/wp3/ranking_integration.json",
+      "goal_ids": [
+        "G301",
+        "G302",
+        "G303",
+        "G304",
+        "G305",
+        "G306",
+        "G307"
+      ],
+      "status": "NOT_STARTED",
+      "prompt": "prompts/04_WP3.md",
+      "max_same_failure_repair_iterations": 3
+    },
+    {
+      "id": "WP4",
+      "title": "SUMO真正联调与paired仿真结果完成",
+      "depends_on": [
+        "WP1",
+        "WP2"
+      ],
+      "owners": [
+        "simulation"
+      ],
+      "docs": [
+        "docs/06_ROAD_FIRE_SUMO.md",
+        "docs/08_TESTING.md"
+      ],
+      "commands": [
+        "make test-sumo",
+        "make demo-sumo-pair",
+        "make test-cancel"
+      ],
+      "artifact": "evidence/wp4/sumo_pair.json",
+      "goal_ids": [
+        "G401",
+        "G402",
+        "G403",
+        "G404",
+        "G405",
+        "G406"
+      ],
+      "status": "NOT_STARTED",
+      "prompt": "prompts/05_WP4.md",
+      "max_same_failure_repair_iterations": 3
+    },
+    {
+      "id": "WP5",
+      "title": "可嵌入Web GIS成品闭环",
+      "depends_on": [
+        "WP0",
+        "WP2",
+        "WP3"
+      ],
+      "owners": [
+        "web"
+      ],
+      "docs": [
+        "docs/03_CONTRACTS.md",
+        "docs/07_WEB_SECURITY.md",
+        "docs/14_OPERATIONAL_ONTOLOGY.md"
+      ],
+      "commands": [
+        "make build-web",
+        "make test-web",
+        "make test-browser",
+        "make demo-local",
+        "make test-object-view"
+      ],
+      "artifact": "evidence/wp5/browser_e2e.json",
+      "goal_ids": [
+        "G501",
+        "G502",
+        "G503",
+        "G504",
+        "G505",
+        "G506",
+        "G507"
+      ],
+      "status": "NOT_STARTED",
+      "prompt": "prompts/06_WP5.md",
+      "max_same_failure_repair_iterations": 3
+    },
+    {
+      "id": "WP6",
+      "title": "成果验证、完整消融与性能成本报告",
+      "depends_on": [
+        "WP1",
+        "WP3",
+        "WP4",
+        "WP5"
+      ],
+      "owners": [
+        "evaluation"
+      ],
+      "docs": [
+        "docs/08_TESTING.md",
+        "docs/09_VALIDATION_ABLATION.md",
+        "docs/02_DATA_CASES.md",
+        "docs/15_COMPETITIVE_BENCHMARK.md"
+      ],
+      "commands": [
+        "make test-outcomes",
+        "make ablate",
+        "make benchmark",
+        "make report",
+        "make compare-neighbors"
+      ],
+      "artifact": "evidence/wp6/ablation_report.json",
+      "goal_ids": [
+        "G601",
+        "G602",
+        "G603",
+        "G604",
+        "G605",
+        "G606",
+        "G607"
+      ],
+      "status": "NOT_STARTED",
+      "prompt": "prompts/07_WP6.md",
+      "max_same_failure_repair_iterations": 3
+    },
+    {
+      "id": "WP7",
+      "title": "干净环境发布验收与完整工程交付",
+      "depends_on": [
+        "WP6"
+      ],
+      "owners": [
+        "integrator",
+        "reviewer"
+      ],
+      "docs": [
+        "docs/11_RELEASE.md",
+        "docs/07_WEB_SECURITY.md",
+        "docs/15_COMPETITIVE_BENCHMARK.md"
+      ],
+      "commands": [
+        "make clean-checkout-test",
+        "make security-check",
+        "make release-check",
+        "make compare-neighbors"
+      ],
+      "artifact": "evidence/wp7/release_review.json",
+      "goal_ids": [
+        "G701",
+        "G702",
+        "G703",
+        "G704",
+        "G705",
+        "G706",
+        "G707"
+      ],
+      "status": "NOT_STARTED",
+      "prompt": "prompts/08_WP7.md",
+      "max_same_failure_repair_iterations": 3
+    }
+  ]
+}

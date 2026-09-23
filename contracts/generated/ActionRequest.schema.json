@@ -1,0 +1,86 @@
+{
+  "$defs": {
+    "ActionType": {
+      "enum": [
+        "CreateScenario",
+        "AddRoadRestriction",
+        "CreateFireIncident",
+        "AttachImportedPerimeter",
+        "AttachEvidence",
+        "ValidateScenario",
+        "RunScenario",
+        "CancelRun",
+        "CompareRuns",
+        "ChangeAnalysisPolicy",
+        "ExportResultBundle"
+      ],
+      "title": "ActionType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "action_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_:.@+\\-/]+$",
+      "title": "Action Id",
+      "type": "string"
+    },
+    "action_type": {
+      "$ref": "#/$defs/ActionType"
+    },
+    "scenario_id": {
+      "maxLength": 160,
+      "minLength": 1,
+      "pattern": "^[A-Za-z0-9_:.@+\\-/]+$",
+      "title": "Scenario Id",
+      "type": "string"
+    },
+    "parameters": {
+      "additionalProperties": true,
+      "title": "Parameters",
+      "type": "object"
+    },
+    "expected_overlay_hash": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expected Overlay Hash"
+    },
+    "actor_context": {
+      "default": "local",
+      "maxLength": 100,
+      "title": "Actor Context",
+      "type": "string"
+    },
+    "origin": {
+      "default": "user",
+      "enum": [
+        "user",
+        "llm"
+      ],
+      "title": "Origin",
+      "type": "string"
+    },
+    "user_confirmed": {
+      "default": false,
+      "title": "User Confirmed",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "action_id",
+    "action_type",
+    "scenario_id",
+    "parameters"
+  ],
+  "title": "ActionRequest",
+  "type": "object"
+}

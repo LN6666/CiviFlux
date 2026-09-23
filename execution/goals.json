@@ -1,0 +1,856 @@
+{
+  "version": "1.1-operational-ontology",
+  "goal_count": 54,
+  "goals": [
+    {
+      "id": "G001",
+      "work_package": "WP0",
+      "title": "建立可运行monorepo与锁文件",
+      "acceptance": "Python API、TypeScript component构建，版本/许可可追溯，不只空目录",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make bootstrap",
+        "make test-contracts",
+        "make test-unit",
+        "make demo-toy",
+        "make systemone-preflight"
+      ]
+    },
+    {
+      "id": "G002",
+      "work_package": "WP0",
+      "title": "冻结Scenario/Result/KG契约",
+      "acceptance": "JSON Schema/Pydantic/TS一致性测试与无效输入拒绝",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make bootstrap",
+        "make test-contracts",
+        "make test-unit",
+        "make demo-toy",
+        "make systemone-preflight"
+      ]
+    },
+    {
+      "id": "G003",
+      "work_package": "WP0",
+      "title": "贯通toy纵向运行",
+      "acceptance": "scenario→route facts→graph→PPR→ResultBundle，从API可取实际数值",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make bootstrap",
+        "make test-contracts",
+        "make test-unit",
+        "make demo-toy",
+        "make systemone-preflight"
+      ]
+    },
+    {
+      "id": "G004",
+      "work_package": "WP0",
+      "title": "真实本地Qwen System-One环境预检",
+      "acceptance": "检查本地Reflex/Qwen endpoint、精确模型/commit pin、hardware与calibration；可跑则真实smoke，不能则BLOCKED_ENVIRONMENT",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make bootstrap",
+        "make test-contracts",
+        "make test-unit",
+        "make demo-toy",
+        "make systemone-preflight"
+      ]
+    },
+    {
+      "id": "G005",
+      "work_package": "WP0",
+      "title": "测试与命令入口",
+      "acceptance": "创建make与CI层级，参考oracle与产品tests隔离",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make bootstrap",
+        "make test-contracts",
+        "make test-unit",
+        "make demo-toy",
+        "make systemone-preflight"
+      ]
+    },
+    {
+      "id": "G006",
+      "work_package": "WP0",
+      "title": "记录状态和边界",
+      "acceptance": "STATE、能力清单、初始release manifest无假PASS",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make bootstrap",
+        "make test-contracts",
+        "make test-unit",
+        "make demo-toy",
+        "make systemone-preflight"
+      ]
+    },
+    {
+      "id": "G007",
+      "work_package": "WP0",
+      "title": "冻结Operational Ontology manifest与代码绑定",
+      "acceptance": "Object/Link/Interface/Action/Function/Projection registry versioned；Pydantic/JSON Schema/TS一致性；authoritative/derived状态可区分",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-contracts",
+        "make test-ontology"
+      ]
+    },
+    {
+      "id": "G101",
+      "work_package": "WP1",
+      "title": "下载并冻结OSM/GTFS",
+      "acceptance": "真实bytes+sha256+日期+license；失败不伪造fixture",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make citypack-fetch",
+        "make citypack-build",
+        "make test-data",
+        "make case-review"
+      ]
+    },
+    {
+      "id": "G102",
+      "work_package": "WP1",
+      "title": "构建标准实体与路网映射",
+      "acceptance": "稳定ID、方向、连接、设施入口、source lineage",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make citypack-fetch",
+        "make citypack-build",
+        "make test-data",
+        "make case-review"
+      ]
+    },
+    {
+      "id": "G103",
+      "work_package": "WP1",
+      "title": "核验公交feed覆盖和shape匹配",
+      "acceptance": "calendar>24h、historical/current分开，ambiguous仅candidate",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make citypack-fetch",
+        "make citypack-build",
+        "make test-data",
+        "make case-review"
+      ]
+    },
+    {
+      "id": "G104",
+      "work_package": "WP1",
+      "title": "R1公告有向路段映射",
+      "acceptance": "端点/方向review图和unknown hours字段",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make citypack-fetch",
+        "make citypack-build",
+        "make test-data",
+        "make case-review"
+      ]
+    },
+    {
+      "id": "G105",
+      "work_package": "WP1",
+      "title": "F1火灾事实假设分离",
+      "acceptance": "日期街道已核验；精确坐标/cordon需source或assumption",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make citypack-fetch",
+        "make citypack-build",
+        "make test-data",
+        "make case-review"
+      ]
+    },
+    {
+      "id": "G106",
+      "work_package": "WP1",
+      "title": "锁数据评估边界",
+      "acceptance": "真实观测最多两轮检查、split/source manifests、missing-data report",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make citypack-fetch",
+        "make citypack-build",
+        "make test-data",
+        "make case-review"
+      ]
+    },
+    {
+      "id": "G201",
+      "work_package": "WP2",
+      "title": "时间与车种限制编译器",
+      "acceptance": "半开时间窗、未知edge拒绝、direction/class准确",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-network",
+        "make test-scenarios",
+        "make demo-road-fire"
+      ]
+    },
+    {
+      "id": "G202",
+      "work_package": "WP2",
+      "title": "独立可达性与路由比较",
+      "acceptance": "turn-aware shortest paths、unreachable不为0",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-network",
+        "make test-scenarios",
+        "make demo-road-fire"
+      ]
+    },
+    {
+      "id": "G203",
+      "work_package": "WP2",
+      "title": "火灾外部限制输入",
+      "acceptance": "点/区/道路→需确认restrictions，不生成火灾physics",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-network",
+        "make test-scenarios",
+        "make demo-road-fire"
+      ]
+    },
+    {
+      "id": "G204",
+      "work_package": "WP2",
+      "title": "设施与公交影响facts",
+      "acceptance": "入口/route match分级、必查设施不被topK裁掉",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-network",
+        "make test-scenarios",
+        "make demo-road-fire"
+      ]
+    },
+    {
+      "id": "G205",
+      "work_package": "WP2",
+      "title": "边界与不完整数据处理",
+      "acceptance": "扩大network验证、缺失指标不假0",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-network",
+        "make test-scenarios",
+        "make demo-road-fire"
+      ]
+    },
+    {
+      "id": "G206",
+      "work_package": "WP2",
+      "title": "oracle和反例全覆盖",
+      "acceptance": "单向/唯一桥/转弯/平面交叉/无事件/权限反例",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-network",
+        "make test-scenarios",
+        "make demo-road-fire"
+      ]
+    },
+    {
+      "id": "G207",
+      "work_package": "WP2",
+      "title": "Road/Fire全部通过typed Actions形成Scenario overlay",
+      "acceptance": "AddRoadRestriction/CreateFireIncident等precondition校验、atomic commit、ActionRecord/replay；不覆写baseline",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-scenarios",
+        "make test-actions",
+        "make demo-road-fire"
+      ]
+    },
+    {
+      "id": "G301",
+      "work_package": "WP3",
+      "title": "真实typed temporal KG投影",
+      "acceptance": "跨道路/公交/设施、provenance、方向和窗口审计",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-graph",
+        "make test-ppr",
+        "make test-systemone-contract",
+        "make test-systemone-local",
+        "make demo-ranking"
+      ]
+    },
+    {
+      "id": "G302",
+      "work_package": "WP3",
+      "title": "CSR PPR及独立oracle",
+      "acceptance": "mass/residual/dangling/alpha，dense+NetworkX一致",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-graph",
+        "make test-ppr",
+        "make test-systemone-contract",
+        "make test-systemone-local",
+        "make demo-ranking"
+      ]
+    },
+    {
+      "id": "G303",
+      "work_package": "WP3",
+      "title": "paired delta可比较",
+      "acceptance": "相同U/s/alpha/policy hashes，no-op=0",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-graph",
+        "make test-ppr",
+        "make test-systemone-contract",
+        "make test-systemone-local",
+        "make demo-ranking"
+      ]
+    },
+    {
+      "id": "G304",
+      "work_package": "WP3",
+      "title": "真实本地Qwen System-One协议与PPR pipeline",
+      "acceptance": "本地Score批量→严格校验policy→真实图PPR，记录model/revision/calibration/latency/cache，无TypeSafe依赖",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-graph",
+        "make test-ppr",
+        "make test-systemone-contract",
+        "make test-systemone-local",
+        "make demo-ranking"
+      ]
+    },
+    {
+      "id": "G305",
+      "work_package": "WP3",
+      "title": "解释路径和类型内显示",
+      "acceptance": "路径引用真实edge，attention不伪装risk",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-graph",
+        "make test-ppr",
+        "make test-systemone-contract",
+        "make test-systemone-local",
+        "make demo-ranking"
+      ]
+    },
+    {
+      "id": "G306",
+      "work_package": "WP3",
+      "title": "防装饰消融钩子",
+      "acceptance": "neutral/permute/no-PPR modes及单relation取消反例",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-graph",
+        "make test-ppr",
+        "make test-systemone-contract",
+        "make test-systemone-local",
+        "make demo-ranking"
+      ]
+    },
+    {
+      "id": "G307",
+      "work_package": "WP3",
+      "title": "Ontology ProjectionSpec生成scenario graph",
+      "acceptance": "PPR只使用显式allowlist投影；audit/run/evidence对象默认不进PPR；projection/hash可审计",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-ontology",
+        "make test-graph",
+        "make test-ppr"
+      ]
+    },
+    {
+      "id": "G401",
+      "work_package": "WP4",
+      "title": "真实binary安装和adapter",
+      "acceptance": "版本锁、命令数组、logs、资源限额",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-sumo",
+        "make demo-sumo-pair",
+        "make test-cancel"
+      ]
+    },
+    {
+      "id": "G402",
+      "work_package": "WP4",
+      "title": "network/demand映射",
+      "acceptance": "有向edge到SUMO映射，same demand/seed，synthetic标签",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-sumo",
+        "make demo-sumo-pair",
+        "make test-cancel"
+      ]
+    },
+    {
+      "id": "G403",
+      "work_package": "WP4",
+      "title": "hard closure/class运行",
+      "acceptance": "禁止soft误用，多rerouter loop反例",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-sumo",
+        "make demo-sumo-pair",
+        "make test-cancel"
+      ]
+    },
+    {
+      "id": "G404",
+      "work_package": "WP4",
+      "title": "before/after metrics",
+      "acceptance": "arrived/unfinished/teleported完整分母，real输出",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-sumo",
+        "make demo-sumo-pair",
+        "make test-cancel"
+      ]
+    },
+    {
+      "id": "G405",
+      "work_package": "WP4",
+      "title": "取消和失败隔离",
+      "acceptance": "kill子进程、atomic产物、坏route不吞掉",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-sumo",
+        "make demo-sumo-pair",
+        "make test-cancel"
+      ]
+    },
+    {
+      "id": "G406",
+      "work_package": "WP4",
+      "title": "Helsinki代表场景可跑",
+      "acceptance": "bounded network和simulation coverage，未校准明确",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-sumo",
+        "make demo-sumo-pair",
+        "make test-cancel"
+      ]
+    },
+    {
+      "id": "G501",
+      "work_package": "WP5",
+      "title": "同一Web Component两宿主",
+      "acceptance": "MapLibre+vanilla，真正同build artifact，dispose不泄漏",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make build-web",
+        "make test-web",
+        "make test-browser",
+        "make demo-local"
+      ]
+    },
+    {
+      "id": "G502",
+      "work_package": "WP5",
+      "title": "地图→scenario→运行",
+      "acceptance": "道路/火灾输入、窗口/车种/assumption明确",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make build-web",
+        "make test-web",
+        "make test-browser",
+        "make demo-local"
+      ]
+    },
+    {
+      "id": "G503",
+      "work_package": "WP5",
+      "title": "进度取消失败体验",
+      "acceptance": "API真实job，不虚拟输出，不吞Qwen System-One错误",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make build-web",
+        "make test-web",
+        "make test-browser",
+        "make demo-local"
+      ]
+    },
+    {
+      "id": "G504",
+      "work_package": "WP5",
+      "title": "事实/attention/证据联动",
+      "acceptance": "before/after同标度，必查设施、why paths、模型状态",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make build-web",
+        "make test-web",
+        "make test-browser",
+        "make demo-local"
+      ]
+    },
+    {
+      "id": "G505",
+      "work_package": "WP5",
+      "title": "导出与重放入口",
+      "acceptance": "结果ZIP含完整manifest/metrics/sources，不含key",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make build-web",
+        "make test-web",
+        "make test-browser",
+        "make demo-local"
+      ]
+    },
+    {
+      "id": "G506",
+      "work_package": "WP5",
+      "title": "local安全/offline",
+      "acceptance": "same origin/token、恶意输入拒绝、offline零出网",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make build-web",
+        "make test-web",
+        "make test-browser",
+        "make demo-local"
+      ]
+    },
+    {
+      "id": "G507",
+      "work_package": "WP5",
+      "title": "Object-centric Web View与Action UI",
+      "acceptance": "点击对象展示identity/state/links/facts/attention/evidence/actions/history；UI不直接CRUD graph",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-web",
+        "make test-browser"
+      ]
+    },
+    {
+      "id": "G601",
+      "work_package": "WP6",
+      "title": "冻结48情景与独立labels",
+      "acceptance": "按母题/走廊split，模型无heldout访问",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-outcomes",
+        "make ablate",
+        "make benchmark",
+        "make report"
+      ]
+    },
+    {
+      "id": "G602",
+      "work_package": "WP6",
+      "title": "公平运行A0–A5",
+      "acceptance": "physical cache共享，真实本地Qwen System-One response冻结，A0–A5负对照完整，不因模型运行重跑SUMO",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-outcomes",
+        "make ablate",
+        "make benchmark",
+        "make report"
+      ]
+    },
+    {
+      "id": "G603",
+      "work_package": "WP6",
+      "title": "R1源事实复现审计",
+      "acceptance": "边界/方向/时间精度与公告对照，非数值准确性",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-outcomes",
+        "make ablate",
+        "make benchmark",
+        "make report"
+      ]
+    },
+    {
+      "id": "G604",
+      "work_package": "WP6",
+      "title": "F1真实地点情景审计",
+      "acceptance": "incident事实与假设分开，不冒称实际管制/响应",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-outcomes",
+        "make ablate",
+        "make benchmark",
+        "make report"
+      ]
+    },
+    {
+      "id": "G605",
+      "work_package": "WP6",
+      "title": "如有观测则独立数值验证",
+      "acceptance": "取得才评估，否则NOT_VALIDATED，不停工空转",
+      "status": "NOT_STARTED",
+      "required_for_v1": false,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-outcomes",
+        "make ablate",
+        "make benchmark",
+        "make report"
+      ]
+    },
+    {
+      "id": "G606",
+      "work_package": "WP6",
+      "title": "成本性能与负结果",
+      "acceptance": "raw metrics/置信区间适用性/预算/RSS/latency；无增益诚实报告",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make test-outcomes",
+        "make ablate",
+        "make benchmark",
+        "make report"
+      ]
+    },
+    {
+      "id": "G607",
+      "work_package": "WP6",
+      "title": "竞争功能矩阵与公平benchmark/reproduction",
+      "acceptance": "完成source-backed feature matrix、内部工程benchmark、至少一个外部OSS真实reproduction note；不同任务不强行总分",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L4",
+      "tests_scope": [
+        "make benchmark",
+        "make compare-neighbors",
+        "make report"
+      ]
+    },
+    {
+      "id": "G701",
+      "work_package": "WP7",
+      "title": "clean checkout重建",
+      "acceptance": "locks/container、文档命令实际可跑",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make clean-checkout-test",
+        "make security-check",
+        "make release-check"
+      ]
+    },
+    {
+      "id": "G702",
+      "work_package": "WP7",
+      "title": "全部must gates",
+      "acceptance": "contracts/network/KG/PPR/Qwen-System-One-local/SUMO/web/realcity/ablation/security/reproduce全部must gates",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make clean-checkout-test",
+        "make security-check",
+        "make release-check"
+      ]
+    },
+    {
+      "id": "G703",
+      "work_package": "WP7",
+      "title": "独立审查与mutation",
+      "acceptance": "关键错误必须被tests挡住，reviewer不伪称人类专家",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make clean-checkout-test",
+        "make security-check",
+        "make release-check"
+      ]
+    },
+    {
+      "id": "G704",
+      "work_package": "WP7",
+      "title": "许可隐私与数据分发",
+      "acceptance": "source attribution/SBOM/no secret/数据包许可单列",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make clean-checkout-test",
+        "make security-check",
+        "make release-check"
+      ]
+    },
+    {
+      "id": "G705",
+      "work_package": "WP7",
+      "title": "完成用户文档和演示",
+      "acceptance": "local安装、真实模式切换、限制/negative findings可见",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make clean-checkout-test",
+        "make security-check",
+        "make release-check"
+      ]
+    },
+    {
+      "id": "G706",
+      "work_package": "WP7",
+      "title": "准确声明完成与缺口",
+      "acceptance": "工程complete与measured validation分开，发布/推送需明确授权",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make clean-checkout-test",
+        "make security-check",
+        "make release-check"
+      ]
+    },
+    {
+      "id": "G707",
+      "work_package": "WP7",
+      "title": "Ontology/竞争比较发布审计",
+      "acceptance": "ontology/action/replay/projection gates、comparison sources、license/trademark wording与release artifacts完整",
+      "status": "NOT_STARTED",
+      "required_for_v1": true,
+      "evidence_files": [],
+      "loop": "L1",
+      "tests_scope": [
+        "make release-check",
+        "make test-ontology",
+        "make compare-neighbors"
+      ]
+    }
+  ]
+}
