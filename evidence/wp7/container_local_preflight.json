@@ -1,0 +1,22 @@
+{
+  "status": "BLOCKED_ENVIRONMENT",
+  "scope": "Local macOS preflight only; this is not a Linux container build or Docker smoke PASS",
+  "docker_daemon": "unavailable on this host",
+  "docker_build": "NOT_RUN",
+  "docker_smoke": "NOT_RUN",
+  "pinned_base_indexes": {
+    "node_22_23_2_bookworm_slim": "sha256:48e4b67d85f87bd551df43704e24d252f56cc5f8e9718841aace50f19948f0f9",
+    "python_3_12_13_slim_bookworm": "sha256:4766d8b510c428e595d74b9cc5bbb2fae8e26316fffb4adc89908d79aacd58a2"
+  },
+  "debian_snapshot": "20260920T000000Z",
+  "local_checks": {
+    "static_input_check": "PASS",
+    "python_syntax": "PASS",
+    "ruff_E4_E9_F_I": "PASS",
+    "native_same_smoke_api_http_action_run_export": "PASS",
+    "native_same_smoke_actual_sumo_pair": "PASS",
+    "native_sumo_version": "1.27.1",
+    "native_model_status": "BLOCKED_API_SETUP"
+  },
+  "next_gate": "GitHub Actions ubuntu-24.04 container job must build the pinned image and run deploy/container_smoke.py with Docker --network none; inspect the uploaded container-reproduction report and image digest."
+}
