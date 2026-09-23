@@ -5,6 +5,7 @@
     "S03-OSM": "07489394d83e34003a64f3aabc0b05669b6345bc3d02fbc550fc851c9f123c6d",
     "S03-GTFS": "0b12f3f5fb763a40f13d84d44f6026cec202c6cefa1e4851bb000bfe4a98679a"
   },
+  "extracted_source_fact_card_sha256": "0f86ac2063fc84d98741297b27379372434029cb582661ab3b83cc9268f2799e",
   "development_cases": [
     "synthetic-toy",
     "HEL-CITYRUN-20260515-16-current-network-whatif",

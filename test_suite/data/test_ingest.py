@@ -1,3 +1,4 @@
+import csv
 import json
 from datetime import date
 from pathlib import Path
@@ -16,18 +17,18 @@ def test_gtfs_service_day_overnight_and_calendar_exceptions():
         with pytest.raises(ValueError):
             parse_gtfs_time(bad)
     calendar = [
-        dict(
-            service_id="weekdays",
-            start_date="20260101",
-            end_date="20261231",
-            monday="1",
-            tuesday="1",
-            wednesday="1",
-            thursday="1",
-            friday="1",
-            saturday="0",
-            sunday="0",
-        )
+        {
+            "service_id": "weekdays",
+            "start_date": "20260101",
+            "end_date": "20261231",
+            "monday": "1",
+            "tuesday": "1",
+            "wednesday": "1",
+            "thursday": "1",
+            "friday": "1",
+            "saturday": "0",
+            "sunday": "0",
+        }
     ]
     exceptions = [
         {"service_id": "weekdays", "date": "20260515", "exception_type": "2"},
@@ -150,8 +151,77 @@ def test_evidence_cases_do_not_invent_hours_or_fire_perimeter():
     if not path.exists():
         pytest.skip("case-review command required")
     report = json.loads(path.read_text())
+    source_card_path = root / "cases/helsinki_cityrun_2026/case_evidence.json"
+    source_card = json.loads(source_card_path.read_text())
+    road = report["road_case"]
+    assert road["source_card"]["sha256"] == sha256_file(source_card_path)
+    assert road["source_fact_count"] == len(source_card["facts"])
+    assert road["motor_road_fact_count"] == sum("road_name" in f for f in source_card["facts"])
+    assert {g["fact_id"] for g in road["mapping"]} == {"R1", "R2", "R3"}
+    facts = {f["fact_id"]: f for f in source_card["facts"]}
+    for group in road["mapping"]:
+        assert group["source_fact"]["road_name"] == facts[group["fact_id"]]["road_name"]
+        assert group["source_card_sha256"] == road["source_card"]["sha256"]
+        assert group["review_status"] == "MACHINE_CANDIDATE_REQUIRES_HUMAN_REVIEW"
+    assert road["mapping"][0]["source_fact"]["to_landmark"] == facts["R1"]["to_landmark"]
+    assert road["mapping"][2]["source_fact"]["announced_date_range"] == facts["R3"]["announced_date_range"]
+    assert road["mapping"][2]["source_fact"]["time_precision"] == "date_range_only"
+    assert road["pedestrian_cycle_notice"]["times_local"] == facts["R4"]["times_local"]
+    with (root / "evidence/wp1/directed_road_mapping.csv").open(newline="") as stream:
+        rows = list(csv.DictReader(stream))
+    assert {row["fact_id"] for row in rows} == {"R1", "R2", "R3", "F1"}
+    assert all(row["exact_start"] == row["exact_end"] == "unknown" for row in rows)
+    assert all(
+        row["source_card_sha256"] == road["source_card"]["sha256"] for row in rows if row["fact_id"] != "F1"
+    )
+    assert {row["source_time_precision"] for row in rows if row["fact_id"] == "R3"} == {"date_range_only"}
     assert report["human_review_status"] == "PENDING"
     assert all(m["exact_start"] is None and m["exact_end"] is None for m in report["road_case"]["mapping"])
     assert report["fire_case"]["incident_facts"]["actual_cordon"] is None
     assert report["fire_case"]["incident_facts"]["building_coordinate"] is None
     assert report["fire_case"]["measured_prediction_validated"] is False
+
+
+@pytest.mark.parametrize(
+    "drift",
+    [
+        "new_fact",
+        "duplicate_fact",
+        "road_name",
+        "direction",
+        "endpoint",
+        "r3_date",
+        "r3_endpoint",
+        "known_hour",
+        "baana_scope",
+    ],
+)
+def test_road_case_card_must_match_candidate_mapping(tmp_path, drift):
+    from urbanimpact.citypack.cases import _validated_road_notice
+
+    root = Path(__file__).resolve().parents[2]
+    card = json.loads((root / "cases/helsinki_cityrun_2026/case_evidence.json").read_text())
+    assert _validated_road_notice(root / "cases/helsinki_cityrun_2026/case_evidence.json")[0] == card
+    facts = {fact["fact_id"]: fact for fact in card["facts"]}
+    if drift == "new_fact":
+        card["facts"].append({"fact_id": "R5", "road_name": "Extra road"})
+    elif drift == "duplicate_fact":
+        card["facts"].append(dict(facts["R1"]))
+    elif drift == "road_name":
+        facts["R2"]["road_name"] = "Another street"
+    elif drift == "direction":
+        facts["R1"]["direction"] = "northbound"
+    elif drift == "endpoint":
+        facts["R1"]["to_landmark"] = "Another endpoint"
+    elif drift == "r3_date":
+        facts["R3"]["announced_date_range"] = ["2026-05-15"]
+    elif drift == "r3_endpoint":
+        facts["R3"]["to_landmark"] = "Another endpoint"
+    elif drift == "known_hour":
+        facts["R1"]["exact_start"] = "2026-05-16T10:00"
+    else:
+        facts["R4"]["mode_scope"] = ["driving"]
+    changed = tmp_path / "case_evidence.json"
+    changed.write_text(json.dumps(card))
+    with pytest.raises(ValueError):
+        _validated_road_notice(changed)

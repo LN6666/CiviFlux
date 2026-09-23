@@ -19,6 +19,90 @@ OPERA = {
     "geometry_method": "mean of OSM way vertices; approximate landmark anchor, not entrance",
 }
 
+# These source fields define the geometry-selection recipe below. A changed
+# announcement card needs an explicit new mapping review, not a silent reuse of
+# candidate edges selected for the old wording.
+ROAD_MAPPING_SOURCE_CONTRACT = {
+    "R1": {
+        "road_name": "Mannerheimintie",
+        "direction": "southbound",
+        "from_landmark": "Finnish National Opera and Ballet",
+        "to_landmark": "Pohjoinen rautatiekatu",
+    },
+    "R2": {
+        "road_name": "Helsinginkatu",
+        "direction": None,
+        "from_landmark": "Mannerheimintie",
+        "to_landmark": "Sturenkatu",
+    },
+    "R3": {"road_name": "Mäntymäentie", "direction": None},
+}
+
+
+def _validated_road_notice(path: Path) -> tuple[dict, dict[str, dict], dict]:
+    case = json.loads(path.read_text())
+    if (
+        case.get("case_id") != "HEL-CITYRUN-20260515-16"
+        or case.get("source_ids") != ["S01"]
+        or case.get("timezone") != "Europe/Helsinki"
+        or case.get("event_dates") != ["2026-05-15", "2026-05-16"]
+    ):
+        raise ValueError("R1 source card does not match the frozen case mapping")
+    facts = case.get("facts")
+    if not isinstance(facts, list) or any(not isinstance(f, dict) or not f.get("fact_id") for f in facts):
+        raise ValueError("R1 source card facts are invalid")
+    by_id = {fact["fact_id"]: fact for fact in facts}
+    if len(by_id) != len(facts) or set(by_id) != set(ROAD_MAPPING_SOURCE_CONTRACT) | {"R4"}:
+        raise ValueError("R1 source facts and candidate mapping IDs differ")
+    road_fact_ids = {fact_id for fact_id, fact in by_id.items() if "road_name" in fact}
+    if road_fact_ids != set(ROAD_MAPPING_SOURCE_CONTRACT):
+        raise ValueError("R1 source motor-road facts and mapping recipe differ")
+    for fact_id, expected in ROAD_MAPPING_SOURCE_CONTRACT.items():
+        fact = by_id[fact_id]
+        if any(fact.get(field) != value for field, value in expected.items()):
+            raise ValueError(f"{fact_id} source endpoints, road, or direction differ from mapping recipe")
+        if "exact_start" not in fact or "exact_end" not in fact:
+            raise ValueError(f"{fact_id} source time fields are missing")
+        if (
+            fact.get("evidence_kind") != "announced"
+            or fact.get("exact_start") is not None
+            or fact.get("exact_end") is not None
+        ):
+            raise ValueError(f"{fact_id} source time or evidence changed; mapping needs review")
+    if by_id["R3"].get("announced_date_range") != case["event_dates"]:
+        raise ValueError("R3 announced date range differs from the mapping scenario")
+    if any("announced_date_range" in by_id[fact_id] for fact_id in ("R1", "R2")):
+        raise ValueError("R1/R2 source date precision changed; mapping needs review")
+    if any(field in by_id["R3"] for field in ("from_landmark", "to_landmark")):
+        raise ValueError("R3 source endpoints changed; mapping needs review")
+    baana = by_id["R4"]
+    if (
+        baana.get("feature_name") != "Baana"
+        or baana.get("mode_scope") != ["walking", "cycling"]
+        or "road_name" in baana
+    ):
+        raise ValueError("Baana source scope changed; review the motor-road separation")
+    if not isinstance(baana.get("times_local"), list) or not baana["times_local"]:
+        raise ValueError("Baana source intervals are missing")
+    return case, by_id, baana
+
+
+def _source_road_fact(case: dict, fact: dict) -> dict:
+    date_range = fact.get("announced_date_range")
+    return {
+        "source_id": case["source_ids"][0],
+        "road_name": fact["road_name"],
+        "direction": fact.get("direction"),
+        "from_landmark": fact.get("from_landmark"),
+        "to_landmark": fact.get("to_landmark"),
+        "event_dates_context": case["event_dates"],
+        "announced_date_range": date_range,
+        "time_precision": "date_range_only" if date_range else "event_dates_context_only",
+        "exact_start": fact["exact_start"],
+        "exact_end": fact["exact_end"],
+        "evidence_kind": fact["evidence_kind"],
+    }
+
 
 def _named(edges, name):
     return [
@@ -152,16 +236,19 @@ def _review_map(path: Path, edges: list[dict], groups: list[dict], anchors: list
 def review(root: Path) -> dict:
     from urbanimpact.contracts import Scenario
 
+    source_card_path = root / "cases/helsinki_cityrun_2026/case_evidence.json"
+    source_case, source_facts, baana = _validated_road_notice(source_card_path)
+    source_card_sha256 = sha256_file(source_card_path)
     out = root / "evidence/wp1"
     out.mkdir(parents=True, exist_ok=True)
     pack_path = root / "data/citypacks/helsinki-current/citypack.json"
     pack = json.loads(pack_path.read_text())
     edges = pack["edges"]
     nodes = {n["id"]: n for n in pack["nodes"]}
-    manner = _named(edges, "Mannerheimintie")
-    northrail = _named(edges, "Pohjoinen Rautatiekatu")
-    helsing = _named(edges, "Helsinginkatu")
-    sturen = _named(edges, "Sturenkatu")
+    manner = _named(edges, source_facts["R1"]["road_name"])
+    northrail = _named(edges, source_facts["R1"]["to_landmark"])
+    helsing = _named(edges, source_facts["R2"]["road_name"])
+    sturen = _named(edges, source_facts["R2"]["to_landmark"])
     opera_anchor = _road_anchor(manner, [OPERA["lon"], OPERA["lat"]], nodes)
     south_anchors = _intersection(manner, northrail, nodes)
     lower_lat = min(a["lat"] for a in south_anchors)
@@ -176,7 +263,7 @@ def review(root: Path) -> dict:
     west_lon = min(a["lon"] for a in west)
     east_lon = max(a["lon"] for a in east)
     r2 = [e for e in helsing if west_lon <= sum(p[0] for p in e["geometry"]) / len(e["geometry"]) <= east_lon]
-    r3 = _named(edges, "Mäntymäentie")
+    r3 = _named(edges, source_facts["R3"]["road_name"])
     leon = _named(edges, "Leonkatu")
     if not all([r1, r2, r3, leon]):
         raise ValueError("named road mapping incomplete")
@@ -189,19 +276,23 @@ def review(root: Path) -> dict:
         ("R3", r3, "both directions assumed"),
         ("F1", [fire_edge], "illustrative directed edge assumption"),
     ]:
-        groups.append(
-            {
-                "fact_id": fact,
-                "directed_edge_ids": sorted(e["id"] for e in chosen),
-                "direction": direction,
-                "review_status": "MACHINE_CANDIDATE_REQUIRES_HUMAN_REVIEW",
-                "reviewed_by": "Codex data worker; not an independent human expert",
-                "review_method": "OSM name + landmark/intersection geometric bounds + directed centerline orientation",
-                "exact_start": None,
-                "exact_end": None,
-                "vehicle_exemptions": None,
-            }
-        )
+        group = {
+            "fact_id": fact,
+            "directed_edge_ids": sorted(e["id"] for e in chosen),
+            "direction": direction,
+            "review_status": "MACHINE_CANDIDATE_REQUIRES_HUMAN_REVIEW",
+            "reviewed_by": "Codex data worker; not an independent human expert",
+            "review_method": "OSM name + landmark/intersection geometric bounds + directed centerline orientation",
+            "exact_start": None,
+            "exact_end": None,
+            "vehicle_exemptions": None,
+        }
+        if fact in ROAD_MAPPING_SOURCE_CONTRACT:
+            group["source_fact"] = _source_road_fact(source_case, source_facts[fact])
+            group["source_card_sha256"] = source_card_sha256
+        groups.append(group)
+    if {g["fact_id"] for g in groups[:3]} != set(ROAD_MAPPING_SOURCE_CONTRACT):
+        raise ValueError("R1 candidate groups and source fact IDs differ")
     road_assumptions = [
         {
             "id": "R1-assumptions",
@@ -264,6 +355,15 @@ def review(root: Path) -> dict:
             stream,
             fieldnames=[
                 "fact_id",
+                "source_id",
+                "source_card_sha256",
+                "source_road_name",
+                "source_direction",
+                "source_from_landmark",
+                "source_to_landmark",
+                "source_event_dates_context",
+                "source_announced_date_range",
+                "source_time_precision",
                 "directed_edge_id",
                 "osm_sumo_id",
                 "road_name",
@@ -277,9 +377,19 @@ def review(root: Path) -> dict:
         writer.writeheader()
         for g in groups:
             for eid in g["directed_edge_ids"]:
+                source = g.get("source_fact", {})
                 writer.writerow(
                     {
                         "fact_id": g["fact_id"],
+                        "source_id": source.get("source_id", ""),
+                        "source_card_sha256": g.get("source_card_sha256", ""),
+                        "source_road_name": source.get("road_name", ""),
+                        "source_direction": source.get("direction") or "unknown",
+                        "source_from_landmark": source.get("from_landmark") or "unknown",
+                        "source_to_landmark": source.get("to_landmark") or "unknown",
+                        "source_event_dates_context": ";".join(source.get("event_dates_context", [])),
+                        "source_announced_date_range": ";".join(source.get("announced_date_range") or []),
+                        "source_time_precision": source.get("time_precision", ""),
                         "directed_edge_id": eid,
                         "osm_sumo_id": emap[eid]["external_id"],
                         "road_name": emap[eid]["name"],
@@ -341,6 +451,7 @@ def review(root: Path) -> dict:
         "schema_version": "1.0",
         "dataset_hash": sha256_file(pack_path),
         "source_hashes": {s["id"]: s["sha256"] for s in pack["sources"]},
+        "extracted_source_fact_card_sha256": source_card_sha256,
         "development_cases": [
             "synthetic-toy",
             "HEL-CITYRUN-20260515-16-current-network-whatif",
@@ -366,18 +477,30 @@ def review(root: Path) -> dict:
         "exit_code": 0,
         "citypack_id": pack["citypack_id"],
         "road_case": {
-            "source_id": "S01",
+            "source_id": source_case["source_ids"][0],
             "source_status": "rechecked_official_page2026-09-23",
+            "source_card": {
+                "path": str(source_card_path.relative_to(root)),
+                "sha256": source_card_sha256,
+                "case_id": source_case["case_id"],
+                "event_dates_context": source_case["event_dates"],
+                "timezone": source_case["timezone"],
+            },
             "mapping": groups[:3],
             "anchors": anchors,
             "unknown_hours_preserved": True,
-            "source_fact_count": 4,
-            "motor_road_fact_count": 3,
-            "candidate_mapped_fact_count": 3,
+            "source_fact_count": len(source_case["facts"]),
+            "motor_road_fact_count": sum("road_name" in fact for fact in source_case["facts"]),
+            "candidate_mapped_fact_count": len(groups[:3]),
             "human_accepted_mapping_count": 0,
             "geometry_precision": None,
             "pedestrian_cycle_notice": {
-                "feature": "Baana",
+                "source_id": source_case["source_ids"][0],
+                "fact_id": baana["fact_id"],
+                "feature": baana["feature_name"],
+                "mode_scope": baana["mode_scope"],
+                "times_local": baana["times_local"],
+                "time_precision": "explicit_local_intervals",
                 "motor_road_hours_inferred": False,
                 "status": "source fact retained in original case card; not compiled into motor-drivable reference",
             },
