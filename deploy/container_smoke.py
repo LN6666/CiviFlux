@@ -11,6 +11,7 @@ import hashlib
 import io
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -143,13 +144,37 @@ def check_sumo(workspace: Path) -> dict:
     from adapters.sumo.fixtures import dual_corridor
 
     city, scenario = dual_corridor()
-    pair = SumoAdapter().run_pair(
-        city,
-        scenario,
-        (Demand("synthetic-v0", ("sa", "ab", "bc", "ch")),),
-        workspace / "sumo",
-        Limits(duration_s=120, wallclock_s=30, max_vehicles=4, max_output_bytes=20_000_000),
-    )
+    adapter = SumoAdapter()
+    folder = workspace / "sumo"
+    try:
+        pair = adapter.run_pair(
+            city,
+            scenario,
+            (Demand("synthetic-v0", ("sa", "ab", "bc", "ch")),),
+            folder,
+            Limits(duration_s=120, wallclock_s=30, max_vehicles=4, max_output_bytes=20_000_000),
+        )
+    except BaseException as error:
+        # The temporary workspace is deleted after this function returns, so put
+        # the bounded native log and linker evidence into the CI JSON artifact.
+        diagnostic = {
+            "logs": {
+                path.name: path.read_text(errors="replace")[-2500:]
+                for path in sorted(folder.glob("*.log"))
+            },
+            "binaries": {"sumo": adapter.sumo, "netconvert": adapter.netconvert},
+        }
+        if sys.platform.startswith("linux") and shutil.which("ldd"):
+            diagnostic["ldd"] = {}
+            for name, binary in diagnostic["binaries"].items():
+                result = subprocess.run(
+                    ["ldd", binary], capture_output=True, text=True, timeout=10, check=False
+                )
+                diagnostic["ldd"][name] = {
+                    "exit_code": result.returncode,
+                    "output_tail": (result.stdout + result.stderr)[-6000:],
+                }
+        raise RuntimeError(f"SUMO pair failed: {error}; diagnostic={json.dumps(diagnostic, sort_keys=True)}") from error
     if pair["status"] != "PASS" or pair["engine"] != "real_local_sumo":
         raise RuntimeError("Actual SUMO pair did not pass")
     return {

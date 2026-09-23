@@ -1,0 +1,14 @@
+{
+  "status": "FAIL",
+  "scope": "Initial Linux container CI smoke, not a release PASS",
+  "github_actions_run": 35896321140,
+  "source_report": ".runtime/ci-container-35896321140/reproduction.json",
+  "git_commit": "f688276182cb7a0c1bca6a4ffcb74ee466bb546a",
+  "docker_build": "PASS",
+  "image_inspect": "PASS",
+  "image_os_arch": "linux/amd64",
+  "image_digest": "sha256:3108b8a2045f9f609cc895b9179b0ed52b86e02db835cf2ed1f717ff30174620",
+  "container_smoke": "FAIL",
+  "failure": "SUMO version executable exited 127 inside the runtime image; its ephemeral native log was not included in the first artifact.",
+  "next_check": "Capture bounded SUMO native log and Linux ldd output, then patch the image only against the observed missing dependency."
+}
