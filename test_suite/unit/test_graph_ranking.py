@@ -66,6 +66,35 @@ def test_no_event_delta_zero():
     assert all(x["delta_attention"] == 0 for x in compare(pair, ["bc"], weights)["records"])
 
 
+def test_projection_rejects_physical_facts_from_another_scenario():
+    city = toy_city()
+    closed = toy_scenario()
+    open_scenario = toy_scenario(closed=())
+    stale = Router().compare(city, closed)
+    assert stale["restrictions"] == ["bc"]
+    assert open_scenario.restrictions == ()
+    with pytest.raises(ValueError, match="Physical facts restrictions"):
+        paired_projection(city, open_scenario, stale, digest({}))
+
+
+@pytest.mark.parametrize(
+    ("field", "wrong"),
+    [
+        ("network_hash", "0" * 64),
+        ("analysis_at", "2025-01-01T00:00:00+00:00"),
+        ("vehicle_class", "bus"),
+        ("restrictions", []),
+    ],
+)
+def test_projection_rejects_unbound_physical_fact_context(field, wrong):
+    city = toy_city()
+    scenario = toy_scenario()
+    facts = Router().compare(city, scenario)
+    facts[field] = wrong
+    with pytest.raises(ValueError, match=f"Physical facts {field}"):
+        paired_projection(city, scenario, facts, digest({}))
+
+
 def test_policy_multi_type_and_single_type_invariance(pair):
     g = pair["baseline"]
     a = {t: 1 for t in RELATION_DEFINITIONS}

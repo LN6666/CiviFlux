@@ -109,6 +109,20 @@ def project(objects: list[OntologyObject], links: list[Link], spec: ProjectionSp
 
 
 def paired_projection(city: CityPack, scenario: Scenario, facts: dict, policy_hash: str) -> dict:
+    from .network import compile_restrictions
+
+    # Cached physical results must describe this exact network and operational instant.
+    # Their own checksum proves integrity, but cannot prove that they belong to this run.
+    expected_context = {
+        "network_hash": digest(city),
+        "analysis_at": scenario.analysis_at.isoformat(),
+        "vehicle_class": scenario.analysis_vehicle_class,
+        "restrictions": sorted(compile_restrictions(city, scenario, scenario.analysis_vehicle_class)),
+    }
+    for field, expected in expected_context.items():
+        if facts.get(field) != expected:
+            raise ValueError(f"Physical facts {field} does not match city/scenario context")
+
     objects = city_objects(city)
     profile = MANIFEST["projections"][0]
     links = {"baseline": [], "event": [], "dependency_evidence": []}
@@ -130,7 +144,7 @@ def paired_projection(city: CityPack, scenario: Scenario, facts: dict, policy_ha
             links[side].append(link)
             link_ids[side].add(link.id)
 
-    blocked = set(facts.get("restrictions", []))
+    blocked = set(expected_context["restrictions"])
     # Router-derived connections change only the operational graph; restricted assets remain in U.
     edge_classes = {e.id: set(e.allowed_vehicle_classes) for e in city.edges}
     for c in city.connections or ():
@@ -205,7 +219,7 @@ def paired_projection(city: CityPack, scenario: Scenario, facts: dict, policy_ha
             allowed_object_types=profile["allowed_object_types"],
             allowed_link_types=profile["allowed_link_types"],
             relation_policy_hash=policy_hash,
-            source_snapshot_hash=digest(city),
+            source_snapshot_hash=expected_context["network_hash"],
         )
         pair[side] = project(objects, links[side], spec)
     if pair["baseline"]["node_universe_hash"] != pair["event"]["node_universe_hash"]:
