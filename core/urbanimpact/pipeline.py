@@ -114,17 +114,19 @@ class AnalysisService:
         scores = {name: 1.0 for name in RELATION_DEFINITIONS}
         policy = None
         provider = "rules"
+        policy_epsilon = 0.1
         if scenario.ranking in ("A3", "A4"):
             checkpoint("system_one_api")
             if self.policy_backend is None:
                 raise RuntimeError("BLOCKED_API_SETUP: configure SimpleJev endpoint and call budget")
             policy = self.policy_backend.score_relations(scenario.objective, RELATION_DEFINITIONS)
             scores = policy["scores"]
+            policy_epsilon = policy["epsilon"]
             provider = policy["provider_mode"]
         pair = paired_projection(city, scenario, facts, digest(scores))
         checkpoint("ranking")
         if scenario.ranking in ("A2", "A3", "A5"):
-            attention = compare(pair, scenario.seed_spec.entity_ids, scores)
+            attention = compare(pair, scenario.seed_spec.entity_ids, scores, epsilon=policy_epsilon)
             if policy:
                 policy["applied_transition_hash"] = digest(attention["transition_hashes"])
         elif scenario.ranking == "A1":
@@ -147,7 +149,9 @@ class AnalysisService:
                 "convergence": None,
             }
         elif scenario.ranking == "A4":
-            attention = direct_relation_rank(pair, scores, [facility.id for facility in city.facilities])
+            attention = direct_relation_rank(
+                pair, scores, [facility.id for facility in city.facilities], epsilon=policy_epsilon
+            )
             policy["applied_transition_hash"] = digest(attention["transition_hashes"])
         else:
             attention = {"kind": "physical_facts_only", "records": [], "convergence": None}

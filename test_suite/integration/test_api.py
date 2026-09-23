@@ -59,7 +59,7 @@ def test_a4_direct_control_uses_test_policy_without_ppr_or_paid_egress(tmp_path)
     class FixedTestPolicy:
         def score_relations(self, objective, definitions):
             assert objective == 'facility_access'
-            return {'provider_mode': 'mock_test', 'scores': {name: 0.5 for name in definitions}}
+            return {'provider_mode': 'mock_test', 'scores': {name: 0.5 for name in definitions}, 'epsilon': 0.2}
 
     with TestClient(create_app(tmp_path, [toy_city()], policy_backend=FixedTestPolicy())) as api:
         api.headers['Authorization'] = 'Bearer ' + api.get('/api/v1/session').json()['token']
@@ -71,6 +71,7 @@ def test_a4_direct_control_uses_test_policy_without_ppr_or_paid_egress(tmp_path)
         assert result['attention']['candidate_ids'] == ['hospital']
         assert len(result['attention']['records']) == 1
         assert result['attention']['convergence'] is None
+        assert result['attention']['epsilon'] == result['policy']['epsilon'] == 0.2
         assert result['facts']['od'][0]['event']['status'] == 'unreachable'
         assert api.get('/api/v1/runs/' + run_id + '/export').status_code == 200
 

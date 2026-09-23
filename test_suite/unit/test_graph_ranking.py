@@ -77,6 +77,7 @@ def test_a4_direct_relation_control_has_candidates_without_ppr(tmp_path, monkeyp
             return {
                 "provider_mode": "mock_test",
                 "scores": {name: (0.2 if name == "ROAD_CONNECTS_TO" else 0.8) for name in definitions},
+                "epsilon": 0.25,
             }
 
     city = toy_city()
@@ -98,8 +99,34 @@ def test_a4_direct_relation_control_has_candidates_without_ppr(tmp_path, monkeyp
     assert len(attention["records"]) == 1
     assert np.isfinite(attention["records"][0]["delta_attention"])
     assert attention["convergence"] is None and attention["comparable"] is True
+    assert attention["epsilon"] == result.policy["epsilon"] == 0.25
     assert result.policy["applied_transition_hash"] == digest(attention["transition_hashes"])
     assert result.provider_mode == "mock_test"
+
+
+def test_a3_uses_recorded_policy_epsilon(tmp_path):
+    from urbanimpact.contracts import Scenario
+    from urbanimpact.pipeline import AnalysisService
+
+    class FixedPolicy:
+        def score_relations(self, _objective, definitions):
+            return {
+                "provider_mode": "mock_test",
+                "scores": {name: 0.5 for name in definitions},
+                "epsilon": 0.3,
+            }
+
+    scenario = Scenario.model_validate({**toy_scenario().model_dump(mode="json"), "ranking": "A3"})
+    result = AnalysisService(tmp_path / "cache", FixedPolicy()).run(
+        toy_city(),
+        scenario,
+        "a3-epsilon",
+        tmp_path / "run",
+        overlay_hash=digest(scenario),
+        action_log_hash=digest([]),
+    )
+    assert result.attention["epsilon"] == result.policy["epsilon"] == 0.3
+    assert result.attention["convergence"] is True
 
 
 def test_a4_no_event_direct_delta_zero_and_rejects_tampered_pair():
