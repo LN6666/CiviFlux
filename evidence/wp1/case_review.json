@@ -6,6 +6,16 @@
   "road_case": {
     "source_id": "S01",
     "source_status": "rechecked_official_page2026-09-23",
+    "source_card": {
+      "path": "cases/helsinki_cityrun_2026/case_evidence.json",
+      "sha256": "0f86ac2063fc84d98741297b27379372434029cb582661ab3b83cc9268f2799e",
+      "case_id": "HEL-CITYRUN-20260515-16",
+      "event_dates_context": [
+        "2026-05-15",
+        "2026-05-16"
+      ],
+      "timezone": "Europe/Helsinki"
+    },
     "mapping": [
       {
         "fact_id": "R1",
@@ -47,7 +57,24 @@
         "review_method": "OSM name + landmark/intersection geometric bounds + directed centerline orientation",
         "exact_start": null,
         "exact_end": null,
-        "vehicle_exemptions": null
+        "vehicle_exemptions": null,
+        "source_fact": {
+          "source_id": "S01",
+          "road_name": "Mannerheimintie",
+          "direction": "southbound",
+          "from_landmark": "Finnish National Opera and Ballet",
+          "to_landmark": "Pohjoinen rautatiekatu",
+          "event_dates_context": [
+            "2026-05-15",
+            "2026-05-16"
+          ],
+          "announced_date_range": null,
+          "time_precision": "event_dates_context_only",
+          "exact_start": null,
+          "exact_end": null,
+          "evidence_kind": "announced"
+        },
+        "source_card_sha256": "0f86ac2063fc84d98741297b27379372434029cb582661ab3b83cc9268f2799e"
       },
       {
         "fact_id": "R2",
@@ -100,7 +127,24 @@
         "review_method": "OSM name + landmark/intersection geometric bounds + directed centerline orientation",
         "exact_start": null,
         "exact_end": null,
-        "vehicle_exemptions": null
+        "vehicle_exemptions": null,
+        "source_fact": {
+          "source_id": "S01",
+          "road_name": "Helsinginkatu",
+          "direction": null,
+          "from_landmark": "Mannerheimintie",
+          "to_landmark": "Sturenkatu",
+          "event_dates_context": [
+            "2026-05-15",
+            "2026-05-16"
+          ],
+          "announced_date_range": null,
+          "time_precision": "event_dates_context_only",
+          "exact_start": null,
+          "exact_end": null,
+          "evidence_kind": "announced"
+        },
+        "source_card_sha256": "0f86ac2063fc84d98741297b27379372434029cb582661ab3b83cc9268f2799e"
       },
       {
         "fact_id": "R3",
@@ -132,7 +176,27 @@
         "review_method": "OSM name + landmark/intersection geometric bounds + directed centerline orientation",
         "exact_start": null,
         "exact_end": null,
-        "vehicle_exemptions": null
+        "vehicle_exemptions": null,
+        "source_fact": {
+          "source_id": "S01",
+          "road_name": "Mäntymäentie",
+          "direction": null,
+          "from_landmark": null,
+          "to_landmark": null,
+          "event_dates_context": [
+            "2026-05-15",
+            "2026-05-16"
+          ],
+          "announced_date_range": [
+            "2026-05-15",
+            "2026-05-16"
+          ],
+          "time_precision": "date_range_only",
+          "exact_start": null,
+          "exact_end": null,
+          "evidence_kind": "announced"
+        },
+        "source_card_sha256": "0f86ac2063fc84d98741297b27379372434029cb582661ab3b83cc9268f2799e"
       }
     ],
     "anchors": [
@@ -218,7 +282,24 @@
     "human_accepted_mapping_count": 0,
     "geometry_precision": null,
     "pedestrian_cycle_notice": {
+      "source_id": "S01",
+      "fact_id": "R4",
       "feature": "Baana",
+      "mode_scope": [
+        "walking",
+        "cycling"
+      ],
+      "times_local": [
+        [
+          "2026-05-15T20:00",
+          "2026-05-15T20:45"
+        ],
+        [
+          "2026-05-16T09:40",
+          "2026-05-16T15:40"
+        ]
+      ],
+      "time_precision": "explicit_local_intervals",
       "motor_road_hours_inferred": false,
       "status": "source fact retained in original case card; not compiled into motor-drivable reference"
     },
@@ -306,7 +387,7 @@
     },
     {
       "path": "evidence/wp1/directed_road_mapping.csv",
-      "sha256": "4ce05dfc4fa16cf603f5b2a72378c9f79f0a29df78edf35e5577de6800679f46"
+      "sha256": "79eda2ed95f3d3b94ad546ffca7aace4ee6985694806662edd9dd38382bb2660"
     },
     {
       "path": "evidence/wp1/directed_road_review.html",
@@ -318,7 +399,7 @@
     },
     {
       "path": "evidence/wp1/evaluation_split_manifest.json",
-      "sha256": "0dc0840246a2aa6c0f3a8a9b0fb2de487d5cd5a7f38086936f0ef96228fd060d"
+      "sha256": "ae1cf2ed469f14d0b91799c8f427bc375fac3c68ac0336e6aaecb43d80a68d72"
     },
     {
       "path": "evidence/wp1/missing_data_report.json",
