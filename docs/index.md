@@ -9,6 +9,7 @@
 | 本次对话每项用户要求落实在哪里 | [USER_REQUIREMENTS_TRACE](USER_REQUIREMENTS_TRACE.md) |
 | 用户决定及旧方案覆盖关系 | [USER_DECISIONS](../execution/USER_DECISIONS.md) |
 | 怎样安装、运行、测试、看失败 | [CURRENT_RUNBOOK](CURRENT_RUNBOOK.md) |
+| Helsinki 官方单位与入口的独立证据 | [SERVICE_MAP_ENTRANCE_EVIDENCE](SERVICE_MAP_ENTRANCE_EVIDENCE.md)；道路接入仍未核验 |
 | 代码职责、数据流、扩展位置 | [CURRENT_ARCHITECTURE](CURRENT_ARCHITECTURE.md) |
 | 新开发者如何接手 | [DEVELOPMENT](../DEVELOPMENT.md) |
 | 工程约束与交付标准 | [CONTRIBUTING](../CONTRIBUTING.md) |
