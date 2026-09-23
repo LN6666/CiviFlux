@@ -22,6 +22,7 @@ FINLAND_METRIC = "EPSG:3067"
 REVIEW_RADIUS_M = 150.0
 MAX_CANDIDATES = 5
 VEHICLE_CLASSES = ("passenger", "emergency", "pedestrian")
+REVIEW_VEHICLE_CLASSES = ("passenger", "emergency")
 SHA256 = re.compile(r"[0-9a-f]{64}\Z")
 
 
@@ -29,8 +30,8 @@ SHA256 = re.compile(r"[0-9a-f]{64}\Z")
 class _ProjectedEdge:
     edge: Edge
     line: LineString
-    incoming_turns: dict[str, int]
-    outgoing_turns: dict[str, int]
+    incoming_turns: dict[str, int] | None
+    outgoing_turns: dict[str, int] | None
 
 
 def _validated_hash(value: str, label: str) -> str:
@@ -41,13 +42,15 @@ def _validated_hash(value: str, label: str) -> str:
 
 def _projected_edges(citypack: CityPack, forward: Transformer) -> list[_ProjectedEdge]:
     nodes = {node.id: node for node in citypack.nodes}
-    incoming = {edge.id: {vehicle: 0 for vehicle in VEHICLE_CLASSES} for edge in citypack.edges}
-    outgoing = {edge.id: {vehicle: 0 for vehicle in VEHICLE_CLASSES} for edge in citypack.edges}
-    for connection in citypack.connections or ():
-        for vehicle in VEHICLE_CLASSES:
-            if vehicle in connection.allowed_vehicle_classes:
-                incoming[connection.to_edge][vehicle] += 1
-                outgoing[connection.from_edge][vehicle] += 1
+    incoming = outgoing = None
+    if citypack.connections is not None:
+        incoming = {edge.id: {vehicle: 0 for vehicle in VEHICLE_CLASSES} for edge in citypack.edges}
+        outgoing = {edge.id: {vehicle: 0 for vehicle in VEHICLE_CLASSES} for edge in citypack.edges}
+        for connection in citypack.connections:
+            for vehicle in VEHICLE_CLASSES:
+                if vehicle in connection.allowed_vehicle_classes:
+                    incoming[connection.to_edge][vehicle] += 1
+                    outgoing[connection.from_edge][vehicle] += 1
 
     projected = []
     for edge in citypack.edges:
@@ -60,8 +63,43 @@ def _projected_edges(citypack: CityPack, forward: Transformer) -> list[_Projecte
         line = LineString([forward.transform(lon, lat) for lon, lat in geometry])
         if line.is_empty or line.length <= 0:
             raise ValueError(f"Road edge {edge.id} has degenerate geometry")
-        projected.append(_ProjectedEdge(edge, line, incoming[edge.id], outgoing[edge.id]))
+        projected.append(
+            _ProjectedEdge(
+                edge,
+                line,
+                incoming[edge.id] if incoming is not None else None,
+                outgoing[edge.id] if outgoing is not None else None,
+            )
+        )
     return projected
+
+
+def _candidate_row(hit: tuple, reverse: Transformer, review_radius_m: float, source_hashes: dict) -> dict:
+    separation, _, road, measure, closest = hit
+    closest_lon, closest_lat = reverse.transform(closest.x, closest.y)
+    edge = road.edge
+    return {
+        "directed_edge_id": edge.id,
+        "external_road_id": edge.external_id,
+        "road_name": edge.name,
+        "from_node_id": edge.source,
+        "to_node_id": edge.target,
+        "distance_to_edge_m": round(separation, 2),
+        "within_review_radius": separation <= review_radius_m,
+        "closest_point_lon_lat": [round(closest_lon, 7), round(closest_lat, 7)],
+        "fraction_along_directed_edge": round(measure / road.line.length, 6),
+        "imported_allowed_vehicle_classes": list(edge.allowed_vehicle_classes),
+        "imported_access_evidence": edge.access_evidence,
+        "turn_coverage": (
+            "CITYPACK_CONNECTION_LIST_PRESENT"
+            if road.incoming_turns is not None
+            else "UNKNOWN_CONNECTION_LIST_MISSING"
+        ),
+        "incoming_turn_counts": road.incoming_turns,
+        "outgoing_turn_counts": road.outgoing_turns,
+        "road_source_id": edge.source_id,
+        "road_source_declared_sha256": source_hashes[edge.source_id],
+    }
 
 
 def assess_road_candidates(
@@ -97,6 +135,11 @@ def assess_road_candidates(
     forward = Transformer.from_crs(WGS84, FINLAND_METRIC, always_xy=True)
     reverse = Transformer.from_crs(FINLAND_METRIC, WGS84, always_xy=True)
     roads = _projected_edges(citypack, forward)
+    turn_coverage = (
+        "CITYPACK_CONNECTION_LIST_PRESENT"
+        if citypack.connections is not None
+        else "UNKNOWN_CONNECTION_LIST_MISSING"
+    )
     rows = []
     for case in snapshot["cases"]:
         source_facility = case["osm_facility"]
@@ -122,28 +165,15 @@ def assess_road_candidates(
                 closest = road.line.interpolate(measure)
                 nearest.append((point.distance(closest), road.edge.id, road, measure, closest))
             nearest.sort(key=lambda row: (row[0], row[1]))
-            candidate_rows = []
-            for separation, _, road, measure, closest in nearest[:max_candidates]:
-                closest_lon, closest_lat = reverse.transform(closest.x, closest.y)
-                edge = road.edge
-                candidate_rows.append(
-                    {
-                        "directed_edge_id": edge.id,
-                        "external_road_id": edge.external_id,
-                        "road_name": edge.name,
-                        "from_node_id": edge.source,
-                        "to_node_id": edge.target,
-                        "distance_to_edge_m": round(separation, 2),
-                        "within_review_radius": separation <= review_radius_m,
-                        "closest_point_lon_lat": [round(closest_lon, 7), round(closest_lat, 7)],
-                        "fraction_along_directed_edge": round(measure / road.line.length, 6),
-                        "imported_allowed_vehicle_classes": list(edge.allowed_vehicle_classes),
-                        "imported_access_evidence": edge.access_evidence,
-                        "incoming_turn_counts": road.incoming_turns,
-                        "outgoing_turn_counts": road.outgoing_turns,
-                        "road_source_id": edge.source_id,
-                        "road_source_declared_sha256": source_hashes[edge.source_id],
-                    }
+            candidate_rows = [
+                _candidate_row(hit, reverse, review_radius_m, source_hashes)
+                for hit in nearest[:max_candidates]
+            ]
+            nearest_permitted = {}
+            for vehicle in REVIEW_VEHICLE_CLASSES:
+                hit = next((hit for hit in nearest if vehicle in hit[2].edge.allowed_vehicle_classes), None)
+                nearest_permitted[vehicle] = (
+                    _candidate_row(hit, reverse, review_radius_m, source_hashes) if hit is not None else None
                 )
             entrances.append(
                 {
@@ -155,6 +185,7 @@ def assess_road_candidates(
                     "official_point_lon_lat": [longitude, latitude],
                     "facility_identity_status": identity["identity_status"],
                     "candidate_directed_edges": candidate_rows,
+                    "nearest_imported_vehicle_permitted_edges": nearest_permitted,
                     "road_access_status": "NOT_VERIFIED",
                     "directed_road_node_id": None,
                     "needs_human_review": True,
@@ -194,6 +225,7 @@ def assess_road_candidates(
         "osm_source_license": snapshot["osm_source"]["license"],
         "citypack_id": citypack.citypack_id,
         "network_temporality": citypack.network_temporality,
+        "turn_coverage": turn_coverage,
         "distance_crs": FINLAND_METRIC,
         "review_radius_m": review_radius_m,
         "max_candidates_per_entrance": max_candidates,

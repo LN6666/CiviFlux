@@ -104,14 +104,14 @@ def _citypack(snapshot: dict) -> CityPack:
     )
 
 
-def _assess(snapshot: dict, citypack: CityPack) -> dict:
+def _assess(snapshot: dict, citypack: CityPack, *, max_candidates: int = 2) -> dict:
     return assess_road_candidates(
         snapshot,
         citypack,
         snapshot_sha256="a" * 64,
         citypack_sha256="b" * 64,
         review_radius_m=20,
-        max_candidates=2,
+        max_candidates=max_candidates,
     )
 
 
@@ -146,7 +146,75 @@ def test_project_to_directed_edge_not_centroid_or_endpoint_and_keep_review_bound
     assert eastbound["from_node_id"] == westbound["to_node_id"]
     assert eastbound["outgoing_turn_counts"] == {"passenger": 1, "emergency": 0, "pedestrian": 0}
     assert westbound["incoming_turn_counts"] == {"passenger": 1, "emergency": 0, "pedestrian": 0}
+    assert eastbound["turn_coverage"] == "CITYPACK_CONNECTION_LIST_PRESENT"
     assert eastbound["imported_access_evidence"] == "synthetic-imported-permission"
+    assert entrance["nearest_imported_vehicle_permitted_edges"]["passenger"]["directed_edge_id"] in {
+        "osm:edge:eastbound",
+        "osm:edge:westbound",
+    }
+
+
+def test_missing_connection_list_has_unknown_turn_counts_not_false_zero():
+    snapshot = _snapshot_case("Tölö gymnasium")
+    citypack = _citypack(snapshot)
+    no_turn_data = CityPack.model_validate({**citypack.model_dump(mode="json"), "connections": None})
+    report = _assess(snapshot, no_turn_data)
+    assert report["turn_coverage"] == "UNKNOWN_CONNECTION_LIST_MISSING"
+    entrance = report["cases"][0]["inspected_official_unit_entrances"][0]
+    for candidate in entrance["candidate_directed_edges"]:
+        assert candidate["turn_coverage"] == "UNKNOWN_CONNECTION_LIST_MISSING"
+        assert candidate["incoming_turn_counts"] is None
+        assert candidate["outgoing_turn_counts"] is None
+    for candidate in entrance["nearest_imported_vehicle_permitted_edges"].values():
+        assert candidate["incoming_turn_counts"] is None
+        assert candidate["outgoing_turn_counts"] is None
+
+
+def test_nearest_vehicle_permitted_edge_survives_disallowed_top_five():
+    snapshot = _snapshot_case("Tölö gymnasium")
+    base = _citypack(snapshot).model_dump(mode="json")
+    official = snapshot["cases"][0]["inspected_entrances"][0]["record"]
+    forward = Transformer.from_crs("EPSG:4326", "EPSG:3067", always_xy=True)
+    reverse = Transformer.from_crs("EPSG:3067", "EPSG:4326", always_xy=True)
+    x, y = forward.transform(float(official["longitude"]), float(official["latitude"]))
+    for offset in range(1, 6):
+        west_id, east_id = f"osm:node:nearwest{offset}", f"osm:node:neareast{offset}"
+        west = reverse.transform(x - 100, y + offset)
+        east = reverse.transform(x + 100, y + offset)
+        base["nodes"].extend(
+            [
+                {"id": west_id, "lon": west[0], "lat": west[1]},
+                {"id": east_id, "lon": east[0], "lat": east[1]},
+            ]
+        )
+        base["edges"].append(
+            {
+                "id": f"osm:edge:pedestrian{offset}",
+                "source": west_id,
+                "target": east_id,
+                "length_m": 200,
+                "speed_kph": 5,
+                "allowed_vehicle_classes": ["pedestrian"],
+                "geometry": [west, east],
+                "source_id": "S03-OSM",
+                "external_id": f"test-pedestrian-{offset}",
+                "access_evidence": "synthetic-pedestrian-only",
+            }
+        )
+    citypack = CityPack.model_validate(base)
+    report = _assess(snapshot, citypack, max_candidates=5)
+    entrance = report["cases"][0]["inspected_official_unit_entrances"][0]
+    top_five = entrance["candidate_directed_edges"]
+    assert len(top_five) == 5
+    assert all("passenger" not in edge["imported_allowed_vehicle_classes"] for edge in top_five)
+    assert all("emergency" not in edge["imported_allowed_vehicle_classes"] for edge in top_five)
+    for vehicle in ("passenger", "emergency"):
+        nearest = entrance["nearest_imported_vehicle_permitted_edges"][vehicle]
+        assert nearest["directed_edge_id"] not in {edge["directed_edge_id"] for edge in top_five}
+        assert nearest["distance_to_edge_m"] == 10.0
+        assert nearest["road_source_declared_sha256"] == snapshot["osm_source"]["sha256"]
+        assert nearest["turn_coverage"] == "CITYPACK_CONNECTION_LIST_PRESENT"
+        assert entrance["road_access_status"] == "NOT_VERIFIED"
 
 
 def test_unmatched_unit_entrance_stays_unlinked_even_when_road_is_nearby():
@@ -181,10 +249,14 @@ def test_saved_real_report_keeps_all_five_cases_and_seven_inspected_points_unver
     assert report["status"] == "CANDIDATES_ONLY_NOT_VERIFIED"
     assert report["network_temporality"] == "current_snapshot"
     assert report["distance_crs"] == "EPSG:3067"
+    assert report["turn_coverage"] == "CITYPACK_CONNECTION_LIST_PRESENT"
     assert all(case["directed_road_node_id"] is None for case in report["cases"])
     entrances = [e for case in report["cases"] for e in case["inspected_official_unit_entrances"]]
     assert all(e["road_access_status"] == "NOT_VERIFIED" for e in entrances)
     assert all(len(e["candidate_directed_edges"]) == 5 for e in entrances)
+    assert all(
+        set(e["nearest_imported_vehicle_permitted_edges"]) == {"passenger", "emergency"} for e in entrances
+    )
 
 
 def test_cli_requires_explicit_local_citypack(monkeypatch):
