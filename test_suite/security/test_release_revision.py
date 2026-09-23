@@ -42,6 +42,10 @@ def fixture(tmp_path: Path) -> tuple[Path, dict]:
     (repo / "core").mkdir(parents=True)
     (repo / "docs").mkdir()
     (repo / "evidence").mkdir()
+    (repo / "evidence" / "wp2").mkdir()
+    (repo / "evidence" / "wp2" / "helsinki_formal_boundary_case.json").write_text(
+        '{"status":"PASS_SCOPED_CURRENT_NETWORK_CASE_REPLAY"}\n'
+    )
     (repo / "core" / "engine.py").write_text("RESULT = 1\n")
     (repo / "core" / "README.md").write_text("First API description.\n")
     (repo / "docs" / "note.md").write_text("First description.\n")
@@ -90,6 +94,18 @@ def test_old_pass_rejected_after_container_build_context_changes(tmp_path: Path)
         "stale PASS evidence" in error
         for error in check_current_revision(document, repo)
     )
+
+
+def test_old_pass_rejected_after_runtime_case_evidence_changes(tmp_path: Path) -> None:
+    repo, document = fixture(tmp_path)
+    report = repo / "evidence" / "wp2" / "helsinki_formal_boundary_case.json"
+    report.write_text('{"status":"NOT_VALIDATED"}\n')
+    assert any(
+        "uncommitted or untracked controlled inputs" in error
+        for error in check_current_revision(document, repo)
+    )
+    commit(repo, "change API boundary evidence")
+    assert all("stale PASS evidence" in error for error in check_current_revision(document, repo))
 
 
 def test_documentation_commit_does_not_invalidate_same_inputs(tmp_path: Path) -> None:
