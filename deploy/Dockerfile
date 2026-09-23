@@ -17,7 +17,7 @@ RUN set -eux; \
       > /etc/apt/sources.list; \
     rm -f /etc/apt/sources.list.d/debian.sources; \
     apt-get update; \
-    apt-get install -y --no-install-recommends libgomp1 libgl1 libglu1-mesa; \
+    apt-get install -y --no-install-recommends libgomp1 libgl1 libglu1-mesa libxrender1; \
     rm -rf /var/lib/apt/lists/*
 RUN python -m pip install --no-cache-dir uv==0.11.23
 COPY pyproject.toml uv.lock .python-version ./

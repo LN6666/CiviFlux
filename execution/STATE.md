@@ -21,18 +21,19 @@
 
 ## 已发布与核验
 
-- 当前完整 Python 检查 220 通过（包括 66 项原参考检查与本轮 SUMO/SBOM 专项检查），浏览器套件 10 项通过。干净检出、冻结依赖安装和隔离 wheel 运行均通过（7d217b8）。
-- 54 项验收逐项记录在 `execution/ACCEPTANCE.md`：42 PASS、10 PARTIAL、1 DEFERRED_USER、1 BLOCKED_EXTERNAL；strict release manifest 保留四项未过 gate，`engineering_complete=false`。
-- [公开 GitHub 仓库](https://github.com/LN6666/CiviFlux) 的 `main` 已推送；[最近已核验的 main CI](https://github.com/LN6666/CiviFlux/actions/runs/35887764508) 通过锁定安装、Python/数据/SUMO/安全、Web 构建及浏览器检查。`main` 已启用检查、代码所有者审查、线性历史、禁止强推/删除的保护；新分支/PR 的 CI 与合并状态需单独核对。
-- 本轮 42/10 账本与新增证据在 [PR #1](https://github.com/LN6666/CiviFlux/pull/1) 中供审查；`main` 在合并前仍是 `7a97e22` 的旧账本。新账户应读取 PR 的实时状态，不把开放 PR 误当已集成发布。
+- 当前完整 Python 检查 225 通过（包括 66 项原参考检查与本轮 SUMO/SBOM/置换专项检查），浏览器套件先前 10 项通过。干净检出、冻结依赖安装和隔离 wheel 运行均通过（7d217b8）。
+- 54 项验收逐项记录在 `execution/ACCEPTANCE.md`：43 PASS、9 PARTIAL、1 DEFERRED_USER、1 BLOCKED_EXTERNAL；strict release manifest 保留未过 gate，`engineering_complete=false`。
+- [公开 GitHub 仓库](https://github.com/LN6666/CiviFlux) 的 `main` 已集成 [PR #1](https://github.com/LN6666/CiviFlux/pull/1)；[该次 main CI](https://github.com/LN6666/CiviFlux/actions/runs/35895921643) 通过。`main` 已启用检查、代码所有者审查、线性历史、禁止强推/删除的保护。合并后旧开发分支继续产生的提交须从新 `main` 建立独立 PR，不能把已合并 PR 当成开放审查。
+- 后续边界案例、历史预检和 Linux 容器修复仍在开发中，须以新 PR 的实际 CI 为准；已有两次 Linux 容器 CI 失败，第二次定位为缺少 `libXrender.so.1`。失败是容器构建/运行 gate，不是本机 SUMO 或 Python core 失败。
 
 ## 明确缺口
 
 - 生产 SimpleJev paid 调用：DEFERRED_USER；免费 demo 必须单列证据，不能冒充生产验收。
 - 独立专家语义标签/模型校准、人工入口与事件几何核验：未完成；不报告校准概率或历史预测精度。
 - 原始城市数据保存在 ignored data/raw 与 citypack 目录；公开仓库包含获取/构建脚本、来源、许可证和校验值，不包含凭据或大型原始数据。
-- 扩大 Helsinki 当前路网后，同一批固定候选 OD 出现道路 3 处、火灾 8 处阶段差异；正式边界尚不稳定。报告在 `evidence/wp2/helsinki_boundary_sensitivity.json`，不把此结果升级成全城结论。
-- Docker daemon 当前不可用；Docker 构建/镜像 digest 固定尚未验证。native local 运行与容器部署分开。
+- 扩大 Helsinki 当前路网后，同一批固定候选 OD 在内圈→外圈出现道路 3 处、火灾 8 处阶段差异；第一外圈→第二外圈该批 48 个目标的 96 个阶段在 1 秒阈值下无差异。第一外圈仅作为此批目标的案例边界；3 个入口无法配对，2 个会重新吸附，不升级成全城/历史结论。证据见 `evidence/wp2/helsinki_boundary_sensitivity.json` 与 `helsinki_formal_boundary_case.json`。
+- 历史事件回测预检显示事件公告机器映射尚未人工接受、火灾实际警戒区未知、事发时网络和独立实测结果缺失。按 `docs/HISTORICAL_BACKTEST_PROTOCOL.md` 分层验收，数值预测仍 `NOT_VALIDATED`。
+- 本机 Docker daemon 不可用；GitHub Linux 已完成 Docker 构建/镜像检查，但容器 smoke 因原生系统库缺失失败。已补镜像依赖与 native ELF 预检，等待新的 Linux CI；native local 运行不能替代容器 PASS。
 
 ## 接手操作
 

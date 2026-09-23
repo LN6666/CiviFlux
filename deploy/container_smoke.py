@@ -11,6 +11,7 @@ import hashlib
 import io
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -146,6 +147,25 @@ def check_sumo(workspace: Path) -> dict:
     city, scenario = dual_corridor()
     adapter = SumoAdapter()
     folder = workspace / "sumo"
+    linker = {}
+    if sys.platform.startswith("linux") and shutil.which("ldd"):
+        import sumo as sumo_package
+
+        for name in ("sumo", "netconvert"):
+            native = Path(sumo_package.SUMO_HOME) / "bin" / name
+            result = subprocess.run(
+                ["ldd", str(native)], capture_output=True, text=True, timeout=10, check=False
+            )
+            output = result.stdout + result.stderr
+            missing = sorted(set(re.findall(r"\b(\S+)\s+=>\s+not found", output)))
+            linker[name] = {
+                "native_binary": str(native),
+                "exit_code": result.returncode,
+                "missing_libraries": missing,
+                "output_tail": output[-6000:],
+            }
+        if any(item["missing_libraries"] for item in linker.values()):
+            raise RuntimeError(f"SUMO native binary has missing libraries: {json.dumps(linker, sort_keys=True)}")
     try:
         pair = adapter.run_pair(
             city,
@@ -162,18 +182,9 @@ def check_sumo(workspace: Path) -> dict:
                 path.name: path.read_text(errors="replace")[-2500:]
                 for path in sorted(folder.glob("*.log"))
             },
-            "binaries": {"sumo": adapter.sumo, "netconvert": adapter.netconvert},
+            "entrypoints": {"sumo": adapter.sumo, "netconvert": adapter.netconvert},
+            "native_linker": linker,
         }
-        if sys.platform.startswith("linux") and shutil.which("ldd"):
-            diagnostic["ldd"] = {}
-            for name, binary in diagnostic["binaries"].items():
-                result = subprocess.run(
-                    ["ldd", binary], capture_output=True, text=True, timeout=10, check=False
-                )
-                diagnostic["ldd"][name] = {
-                    "exit_code": result.returncode,
-                    "output_tail": (result.stdout + result.stderr)[-6000:],
-                }
         raise RuntimeError(f"SUMO pair failed: {error}; diagnostic={json.dumps(diagnostic, sort_keys=True)}") from error
     if pair["status"] != "PASS" or pair["engine"] != "real_local_sumo":
         raise RuntimeError("Actual SUMO pair did not pass")
@@ -184,6 +195,9 @@ def check_sumo(workspace: Path) -> dict:
         "baseline_arrived": pair["baseline"]["arrived"],
         "event_arrived": pair["event"]["arrived"],
         "network_sha256": pair["network_sha256"],
+        "native_linker_missing_libraries": {
+            name: item["missing_libraries"] for name, item in linker.items()
+        },
     }
 
 

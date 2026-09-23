@@ -158,6 +158,7 @@
         "evidence/wp6/ontology_ablation.json",
         "test_suite/unit/test_network.py",
         "evidence/wp2/helsinki_boundary_sensitivity.json",
+        "evidence/wp2/helsinki_formal_boundary_case.json",
         "scripts/boundary_sensitivity.py"
       ],
       "remaining_goal_ids": [
@@ -386,6 +387,7 @@
         "evidence/wp1/directed_road_review.html",
         "evidence/wp2/helsinki_fire_product.json",
         "evidence/wp1/missing_data_report.json",
+        "evidence/wp6/historical_backtest_preflight.json",
         "evidence/wp6/report.json",
         "evidence/wp6/benchmark.json",
         "evidence/wp6/REPORT.md",

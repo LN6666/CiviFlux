@@ -164,7 +164,7 @@ def main() -> int:
             verify(report, out)
     except CheckFailure as error:
         report.update(status=error.status, failed_stage=error.stage, error=str(error))
-    except Exception as error:
+    except Exception as error:  # noqa: BLE001 - always write an artifact for unexpected CI failures
         report.update(status="FAIL", failed_stage="unexpected", error=str(error))
     out.write_text(json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n")
     print(f"container reproducibility: {report['status']} -> {out}")
