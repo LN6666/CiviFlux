@@ -85,7 +85,7 @@ uv run --frozen python scripts/data_pipeline.py build
 uv run --frozen python scripts/data_pipeline.py review
 ```
 
-数据源、文件哈希、下载时间、许可证、时间覆盖和缺失信息写入数据/evidence。当前 compact reference 在 `data/citypacks/helsinki-current/`；更大的外圈样本是否保留见数据 evidence。不要硬编码 edge 数量或 citypack ID：裁切版本与原始 source hash 不同，须使用当次产物。
+数据源、文件哈希、下载时间、许可证、时间覆盖和缺失信息写入数据/evidence。compact reference 在 `data/citypacks/helsinki-current/`；正式当前网络案例的外圈包在 `data/citypacks/helsinki-boundary-outer/citypack.json`，属于部署者本地数据，不随公开仓库分发。不要硬编码 edge 数量或 citypack ID：裁切版本与原始 source hash 不同，须使用当次产物。
 
 `evidence/wp1/road_scenario.json` 和 `fire_scenario.json` 是带证据标签的案例情景。设施入口未经核验、道路/公交 shape 几何关联、公告时间和假设限制不能升级为观察到的因果或历史交通真值。
 
@@ -100,6 +100,8 @@ PYTHONPATH=core:. uv run --frozen python scripts/boundary_sensitivity.py
 [实测报告](../evidence/wp2/helsinki_boundary_sensitivity.json)记录相同 origin、限制边与固定候选入口的三层路网比较。Road/Fire 各有 48 个可配对 OD：内圈→第一外圈分别有 3/8 个阶段差异；第一外圈→第二外圈各 96 个阶段在 1 秒阈值下均无差异，已配对路径也未改变，最大旅行时间变化分别为 0.612/0.814 秒。另有 3 个候选入口不能跨圈配对。独立转换仍改变大量共有边权重和转向，所以这只证明**这批 OD 在相邻外圈上的观测稳定性**，不证明全城收敛或历史预测准确。
 
 已将第一外圈选为这 48 个候选目标的案例边界，并在它与第二外圈上通过真实产品 Action→路由→KG→固定 PPR 重跑 Road/Fire；执行 `PYTHONPATH=core:. uv run --frozen python scripts/formal_boundary_case.py`，核对[案例重放报告](../evidence/wp2/helsinki_formal_boundary_case.json)。原案例 51 个候选设施中另 3 个入口未能跨圈配对，2 个原生入口在扩大网络后会重新吸附；报告保留它们的未知状态。这个范围内的稳定性不能升级成全部设施、城市或历史事件有效性。
+
+本地 API 启动时，若上述外圈包存在，只在它的 SHA-256 与正式案例报告相符且报告标明外圈范围已完成受限重放时，才在 `/api/v1/citypacks` 登记它；网页从下拉框直接选择，不通过 10 MiB 浏览器上传接口。外圈文件不存在时仍可使用 toy/compact 包，不自动下载；文件存在但与冻结报告冲突时启动失败，需核对本地数据而非默默回退。UI 的包级 warning 明示仅 48 个原候选入口的当前网络 what-if 稳定性，另 3 个未配对入口与 2 个重新吸附入口仍待核验。`CIVIFLUX_TOY_ONLY=1` 仅供明确的 toy/CI 运行；它不构成 Helsinki 产品验收。
 
 历史事件回测须把来源事实、事发时路网/时刻、独立运营影响记录和独立数值观测分开验收；流程和指标见[回测协议](HISTORICAL_BACKTEST_PROTOCOL.md)。`python3 scripts/historical_backtest_preflight.py`只盘点当前证据，输出与[保存报告](../evidence/wp6/historical_backtest_preflight.json)可核对；它不会运行模型或把当前网络 what-if 评为历史预测。现有 R1 映射尚无人工接受，F1 实际警戒区未知，事发日期 GTFS 与独立实测目标均缺，历史数值结论继续 `NOT_VALIDATED`。
 
