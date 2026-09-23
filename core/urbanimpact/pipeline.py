@@ -65,6 +65,7 @@ class AnalysisService:
         *,
         overlay_hash: str,
         action_log_hash: str,
+        extra_limitations: tuple[str, ...] = (),
         stage: Callable[[str], None] = lambda _: None,
         cancel: Event | None = None,
     ) -> ResultBundle:
@@ -178,6 +179,7 @@ class AnalysisService:
             assumptions=scenario.assumptions,
             sources=city.sources,
             limitations=tuple(city.warnings)
+            + extra_limitations
             + (
                 "Planning/research support; not operational dispatch or evacuation guidance.",
                 "Fixed network travel time is not congestion or emergency response time.",

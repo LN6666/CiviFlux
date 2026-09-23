@@ -72,7 +72,7 @@ def create_app(root: Path | None = None, cities=None, policy_backend=None, data_
         policy_backend = SimpleJevBackend(
             SimpleJevConfig.from_env(Path(".env"), ontology_version=MANIFEST["ontology_version"])
         )
-    service = RunService(root, cities, policy_backend)
+    service = RunService(root, cities, policy_backend, citypack_scope_warnings=formal_scope)
     token = secrets.token_urlsafe(32)
 
     @asynccontextmanager

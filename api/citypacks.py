@@ -25,7 +25,8 @@ def _verified_formal_outer(root: Path) -> tuple[CityPack, str]:
     report_path = root / FORMAL_REPORT_PATH
     if not report_path.is_file():
         raise ValueError("Formal Helsinki outer CityPack exists without its boundary evidence")
-    report = json.loads(report_path.read_text())
+    report_bytes = report_path.read_bytes()
+    report = json.loads(report_bytes)
     if (
         report.get("status") != FORMAL_REPORT_STATUS
         or report.get("formal_case_boundary") != "outer"
@@ -75,7 +76,8 @@ def _verified_formal_outer(root: Path) -> tuple[CityPack, str]:
         f"Outer boundary comparison covers only {target_count} frozen candidate entrances "
         "in the recorded Road/Fire cases. Original candidate entrances excluded: "
         f"{len(excluded)}; native-crop resnaps: {len(resnapped)}. New scenarios and "
-        "citywide or historical claims remain unvalidated."
+        "citywide or historical claims remain unvalidated. Case evidence: "
+        f"{FORMAL_REPORT_PATH.as_posix()} (SHA-256 {hashlib.sha256(report_bytes).hexdigest()})."
     )
     return city, scope
 

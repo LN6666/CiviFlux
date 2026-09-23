@@ -19,10 +19,19 @@ from urbanimpact.util import atomic_json, canonical, digest, file_hash
 
 
 class RunService:
-    def __init__(self, root: Path, cities: list[CityPack] | None = None, policy_backend=None):
+    def __init__(
+        self,
+        root: Path,
+        cities: list[CityPack] | None = None,
+        policy_backend=None,
+        citypack_scope_warnings: dict[str, str] | None = None,
+    ):
         self.root = root
         root.mkdir(parents=True, exist_ok=True)
         self.cities = {c.citypack_id: c for c in cities or [toy_city()]}
+        self.citypack_scope_warnings = dict(citypack_scope_warnings or {})
+        if set(self.citypack_scope_warnings) - set(self.cities):
+            raise ValueError("CityPack scope warning references an unknown CityPack")
         self.workspaces = {
             id: Workspace(root / "workspaces" / (digest(id) + ".sqlite"), city)
             for id, city in self.cities.items()
@@ -158,6 +167,7 @@ class RunService:
             if event.is_set():
                 raise AnalysisCancelled()
             self._update(rid, status="running", stage="validating")
+            scope_warning = self.citypack_scope_warnings.get(city.citypack_id)
             self.analysis.run(
                 city,
                 s,
@@ -165,6 +175,7 @@ class RunService:
                 folder,
                 overlay_hash=digest(s),
                 action_log_hash=digest(history),
+                extra_limitations=(scope_warning,) if scope_warning else (),
                 stage=lambda name: self._update(rid, stage=name),
                 cancel=event,
             )

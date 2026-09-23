@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 import hashlib
+import io
 import json
+import zipfile
 from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
 from urbanimpact.contracts import CityPack, Source
 from urbanimpact.fixtures import toy_city
+from urbanimpact.util import digest
 
 from api.app import create_app
 from api.citypacks import FORMAL_OUTER_PATH, FORMAL_REPORT_PATH, load_local_citypacks
@@ -60,7 +63,8 @@ def fake_formal_pack(root: Path) -> tuple[Path, Path, str]:
 
 
 def test_formal_outer_pack_is_server_registered_and_visible_to_web(tmp_path):
-    _, _, outer_id = fake_formal_pack(tmp_path)
+    pack_path, report_path, outer_id = fake_formal_pack(tmp_path)
+    source_hash = digest(CityPack.model_validate_json(pack_path.read_bytes()))
     with TestClient(create_app(tmp_path / "workspace", data_root=tmp_path)) as client:
         client.headers["Authorization"] = "Bearer " + client.get("/api/v1/session").json()["token"]
         packs = client.get("/api/v1/citypacks").json()
@@ -68,6 +72,8 @@ def test_formal_outer_pack_is_server_registered_and_visible_to_web(tmp_path):
         listed = next(pack for pack in packs if pack["citypack_id"] == outer_id)
         assert any("Original candidate entrances excluded: 1" in warning for warning in listed["warnings"])
         assert any("New scenarios and citywide" in warning for warning in listed["warnings"])
+        scope_warning = next(w for w in listed["warnings"] if "Case evidence:" in w)
+        assert hashlib.sha256(report_path.read_bytes()).hexdigest() in scope_warning
         geometry = client.get(f"/api/v1/citypacks/{outer_id}")
         assert geometry.status_code == 200
         assert geometry.json()["geojson"]["features"]
@@ -94,10 +100,21 @@ def test_formal_outer_pack_is_server_registered_and_visible_to_web(tmp_path):
         run_id = submitted.json()["run_id"]
         client.app.state.service.futures[run_id].result(timeout=10)
         assert client.get(f"/api/v1/runs/{run_id}").json()["status"] == "completed"
-        assert client.get(f"/api/v1/runs/{run_id}/results").json()["attention"]["convergence"]
+        result = client.get(f"/api/v1/runs/{run_id}/results").json()
+        assert result["attention"]["convergence"]
+        assert result["source_snapshot_hash"] == source_hash
+        assert scope_warning in result["limitations"]
+        exported = client.get(f"/api/v1/runs/{run_id}/export")
+        assert exported.status_code == 200
+        with zipfile.ZipFile(io.BytesIO(exported.content)) as bundle:
+            saved_result = json.loads(bundle.read("result.json"))
+        assert scope_warning in saved_result["limitations"]
+        assert saved_result["source_snapshot_hash"] == source_hash
 
 
-@pytest.mark.parametrize("tamper", ["pack", "report_status", "report_path", "missing_report", "unstable_case", "coverage"])
+@pytest.mark.parametrize(
+    "tamper", ["pack", "report_status", "report_path", "missing_report", "unstable_case", "coverage"]
+)
 def test_unverified_formal_pack_fails_closed(tmp_path, tamper):
     pack_path, report_path, _ = fake_formal_pack(tmp_path)
     if tamper == "pack":
