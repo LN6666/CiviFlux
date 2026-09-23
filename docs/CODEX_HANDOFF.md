@@ -4,6 +4,8 @@
 
 仓库：[LN6666/CiviFlux](https://github.com/LN6666/CiviFlux)，公开。所有人可读；其他账号贡献时 fork 或创建有权限的分支并提交 PR，由仓库维护者审核。不得假定自己拥有原始账号的 Featherless、GitHub 或本机凭据，也不能自动继承本次 Codex 会话的 goal 状态。`main` 是集成线；开发分支使用 `codex/` 前缀。先读 `git status`、最近提交和 CI，不重做已完成实验，也不改写共享历史。
 
+**交接锚点：**`main` 的已集成起点为 `7a97e22`；本轮 42/10 验收账本、220 项 Python/10 项浏览器证据和负面 Helsinki 边界结果位于待审的 [PR #1](https://github.com/LN6666/CiviFlux/pull/1)（`codex/close-independent-v1-gates`）。接手者先看 PR 的实际状态与 CI；只有合并后才把其中内容当作 `main`。即使 PR 尚未合并，本文件在 `main` 的旧版已提供基本接手步骤，PR 给出最新证据。
+
 ## 新账户的第一步
 
 1. 在自己的机器执行 `git clone https://github.com/LN6666/CiviFlux.git`，在 Codex 中把克隆出的 `CiviFlux` 目录作为项目打开。公开仓库可匿名克隆；提交 PR 时才需要自己的 GitHub 身份或 fork。接手正在审查的改动时也查看[开放的 PR](https://github.com/LN6666/CiviFlux/pulls)，不要以为未合并分支已经在 `main`。

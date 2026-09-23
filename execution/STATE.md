@@ -24,6 +24,7 @@
 - 当前完整 Python 检查 220 通过（包括 66 项原参考检查与本轮 SUMO/SBOM 专项检查），浏览器套件 10 项通过。干净检出、冻结依赖安装和隔离 wheel 运行均通过（7d217b8）。
 - 54 项验收逐项记录在 `execution/ACCEPTANCE.md`：42 PASS、10 PARTIAL、1 DEFERRED_USER、1 BLOCKED_EXTERNAL；strict release manifest 保留四项未过 gate，`engineering_complete=false`。
 - [公开 GitHub 仓库](https://github.com/LN6666/CiviFlux) 的 `main` 已推送；[最近已核验的 main CI](https://github.com/LN6666/CiviFlux/actions/runs/35887764508) 通过锁定安装、Python/数据/SUMO/安全、Web 构建及浏览器检查。`main` 已启用检查、代码所有者审查、线性历史、禁止强推/删除的保护；新分支/PR 的 CI 与合并状态需单独核对。
+- 本轮 42/10 账本与新增证据在 [PR #1](https://github.com/LN6666/CiviFlux/pull/1) 中供审查；`main` 在合并前仍是 `7a97e22` 的旧账本。新账户应读取 PR 的实时状态，不把开放 PR 误当已集成发布。
 
 ## 明确缺口
 
