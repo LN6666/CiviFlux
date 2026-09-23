@@ -21,6 +21,7 @@ The repository has progressed from a specification/reference-test pack to a prod
 - Added a source-tiered historical backtest protocol and a read-only evidence preflight. No event-matched observed traffic outcomes are available for numeric validation.
 - Pinned container build inputs and added an offline Linux CI smoke. Three initial runs exposed missing SUMO native libraries; adding `libxrender1`, `libatomic1` and concise ELF linker diagnostics led to a passing Linux `core`/`container` run. The container report is scoped to a synthetic city and disabled model egress.
 - After PR #1 was squash-merged, moved subsequent work to a fresh branch/PR path. PR branch pushes now run a single pull-request workflow to avoid duplicate failure notifications.
+- Protected `main` now requires both passing `core` and `container` checks before ordinary PR merges.
 
 ## Source pack — 2026-09-23, handoff-3-operational-ontology
 
