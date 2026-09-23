@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "code_commit": "ada0475629919b6d1aa4d5cea3ed3bf85f3977c4",
+  "command": "make test-data",
+  "exit_code": 0,
+  "tests": {
+    "passed": 50,
+    "failed": 0,
+    "skipped": 0
+  },
+  "data_scope": "ignored local current-snapshot Helsinki CityPack and source files temporarily linked for the test; links removed",
+  "citypack_path": "data/citypacks/helsinki-current/citypack.json",
+  "citypack_sha256": "5c3b703c2def3712592fe40c42678fe98c994124d76556efe55afd1ec8e3cc18",
+  "citypack_committed": false,
+  "temporary_links_removed": true,
+  "controlled_inputs_clean_after_test": true,
+  "log_path": "evidence/wp7/current_data_test_ada.log",
+  "log_sha256": "5bf5c762ec339dc6e8dcfcae3cea440d41feb0d3788731b1104f27dff26905c3",
+  "limitations": [
+    "Current OSM/GTFS snapshot and candidate facility access, not event-date network truth or independent traffic validation.",
+    "Local ignored CityPack and raw sources are not present in public CI; that suite skips one raw-data-dependent test there."
+  ],
+  "recorded_at": "2026-09-23T21:00:50.621706+00:00"
+}
