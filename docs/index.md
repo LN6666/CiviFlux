@@ -16,6 +16,7 @@
 | 已接受的架构决策 | [ADR 0001](adr/0001-current-architecture.md) |
 | PPR 算法选择与误差边界 | [ADR 0002](adr/0002-pagerank.md) |
 | 范围、证据与工程风险约束 | [ARCHITECTURE_GUARDRAILS](ARCHITECTURE_GUARDRAILS.md) |
+| 历史道路/火灾扰动怎样回测、目前缺什么证据 | [HISTORICAL_BACKTEST_PROTOCOL](HISTORICAL_BACKTEST_PROTOCOL.md) |
 | SimpleJev 状态、可选 Qwen 比较与付费调用暂缓 | [模型 adapter](../adapters/system_one/README.md) |
 | 当前 checkpoint/必须 gate | [execution/STATE](../execution/STATE.md) 与 `evidence/` |
 

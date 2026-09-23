@@ -97,7 +97,11 @@ uv run --frozen python scripts/data_pipeline.py review
 PYTHONPATH=core:. uv run --frozen python scripts/boundary_sensitivity.py
 ```
 
-[实测报告](../evidence/wp2/helsinki_boundary_sensitivity.json)记录相同 origin、限制边与固定候选入口的比较。Road/Fire 各有 48 个可配对 OD，分别有 3/8 个基线或事件阶段结果差异；另有 3 个候选入口不能配对。扩大范围后独立转换会改变部分共有边长度、转向拓扑和旅行时间，所以这是**边界及导入敏感性**，不能宣称原小范围结果稳定、全城有效或历史预测准确。当前 CityPack 继续限定为案例范围；扩大后仍需选定稳定的正式分析边界并重跑相关证据。
+[实测报告](../evidence/wp2/helsinki_boundary_sensitivity.json)记录相同 origin、限制边与固定候选入口的三层路网比较。Road/Fire 各有 48 个可配对 OD：内圈→第一外圈分别有 3/8 个阶段差异；第一外圈→第二外圈各 96 个阶段在 1 秒阈值下均无差异，已配对路径也未改变，最大旅行时间变化分别为 0.612/0.814 秒。另有 3 个候选入口不能跨圈配对。独立转换仍改变大量共有边权重和转向，所以这只证明**这批 OD 在相邻外圈上的观测稳定性**，不证明全城收敛或历史预测准确。
+
+已将第一外圈选为这 48 个候选目标的案例边界，并在它与第二外圈上通过真实产品 Action→路由→KG→固定 PPR 重跑 Road/Fire；执行 `PYTHONPATH=core:. uv run --frozen python scripts/formal_boundary_case.py`，核对[案例重放报告](../evidence/wp2/helsinki_formal_boundary_case.json)。原案例 51 个候选设施中另 3 个入口未能跨圈配对，2 个原生入口在扩大网络后会重新吸附；报告保留它们的未知状态。这个范围内的稳定性不能升级成全部设施、城市或历史事件有效性。
+
+历史事件回测须把来源事实、事发时路网/时刻、独立运营影响记录和独立数值观测分开验收；流程和指标见[回测协议](HISTORICAL_BACKTEST_PROTOCOL.md)。`python3 scripts/historical_backtest_preflight.py`只盘点当前证据，输出与[保存报告](../evidence/wp6/historical_backtest_preflight.json)可核对；它不会运行模型或把当前网络 what-if 评为历史预测。现有 R1 映射尚无人工接受，F1 实际警戒区未知，事发日期 GTFS 与独立实测目标均缺，历史数值结论继续 `NOT_VALIDATED`。
 
 ## 6. SimpleJev Qwen classifier 与暂缓的付费 gate
 
@@ -106,6 +110,8 @@ PYTHONPATH=core:. uv run --frozen python scripts/boundary_sensitivity.py
 当前生产付费调用为 `DEFERRED_USER`。保持生产出网/预算关闭，不创建账号、不索取 key、不下载或启动本地模型。公开 demo 的授权、调用数、成功或服务错误单列；demo 成功不能冒充生产接入，也不能证明真实交通预测有效。配置与实际状态见 [adapter README](../adapters/system_one/README.md)。
 
 SimpleJev 的 Score 是有序 rubric 的期望索引，Choice 为候选集条件概率，Noul 是转换后的评级判断；这些输出都不自动等同现实正确率。[服务语义](https://simple-jev.featherless.ai/docs)。普通 DashScope/Model Studio `qwen_api` 仅为可选比较，生成式 relevance、缓存 replay、rules 和 mock 均不能顶替 classifier gate。
+
+无需新 API 请求即可重放冻结免费策略的关系分数负对照：`make policy-permutation-control`。它在合成图穷尽 720 种关系分数置换，保持城市、情景、物理 facts、seed 和 PPR 参数不变；[结果](../evidence/wp6/policy_permutation_control.json)只检验权重是否影响转移及其敏感性。事件图的单一关系权重会抵消；此检查不替代生产 A3/A4 消融或专家语义正确性验证。
 
 恢复生产模型工作后，核验实际 endpoint、可用模型、typed schema、分数归一方式、配置/rubric provenance 和明确预算，再运行有界协议/图集成检查。只有批准的抽象 relation definitions 和 objective 可发出；城市对象、坐标、用户笔记、身份与物理参数留在本地。账号/服务链接目前仅供资料查询。
 

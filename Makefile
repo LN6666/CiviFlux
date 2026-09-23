@@ -2,7 +2,7 @@ SHELL := /bin/bash
 export PYTHONPATH := $(CURDIR)/core:$(CURDIR)
 PY := uv run --frozen python
 PYTEST := uv run --frozen pytest
-.PHONY: bootstrap contracts test-contracts test-unit test-ontology test-actions test-network test-scenarios test-graph test-ppr test-systemone-contract test-systemone-local systemone-preflight test-sumo test-cancel demo-toy demo-road-fire demo-ranking demo-sumo-pair citypack-fetch citypack-build case-review test-data build-web test-web test-browser test-object-view demo-local demo-offline test-reference test-api test-fast test-all sbom-check sbom-host-check
+.PHONY: bootstrap contracts test-contracts test-unit test-ontology test-actions test-network test-scenarios test-graph test-ppr test-systemone-contract test-systemone-local systemone-preflight test-sumo test-cancel demo-toy demo-road-fire demo-ranking demo-sumo-pair citypack-fetch citypack-build case-review test-data build-web test-web test-browser test-object-view demo-local demo-offline test-reference test-api test-fast test-all sbom-check sbom-host-check policy-permutation-control
 bootstrap:
 	uv sync --frozen
 	npm --prefix web ci
@@ -62,6 +62,8 @@ test-outcomes:
 	$(PYTEST) -q test_suite/outcomes
 ablate:
 	$(PY) scripts/evaluate.py ablate
+policy-permutation-control:
+	$(PY) scripts/offline_policy_permutation.py
 benchmark:
 	$(PY) scripts/evaluate.py benchmark
 report:

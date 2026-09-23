@@ -1,0 +1,12 @@
+{
+  "status": "FAIL",
+  "scope": "Second Linux container CI diagnostic, not a release PASS",
+  "github_actions_run": 35896881780,
+  "source_report": ".runtime/ci-container-35896881780/reproduction.json",
+  "docker_build": "PASS",
+  "image_inspect": "PASS",
+  "container_smoke": "FAIL",
+  "observed_native_error": "/app/.venv/lib/python3.12/site-packages/sumo/bin/sumo: error while loading shared libraries: libXrender.so.1: cannot open shared object file: No such file or directory",
+  "diagnosis": "The previous ldd check targeted Python console-script wrappers, so it returned 'not a dynamic executable'. The native wheel binary under sumo/bin must be checked.",
+  "fix": "Add Debian libxrender1 to the same pinned snapshot install and preflight ldd on both native sumo and netconvert binaries."
+}
