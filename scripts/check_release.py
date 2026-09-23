@@ -23,6 +23,7 @@ ROOT = Path(__file__).resolve().parents[1]
 # code it attests. Keep this list broader than an individual gate's inputs.
 CONTROLLED_INPUTS = (
     ".github/workflows",
+    ".dockerignore",
     ".gitignore",
     ".env.example",
     "Makefile",
