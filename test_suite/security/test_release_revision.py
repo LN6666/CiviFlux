@@ -82,6 +82,16 @@ def test_old_pass_rejected_after_committed_code_change_despite_unchanged_evidenc
     assert all("stale PASS evidence" in error for error in errors)
 
 
+def test_old_pass_rejected_after_container_build_context_changes(tmp_path: Path) -> None:
+    repo, document = fixture(tmp_path)
+    (repo / ".dockerignore").write_text(".env\ndata\n")
+    commit(repo, "add container build exclusions")
+    assert all(
+        "stale PASS evidence" in error
+        for error in check_current_revision(document, repo)
+    )
+
+
 def test_documentation_commit_does_not_invalidate_same_inputs(tmp_path: Path) -> None:
     repo, document = fixture(tmp_path)
     (repo / "docs" / "note.md").write_text("Revised description.\n")
