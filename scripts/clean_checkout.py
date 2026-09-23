@@ -1,7 +1,8 @@
-"""Verify committed HEAD from an offline export and an isolated wheel installation.
+"""Verify committed HEAD from a fresh export and an isolated wheel installation.
 
-No data/model download, hosted inference or Docker is used. Missing offline cache
-is BLOCKED_ENVIRONMENT, never a skipped PASS. All temporary inputs are removed.
+Offline by default. An explicit flag permits only frozen dependency wheel downloads.
+No data/model download, hosted inference or Docker is used. Missing offline cache is
+BLOCKED_ENVIRONMENT, never a skipped PASS. All temporary inputs are removed.
 """
 
 from __future__ import annotations
@@ -58,7 +59,7 @@ def failure_status(stage: str, output: str) -> str:
         "no python interpreter",
         "no space left on device",
     )
-    if stage in ("offline_sync", "wheel_build", "wheel_install") and any(
+    if stage in ("dependency_sync", "offline_sync", "wheel_build", "wheel_install") and any(
         text in output.lower() for text in unavailable
     ):
         return "BLOCKED_ENVIRONMENT"
@@ -156,7 +157,7 @@ print(json.dumps({'ontology_version': MANIFEST['ontology_version'],
 """
 
 
-def verify(repo: Path, timeout: int, report: dict) -> None:
+def verify(repo: Path, timeout: int, report: dict, allow_dependency_downloads: bool = False) -> None:
     if not shutil.which("git") or not shutil.which("uv"):
         raise CheckFailure("prerequisites", "BLOCKED_ENVIRONMENT", "git and uv must be installed locally")
     env, checks = environment(), report["checks"]
@@ -196,6 +197,27 @@ def verify(repo: Path, timeout: int, report: dict) -> None:
                     )
             report["input_hashes"] = {name: sha256(checkout / name) for name in ("uv.lock", "pyproject.toml")}
             env["UV_PROJECT_ENVIRONMENT"] = str(checkout / ".venv")
+            if allow_dependency_downloads:
+                # Frozen registry wheels only: no project build or unpinned build dependencies online.
+                command(
+                    "dependency_sync",
+                    [
+                        "uv",
+                        "sync",
+                        "--frozen",
+                        "--no-install-project",
+                        "--no-build",
+                        "--python",
+                        "3.12",
+                        "--no-python-downloads",
+                    ],
+                    checkout,
+                    {**env, "UV_OFFLINE": "false"},
+                    checks,
+                    timeout,
+                    temp,
+                )
+            # Building the local project and all subsequent work remain offline even with the flag.
             command(
                 "offline_sync",
                 ["uv", "sync", "--frozen", "--offline", "--python", "3.12", "--no-python-downloads"],
@@ -325,20 +347,30 @@ def main() -> int:
     parser.add_argument("--repo", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--out", type=Path, default=Path("evidence/wp7/clean_checkout.json"))
     parser.add_argument("--timeout", type=int, default=180, help="Maximum seconds per child command")
+    parser.add_argument(
+        "--allow-dependency-downloads",
+        action="store_true",
+        help="Allow frozen registry dependency wheels into the temporary venv; no other egress",
+    )
     args = parser.parse_args()
     if not 1 <= args.timeout <= 600:
         parser.error("--timeout must be between 1 and 600 seconds")
     report = {
         "status": "FAIL",
-        "scope": "committed HEAD offline Python installation, toy routing/PPR and wheel resources",
+        "scope": "committed HEAD frozen Python installation, toy routing/PPR and wheel resources",
         "created_at": datetime.now(UTC).isoformat(),
         "python": platform.python_version(),
         "platform": platform.platform(),
-        "network": "disabled for uv; no data/model calls",
+        "allow_dependency_downloads": args.allow_dependency_downloads,
+        "network": (
+            "frozen registry wheels allowed during dependency_sync only; no data/model calls"
+            if args.allow_dependency_downloads
+            else "disabled for uv; no data/model calls"
+        ),
         "checks": [],
     }
     try:
-        verify(args.repo.resolve(), args.timeout, report)
+        verify(args.repo.resolve(), args.timeout, report, args.allow_dependency_downloads)
         report["status"] = "PASS"
     except CheckFailure as error:
         report.update(status=error.status, failed_stage=error.stage, detail=error.detail)
