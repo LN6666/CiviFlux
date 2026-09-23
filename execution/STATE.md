@@ -22,9 +22,9 @@
 ## 已发布与核验
 
 - 当前完整 Python 检查 225 通过（包括 66 项原参考检查与本轮 SUMO/SBOM/置换专项检查），浏览器套件先前 10 项通过。干净检出、冻结依赖安装和隔离 wheel 运行均通过（7d217b8）。
-- 54 项验收逐项记录在 `execution/ACCEPTANCE.md`：43 PASS、9 PARTIAL、1 DEFERRED_USER、1 BLOCKED_EXTERNAL；strict release manifest 保留未过 gate，`engineering_complete=false`。
+- 54 项验收逐项记录在 `execution/ACCEPTANCE.md`：44 PASS、8 PARTIAL、1 DEFERRED_USER、1 BLOCKED_EXTERNAL；strict release manifest 保留未过 gate，`engineering_complete=false`。
 - [公开 GitHub 仓库](https://github.com/LN6666/CiviFlux) 的 `main` 已集成 [PR #1](https://github.com/LN6666/CiviFlux/pull/1)；[该次 main CI](https://github.com/LN6666/CiviFlux/actions/runs/35895921643) 通过。`main` 已启用检查、代码所有者审查、线性历史、禁止强推/删除的保护。合并后旧开发分支继续产生的提交须从新 `main` 建立独立 PR，不能把已合并 PR 当成开放审查。
-- 后续边界案例、历史预检和 Linux 容器修复在 [PR #2](https://github.com/LN6666/CiviFlux/pull/2)；该次 `core` CI 通过，`container` 失败。前两轮发现 `libXrender.so.1`，第三轮原生 ELF 预检定位 `libatomic.so.1`；均是容器运行依赖，不是本机 SUMO 或 Python core 失败。依赖修复待新 CI 复验。
+- 后续边界案例、历史预检和 Linux 容器修复在 [PR #2](https://github.com/LN6666/CiviFlux/pull/2)；[当前 CI](https://github.com/LN6666/CiviFlux/actions/runs/35898788800) 的 `core` 与 `container` 均通过。前三轮失败分别促成原生日志、`libxrender1`、`libatomic1` 修复；失败与通过证据均保留。
 
 ## 明确缺口
 
@@ -33,7 +33,7 @@
 - 原始城市数据保存在 ignored data/raw 与 citypack 目录；公开仓库包含获取/构建脚本、来源、许可证和校验值，不包含凭据或大型原始数据。
 - 扩大 Helsinki 当前路网后，同一批固定候选 OD 在内圈→外圈出现道路 3 处、火灾 8 处阶段差异；第一外圈→第二外圈该批 48 个目标的 96 个阶段在 1 秒阈值下无差异。第一外圈仅作为此批目标的案例边界；3 个入口无法配对，2 个会重新吸附，不升级成全城/历史结论。证据见 `evidence/wp2/helsinki_boundary_sensitivity.json` 与 `helsinki_formal_boundary_case.json`。
 - 历史事件回测预检显示事件公告机器映射尚未人工接受、火灾实际警戒区未知、事发时网络和独立实测结果缺失。按 `docs/HISTORICAL_BACKTEST_PROTOCOL.md` 分层验收，数值预测仍 `NOT_VALIDATED`。
-- 本机 Docker daemon 不可用；GitHub Linux 已完成 Docker 构建/镜像检查，但容器 smoke 因原生系统库缺失失败。已补 `libxrender1`/`libatomic1` 与 native ELF 预检，等待新的 Linux CI；native local 运行不能替代容器 PASS。
+- 本机 Docker daemon 不可用；GitHub Linux 已完成固定基础镜像构建、digest 检查和无网络只读容器真实 API/export/SUMO smoke。G701 可在此受限范围内标 PASS；它不构成历史城市预测或生产模型验收。
 
 ## 接手操作
 

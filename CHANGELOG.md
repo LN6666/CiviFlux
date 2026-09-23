@@ -15,11 +15,11 @@ The repository has progressed from a specification/reference-test pack to a prod
 - Rebuilt an enlarged Helsinki road crop from frozen OSM bytes and recorded a negative fixed-OD boundary-sensitivity result; current city examples retain their limited scope.
 - Added a real SUMO cyclic-network multi-closure rerouter regression and browser lifecycle/cancellation E2E checks.
 - Added a deterministic CycloneDX 1.6 SBOM, content-addressed license/NOTICE inventory, explicit unknowns, portable lock verification and per-host native-file generation in CI.
-- Updated the 54-goal ledger and cross-account handoff for these bounded validations. Paid model, independent human/historical verification and Docker release gates remain open.
+- Updated the 54-goal ledger and cross-account handoff for these bounded validations. Paid model and independent human/historical verification gates remain open.
 - Exhaustively permuted six frozen SimpleJev relation scores (720 orderings) in an offline graph control; the result tests implementation sensitivity, not model quality.
 - Compared three nested Helsinki crops, then replayed the scoped 48-target outer-ring Road/Fire cases through typed Action, routing, KG projection and fixed PPR. Missing and resnapped entrances remain unresolved.
 - Added a source-tiered historical backtest protocol and a read-only evidence preflight. No event-matched observed traffic outcomes are available for numeric validation.
-- Pinned container build inputs and added an offline Linux CI smoke. Three initial runs exposed missing SUMO native libraries; added `libxrender1`, `libatomic1` and concise ELF linker diagnostics, pending CI confirmation.
+- Pinned container build inputs and added an offline Linux CI smoke. Three initial runs exposed missing SUMO native libraries; adding `libxrender1`, `libatomic1` and concise ELF linker diagnostics led to a passing Linux `core`/`container` run. The container report is scoped to a synthetic city and disabled model egress.
 - After PR #1 was squash-merged, moved subsequent work to a fresh branch/PR path. PR branch pushes now run a single pull-request workflow to avoid duplicate failure notifications.
 
 ## Source pack — 2026-09-23, handoff-3-operational-ontology

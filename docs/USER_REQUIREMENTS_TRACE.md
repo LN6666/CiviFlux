@@ -4,7 +4,7 @@
 
 | 用户要求 | 当前工程落实 | 如何核对 / 尚未完成 |
 |---|---|---|
-| 直接开发，目标导向完成 Road & Fire GIS v1 | `core/`、`adapters/`、`api/`、`web/` 的实际产品，8 个工作包与 54 项目标 | [验收清单](../execution/ACCEPTANCE.md)；当前 43 PASS、9 PARTIAL、1 DEFERRED_USER、1 BLOCKED_EXTERNAL，不声称 v1 全部完成 |
+| 直接开发，目标导向完成 Road & Fire GIS v1 | `core/`、`adapters/`、`api/`、`web/` 的实际产品，8 个工作包与 54 项目标 | [验收清单](../execution/ACCEPTANCE.md)；当前 44 PASS、8 PARTIAL、1 DEFERRED_USER、1 BLOCKED_EXTERNAL，不声称 v1 全部完成 |
 | 工程化、模块解耦，贯彻软件工程设计和架构思想 | typed contracts、不可变城市快照、Action 事务与重放、物理/语义计算分层、provider/地图适配边界、代码生成、独立 oracle、锁定依赖、CI | [当前架构](CURRENT_ARCHITECTURE.md)、[ADR 0001](adr/0001-current-architecture.md)、[开发手册](../DEVELOPMENT.md)；后续改动需遵守边界并提供针对性回归 |
 | 优先做本体论＋知识图谱＋适合当前问题的 PageRank | 唯一 ontology registry、typed temporal KG、显式 `ProjectionSpec`、静态依赖与事件 operational 图分离、CSR 稀疏个性化 PageRank、dense/NetworkX oracle 及冻结模型关系分数的离线置换对照 | [架构](CURRENT_ARCHITECTURE.md)、[ADR 0002](adr/0002-pagerank.md)、[架构约束](ARCHITECTURE_GUARDRAILS.md)、[G301–G307](../execution/ACCEPTANCE.md)；完整生产 A3/A4 消融和独立语义评价仍缺 |
 | 参考所贴讨论中“最大的新问题”起的工程风险 | 限制本体范围，保留版本迁移、实体消歧、投影/缓存绑定、模型评分与物理事实分离、人工独立标签、端到端性能与解释边界 | [ARCHITECTURE_GUARDRAILS](ARCHITECTURE_GUARDRAILS.md)；未来迁移、专家校准、真实 ROI 稳定性仍不能标记通过 |

@@ -436,14 +436,16 @@
       "prompt": "prompts/08_WP7.md",
       "max_same_failure_repair_iterations": 3,
       "status_counts": {
-        "PARTIAL": 3,
-        "PASS": 4
+        "PARTIAL": 2,
+        "PASS": 5
       },
       "evidence_files": [
         "evidence/wp7/clean_checkout.json",
         "evidence/wp7/clean_checkout_offline.json",
+        "evidence/wp7/container_ci_pass.json",
         "evidence/current_product_release.json",
         "evidence/wp7/release_check.log",
+        "evidence/wp7/release_check_after_container.log",
         "evidence/wp0/ontology_review.md",
         "evidence/wp7/final_python_junit.xml",
         "evidence/wp7/repository_hygiene.json",
@@ -461,7 +463,6 @@
         "comparison/feature_matrix.csv"
       ],
       "remaining_goal_ids": [
-        "G701",
         "G702",
         "G707"
       ],
@@ -472,8 +473,8 @@
   "assessment_date": "2026-09-24",
   "decision_authority": "execution/USER_DECISIONS.md",
   "goal_status_counts": {
-    "PASS": 43,
-    "PARTIAL": 9,
+    "PASS": 44,
+    "PARTIAL": 8,
     "DEFERRED_USER": 1,
     "BLOCKED_EXTERNAL": 1
   },

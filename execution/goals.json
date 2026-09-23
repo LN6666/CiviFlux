@@ -1207,7 +1207,7 @@
       "work_package": "WP7",
       "title": "clean checkout重建",
       "acceptance": "locks/container、文档命令实际可跑",
-      "status": "PARTIAL",
+      "status": "PASS",
       "required_for_v1": true,
       "evidence_files": [
         "evidence/wp7/clean_checkout.json",
@@ -1215,6 +1215,7 @@
         "evidence/wp7/container_ci_initial_fail.json",
         "evidence/wp7/container_ci_linker_fail.json",
         "evidence/wp7/container_ci_atomic_fail.json",
+        "evidence/wp7/container_ci_pass.json",
         "deploy/Dockerfile"
       ],
       "loop": "L1",
@@ -1223,12 +1224,10 @@
         "make security-check",
         "make release-check"
       ],
-      "assessment": "干净 committed HEAD 的 native 固定依赖、toy 和安装 wheel 通过；GitHub Linux 已构建固定 base 的镜像并检查 digest/platform，但容器 smoke 依次因缺 libXrender.so.1、libatomic.so.1 失败，修复待 CI 复验。本机 Docker daemon 不可用。",
-      "remaining_steps": [
-        "确认修复后的 Linux 无网络、只读容器真实 API/SUMO smoke 与 digest；不得将 native PASS 扩为容器 PASS。"
-      ],
+      "assessment": "较早提交 7d217b8 的 native 干净检出固定依赖、toy 和安装 wheel 通过；GitHub Actions 35898788800 从当前 PR 代码在 Linux amd64 构建锁定基础镜像、记录本地镜像内容摘要（未发布 registry 镜像），并在无网络只读容器通过真实 API/export 与合成需求 SUMO 1.27.1 smoke。先前缺库失败保留为回归证据。此项不覆盖历史实测或付费模型。",
+      "remaining_steps": [],
       "assessed_at": "2026-09-24",
-      "assessment_basis": "Existing produced artifacts and inspected product checks; no new runtime validation during this documentation audit."
+      "assessment_basis": "GitHub Actions 35898788800 container reproduction artifact, pinned image digest and passing offline API/SUMO smoke; prior native clean checkout evidence."
     },
     {
       "id": "G702",
@@ -1239,7 +1238,8 @@
       "required_for_v1": true,
       "evidence_files": [
         "evidence/current_product_release.json",
-        "evidence/wp7/release_check.log"
+        "evidence/wp7/release_check.log",
+        "evidence/wp7/release_check_after_container.log"
       ],
       "loop": "L1",
       "tests_scope": [
@@ -1247,9 +1247,9 @@
         "make security-check",
         "make release-check"
       ],
-      "assessment": "contracts/network/graph/PPR/SUMO/web/security 有实际通过；全部 must gates 尚未满足。",
+      "assessment": "contracts/network/graph/PPR/SUMO/web/security/reproduce 有实际通过；全部 must gates 尚未满足。",
       "remaining_steps": [
-        "处理 production SimpleJev/完整消融、人工真实城市映射及容器复现缺口；strict release-check 当前应继续非零。"
+        "处理 production SimpleJev/完整消融与人工真实城市映射缺口；strict release-check 当前应继续非零。"
       ],
       "assessed_at": "2026-09-24",
       "assessment_basis": "Existing produced artifacts and inspected product checks; no new runtime validation during this documentation audit.",
@@ -1376,9 +1376,9 @@
         "make test-ontology",
         "make compare-neighbors"
       ],
-      "assessment": "ontology/action/replay/projection、比较来源、NOTICE 与 SBOM 均有证据；容器复现和未过的完整 release gates 仍阻止完整 v1 签发。",
+      "assessment": "ontology/action/replay/projection、比较来源、NOTICE、SBOM 与 Linux 容器复现均有证据；未过的外部及付费模型 release gates 仍阻止完整 v1 签发。",
       "remaining_steps": [
-        "完成 G701/G702 的外部与环境闸门后再签完整 v1 发布包；当前交付继续标明部分验收。"
+        "完成 G702 的外部与付费模型闸门后再签完整 v1 发布包；当前交付继续标明部分验收。"
       ],
       "assessed_at": "2026-09-24",
       "assessment_basis": "New bounded product or artifact validation in this branch; scope and unresolved limitations stated explicitly."
@@ -1386,8 +1386,8 @@
   ],
   "assessment_date": "2026-09-24",
   "status_counts": {
-    "PASS": 43,
-    "PARTIAL": 9,
+    "PASS": 44,
+    "PARTIAL": 8,
     "DEFERRED_USER": 1,
     "BLOCKED_EXTERNAL": 1
   },

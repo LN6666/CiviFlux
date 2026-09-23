@@ -1,0 +1,186 @@
+{
+  "checked_at": "2026-09-23T17:54:17.524515+00:00",
+  "checks": [
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "elapsed_s": 0.001,
+      "exit_code": 0,
+      "output": "3cd96acabb6b93afdc1756593d128f274045a215\n",
+      "stage": "git_commit",
+      "status": "PASS",
+      "timeout_s": 15
+    },
+    {
+      "command": [
+        "docker",
+        "version",
+        "--format",
+        "{{.Server.Version}}"
+      ],
+      "elapsed_s": 0.064,
+      "exit_code": 0,
+      "output": "28.0.4\n",
+      "stage": "docker_daemon",
+      "status": "PASS",
+      "timeout_s": 20
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "version"
+      ],
+      "elapsed_s": 0.148,
+      "exit_code": 0,
+      "output": "github.com/docker/buildx v0.37.1 0b265a9f62db554fa9aba6dd19e1bd5704bc7d8a\n",
+      "stage": "docker_buildx",
+      "status": "PASS",
+      "timeout_s": 20
+    },
+    {
+      "command": [
+        "docker",
+        "buildx",
+        "build",
+        "--platform",
+        "linux/amd64",
+        "--pull",
+        "--load",
+        "--progress",
+        "plain",
+        "--metadata-file",
+        "/home/runner/work/CiviFlux/CiviFlux/.runtime/container-ci/build-metadata.json",
+        "--tag",
+        "civiflux-container-check:8c7e291e5cad",
+        "--file",
+        "deploy/Dockerfile",
+        "."
+      ],
+      "elapsed_s": 29.334,
+      "exit_code": 0,
+      "output": "ting up libllvm15:amd64 (1:15.0.6-4+b1) ...\n#13 9.068 Setting up libx11-6:amd64 (2:1.8.4-2+deb12u2) ...\n#13 9.069 Setting up libdrm-amdgpu1:amd64 (2.4.114-1+b1) ...\n#13 9.072 Setting up libxcb-dri3-0:amd64 (1.15-1) ...\n#13 9.073 Setting up libx11-xcb1:amd64 (2:1.8.4-2+deb12u2) ...\n#13 9.075 Setting up libdrm-nouveau2:amd64 (2.4.114-1+b1) ...\n#13 9.077 Setting up libxrender1:amd64 (1:0.9.10-1.1) ...\n#13 9.078 Setting up libdrm-radeon1:amd64 (2.4.114-1+b1) ...\n#13 9.080 Setting up libdrm-intel1:amd64 (2.4.114-1+b1) ...\n#13 9.081 Setting up libgl1-mesa-dri:amd64 (22.3.6-1+deb12u2) ...\n#13 9.086 Setting up libxext6:amd64 (2:1.3.4-1+b1) ...\n#13 9.088 Setting up libxxf86vm1:amd64 (1:1.1.4-1+b2) ...\n#13 9.089 Setting up libxfixes3:amd64 (1:6.0.0-2) ...\n#13 9.091 Setting up libglx-mesa0:amd64 (22.3.6-1+deb12u2) ...\n#13 9.094 Setting up libglx0:amd64 (1.6.0-1) ...\n#13 9.096 Setting up libgl1:amd64 (1.6.0-1) ...\n#13 9.097 Processing triggers for libc-bin (2.36-9+deb12u14) ...\n#13 9.136 + rm -rf /var/lib/apt/lists/auxfiles /var/lib/apt/lists/lock /var/lib/apt/lists/partial /var/lib/apt/lists/snapshot.debian.org_archive_debian-security_20260920T000000Z_dists_bookworm-security_InRelease /var/lib/apt/lists/snapshot.debian.org_archive_debian-security_20260920T000000Z_dists_bookworm-security_main_binary-amd64_Packages.lz4 /var/lib/apt/lists/snapshot.debian.org_archive_debian_20260920T000000Z_dists_bookworm-updates_InRelease /var/lib/apt/lists/snapshot.debian.org_archive_debian_20260920T000000Z_dists_bookworm-updates_main_binary-amd64_Packages.lz4 /var/lib/apt/lists/snapshot.debian.org_archive_debian_20260920T000000Z_dists_bookworm_InRelease /var/lib/apt/lists/snapshot.debian.org_archive_debian_20260920T000000Z_dists_bookworm_main_binary-amd64_Packages.lz4\n#13 DONE 9.9s\n\n#17 [stage-1  4/14] RUN python -m pip install --no-cache-dir uv==0.11.23\n#17 1.529 Collecting uv==0.11.23\n#17 1.609   Downloading uv-0.11.23-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (11 kB)\n#17 1.627 Downloading uv-0.11.23-py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (25.4 MB)\n#17 1.871    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 25.4/25.4 MB 121.5 MB/s eta 0:00:00\n#17 1.897 Installing collected packages: uv\n#17 2.175 Successfully installed uv-0.11.23\n#17 2.176 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.\n#17 2.301 \n#17 2.301 [notice] A new release of pip is available: 25.0.1 -> 26.2.1\n#17 2.301 [notice] To update, run: pip install --upgrade pip\n#17 DONE 2.8s\n\n#18 [stage-1  5/14] COPY pyproject.toml uv.lock .python-version ./\n#18 DONE 0.0s\n\n#19 [stage-1  6/14] COPY core/ ./core/\n#19 DONE 0.0s\n\n#20 [stage-1  7/14] COPY api/ ./api/\n#20 DONE 0.0s\n\n#21 [stage-1  8/14] COPY adapters/ ./adapters/\n#21 DONE 0.0s\n\n#22 [stage-1  9/14] COPY ontology/ ./ontology/\n#22 DONE 0.0s\n\n#23 [stage-1 10/14] RUN uv sync --frozen --no-dev --no-editable --no-python-downloads\n#23 0.128 Using CPython 3.12.13 interpreter at: /usr/local/bin/python3.12\n#23 0.128 Creating virtual environment at: .venv\n#23 0.141    Building civiflux @ file:///app\n#23 0.201 Downloading scipy (33.7MiB)\n#23 0.202 Downloading networkx (2.0MiB)\n#23 0.220 Downloading osmium (1.8MiB)\n#23 0.220 Downloading shapely (3.0MiB)\n#23 0.221 Downloading pydantic-core (2.0MiB)\n#23 0.221 Downloading pyarrow (45.4MiB)\n#23 0.221 Downloading numpy (15.9MiB)\n#23 0.222 Downloading pyproj (9.6MiB)\n#23 0.222 Downloading sumo-data (15.4MiB)\n#23 0.222 Downloading eclipse-sumo (140.3MiB)\n#23 0.686  Downloaded osmium\n#23 0.699  Downloaded pydantic-core\n#23 0.748       Built civiflux @ file:///app\n#23 0.771  Downloaded shapely\n#23 0.977  Downloaded networkx\n#23 1.122  Downloaded pyproj\n#23 1.405  Downloaded sumo-data\n#23 1.963  Downloaded numpy\n#23 2.638  Downloaded scipy\n#23 2.838  Downloaded pyarrow\n#23 3.201  Downloaded eclipse-sumo\n#23 3.202 Prepared 37 packages in 3.06s\n#23 3.249 Installed 37 packages in 47ms\n#23 3.249  + annotated-doc==0.0.5\n#23 3.249  + annotated-types==0.8.0\n#23 3.249  + anyio==4.15.1\n#23 3.249  + attrs==26.1.0\n#23 3.249  + certifi==2026.7.22\n#23 3.249  + charset-normalizer==3.5.1\n#23 3.249  + civiflux==0.1.0 (from file:///app)\n#23 3.249  + click==8.5.0\n#23 3.249  + defusedxml==0.7.1\n#23 3.249  + eclipse-sumo==1.27.1\n#23 3.249  + fastapi==0.141.1\n#23 3.249  + h11==0.16.0\n#23 3.249  + httpcore==1.0.9\n#23 3.249  + httpx==0.28.1\n#23 3.249  + idna==3.20\n#23 3.249  + jsonschema==4.26.0\n#23 3.249  + jsonschema-specifications==2025.9.1\n#23 3.249  + networkx==3.7\n#23 3.249  + numpy==2.5.3\n#23 3.249  + osmium==4.3.1\n#23 3.249  + pyarrow==23.0.1\n#23 3.249  + pydantic==2.13.5\n#23 3.249  + pydantic-core==2.46.5\n#23 3.249  + pyproj==3.8.0\n#23 3.250  + pyyaml==6.0.3\n#23 3.250  + referencing==0.37.0\n#23 3.250  + requests==2.34.2\n#23 3.250  + rpds-py==2026.6.3\n#23 3.250  + scipy==1.18.1\n#23 3.250  + shapely==2.1.2\n#23 3.250  + starlette==1.7.0\n#23 3.250  + sumo-data==1.27.1\n#23 3.250  + sumolib==1.27.1\n#23 3.250  + typing-extensions==4.16.0\n#23 3.250  + typing-inspection==0.4.4\n#23 3.250  + urllib3==2.8.0\n#23 3.250  + uvicorn==0.53.0\n#23 DONE 8.3s\n\n#24 [stage-1 11/14] COPY --from=web /build/web/dist ./web/dist\n#24 DONE 0.0s\n\n#25 [stage-1 12/14] COPY config/ ./config/\n#25 DONE 0.0s\n\n#26 [stage-1 13/14] COPY cases/synthetic/ ./cases/synthetic/\n#26 DONE 0.0s\n\n#27 [stage-1 14/14] COPY deploy/container_smoke.py ./deploy/container_smoke.py\n#27 DONE 0.0s\n\n#28 exporting to image\n#28 exporting layers\n#28 exporting layers 3.2s done\n#28 writing image sha256:63a1c22134a0266e7c64b14d4e61438f45092b5b7f1f070423f0c30806ac34d3 done\n#28 naming to docker.io/library/civiflux-container-check:8c7e291e5cad done\n#28 DONE 3.2s\n\n#29 resolving provenance for metadata file\n#29 DONE 0.0s\n",
+      "stage": "docker_build",
+      "status": "PASS",
+      "timeout_s": 1200
+    },
+    {
+      "command": [
+        "docker",
+        "image",
+        "inspect",
+        "--format",
+        "{{json .}}",
+        "civiflux-container-check:8c7e291e5cad"
+      ],
+      "elapsed_s": 0.013,
+      "exit_code": 0,
+      "output": "{\"Id\":\"sha256:63a1c22134a0266e7c64b14d4e61438f45092b5b7f1f070423f0c30806ac34d3\",\"RepoTags\":[\"civiflux-container-check:8c7e291e5cad\"],\"RepoDigests\":[],\"Parent\":\"\",\"Comment\":\"buildkit.dockerfile.v0\",\"Created\":\"2026-09-23T17:54:43.878056556Z\",\"DockerVersion\":\"\",\"Author\":\"\",\"Config\":{\"Hostname\":\"\",\"Domainname\":\"\",\"User\":\"\",\"AttachStdin\":false,\"AttachStdout\":false,\"AttachStderr\":false,\"Tty\":false,\"OpenStdin\":false,\"StdinOnce\":false,\"Env\":[\"PATH=/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\",\"LANG=C.UTF-8\",\"GPG_KEY=7169605F62C751356D054A26A821E680E5FA6305\",\"PYTHON_VERSION=3.12.13\",\"PYTHON_SHA256=c08bc65a81971c1dd5783182826503369466c7e67374d1646519adf05207b684\",\"PYTHONPATH=/app/core:/app\",\"PYTHONDONTWRITEBYTECODE=1\",\"CIVIFLUX_WORKSPACE=/workspace\",\"QWEN_API_ALLOW_EGRESS=0\",\"QWEN_API_MAX_CALLS=0\",\"SIMPLEJEV_ALLOW_EGRESS=0\",\"SIMPLEJEV_MAX_CALLS=0\"],\"Cmd\":[\"/app/.venv/bin/python\",\"-m\",\"api\",\"--port\",\"8765\"],\"ArgsEscaped\":true,\"Image\":\"\",\"Volumes\":null,\"WorkingDir\":\"/app\",\"Entrypoint\":null,\"OnBuild\":null,\"Labels\":null},\"Architecture\":\"amd64\",\"Os\":\"linux\",\"Size\":1308968230,\"GraphDriver\":{\"Data\":{\"LowerDir\":\"/var/lib/docker/overlay2/a6aqmqh82e855mvg7yt8enntl/diff:/var/lib/docker/overlay2/67pryljm67j2ot8ofrrrg0kff/diff:/var/lib/docker/overlay2/zhbxukhemxpqq5dfwp7j8agp7/diff:/var/lib/docker/overlay2/rbw9urolv25lc90rfkd6t8g3f/diff:/var/lib/docker/overlay2/4vz2d3ejzll4bg939dbcdwfi1/diff:/var/lib/docker/overlay2/2is2tq16bdsf5qv2fp2efchkg/diff:/var/lib/docker/overlay2/91p82xlvvfm3p7b2a00fldo2c/diff:/var/lib/docker/overlay2/wh2barca84qbwodpcy4d4onrn/diff:/var/lib/docker/overlay2/nncjn8fyr3geu8x6k9tqdvmik/diff:/var/lib/docker/overlay2/kps7e6us5y9ujqd8sm1l2vgky/diff:/var/lib/docker/overlay2/ti6b78h6qk5ag28mvbd0vwetv/diff:/var/lib/docker/overlay2/k63awgf0yrdnc0of9gny6rj1i/diff:/var/lib/docker/overlay2/0887501d51a2484b982ac14f5d2af8402dc66c8d7716269ff7209c65eeb5b567/diff:/var/lib/docker/overlay2/a1e26b6e1e9d24a9416ca700b38e4c6039b4214b74a29f1f16e369fcbc3cf484/diff:/var/lib/docker/overlay2/9566b7748d9333c576d0bd211d010063bb04ddb2fc03f0f2e211a781ffba044d/diff:/var/lib/docker/overlay2/b7d636916915c051b2be4adcee29dd60be4e4ebbe4e60c194afdb74773b71272/diff\",\"MergedDir\":\"/var/lib/docker/overlay2/vofx75yplj86okzivg2vpmnxh/merged\",\"UpperDir\":\"/var/lib/docker/overlay2/vofx75yplj86okzivg2vpmnxh/diff\",\"WorkDir\":\"/var/lib/docker/overlay2/vofx75yplj86okzivg2vpmnxh/work\"},\"Name\":\"overlay2\"},\"RootFS\":{\"Type\":\"layers\",\"Layers\":[\"sha256:66462cc862fe2053b9863fefa3866e07bb5dfb06f6b3ce3177cc096e4021aabe\",\"sha256:bbbb19fa59e928e9d2412742b476b97f157cd95304b1f9fd3a82d221f661acde\",\"sha256:0632d0601fca2055c070f7382e63078c292b98d8fa4a5388ee04bd6b1ea0582e\",\"sha256:da835b7922cb8503b751d1cd1a3ac2309a9608198554e43fdd225591a1ec16f4\",\"sha256:b302e3101fc2652d1e263d21bac0a1399ca7b6ae778d3b61c0c2977662241355\",\"sha256:2ae26b9557caefb90146ca259da4ed09a0010cca02ec545cf653275b37de6c37\",\"sha256:7fcdb7c7f7d8455f1b42fc3c5c80e6a6774a6fef9730fc92477457352ab45a42\",\"sha256:ae065226caf0de647e8b927ffe6cba02807eb49c7d31a1819b04ec9bc49ac17c\",\"sha256:5f12f5376849cb60182f3d639dc256cd277a175ad852f3e1112e74ce8d6fba6b\",\"sha256:a981bbb60a1fe8978d679c971ef4e5866588fb2d514716108cc0745201b5ee79\",\"sha256:8ccb793e7fcb81a7f48fb3de02b27b80f1ed168046ee5dfeb892a309fa1b38f2\",\"sha256:f3c424c8adb2310b3f911b42afcb5eb8f3de0b3ef8e7f3c2a2a489ed43b73b9e\",\"sha256:b77f3df1e06ffbe87c4b67174c39508d4187e2665b0e1b3d5166ae5967d05f4c\",\"sha256:614ff13e890a093962b986201ba42839b71de46f889a197f262743b2501ed990\",\"sha256:8652b4945fb852d797138279b304370a66a63fbd0eec780f2ae7d642dae24b93\",\"sha256:f8e9432a9f7d8845d3c6f8da2291932d44d44b3bab8afe56b75afc28850f3aee\",\"sha256:3c9c2bed149de5be17988d66aca84a11c0aacc08b5d1d3d4de7654d886ec5553\"]},\"Metadata\":{\"LastTagTime\":\"2026-09-23T17:54:47.050488362Z\"}}\n",
+      "stage": "image_inspect",
+      "status": "PASS",
+      "timeout_s": 30
+    },
+    {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "--read-only",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges",
+        "--pids-limit",
+        "128",
+        "--memory",
+        "2g",
+        "--tmpfs",
+        "/workspace:rw,nosuid,nodev,size=128m",
+        "--tmpfs",
+        "/tmp:rw,nosuid,nodev,size=64m",
+        "--env",
+        "CIVIFLUX_TOY_ONLY=1",
+        "--env",
+        "QWEN_API_ALLOW_EGRESS=0",
+        "--env",
+        "QWEN_API_MAX_CALLS=0",
+        "--env",
+        "SIMPLEJEV_ALLOW_EGRESS=0",
+        "--env",
+        "SIMPLEJEV_MAX_CALLS=0",
+        "--entrypoint",
+        "/app/.venv/bin/python",
+        "civiflux-container-check:8c7e291e5cad",
+        "/app/deploy/container_smoke.py"
+      ],
+      "elapsed_s": 2.951,
+      "exit_code": 0,
+      "output": "{\"api\": {\"citypack_id\": \"TOY-DUAL-CORRIDOR\", \"export_sha256\": \"44530ac0086d6189ab89f0cf8c0bd6beca8551af270ea421d277e3d03136754e\", \"health\": {\"ontology_version\": \"1.0.0\", \"status\": \"ok\", \"version\": \"0.1.0\"}, \"od_count\": 1, \"ppr_converged\": true, \"qwen_status\": \"BLOCKED_API_SETUP\", \"scenario_status\": \"completed\"}, \"model_egress\": \"disabled_by_environment_and_docker_network_none\", \"python\": \"3.12.13\", \"scope\": \"Linux installed image; synthetic city, actual local SUMO, API HTTP and export; no hosted model or measured-city claim\", \"status\": \"PASS\", \"sumo\": {\"baseline_arrived\": 1, \"demand_kind\": \"synthetic\", \"engine\": \"real_local_sumo\", \"event_arrived\": 1, \"native_linker_missing_libraries\": {\"netconvert\": [], \"sumo\": []}, \"network_sha256\": \"cc5821a1cb42ed20a93da20a8f449e8ee1af2fb1b9b3b7dbbacdeb6a17d121a4\", \"version\": \"1.27.1\"}, \"web_bundle\": true}\n",
+      "stage": "container_smoke",
+      "status": "PASS",
+      "timeout_s": 150
+    }
+  ],
+  "docker_server": "28.0.4",
+  "git_commit": "3cd96acabb6b93afdc1756593d128f274045a215",
+  "image": {
+    "architecture": "amd64",
+    "buildx_manifest_digest": "sha256:63a1c22134a0266e7c64b14d4e61438f45092b5b7f1f070423f0c30806ac34d3",
+    "id": "sha256:63a1c22134a0266e7c64b14d4e61438f45092b5b7f1f070423f0c30806ac34d3",
+    "os": "linux",
+    "repo_digests": [],
+    "tag": "civiflux-container-check:8c7e291e5cad"
+  },
+  "inputs": {
+    "base_images": [
+      "node:22.23.2-bookworm-slim@sha256:48e4b67d85f87bd551df43704e24d252f56cc5f8e9718841aace50f19948f0f9",
+      "python:3.12.13-slim-bookworm@sha256:4766d8b510c428e595d74b9cc5bbb2fae8e26316fffb4adc89908d79aacd58a2"
+    ],
+    "debian_snapshot": "20260920T000000Z",
+    "input_sha256": {
+      "deploy/Dockerfile": "8c7e291e5cada46bebd74311e7e52a818ce70b1365d6d7b55904b8a0022f6993",
+      "deploy/container_smoke.py": "e2da5cafabb49ea89bd28a5700d65d769a3b7b8990094ecb296dc63b09ba77d6",
+      "uv.lock": "f69a0c8d075db182089e3298d733e88527fc8f264746e2890ca2666d01e75b26",
+      "web/package-lock.json": "3c35672903c796f1dbe8c67f2637bec17e27fd9bf40fafb64f2fa9bcaae80940"
+    }
+  },
+  "scope": "linux/amd64 pinned-image build and offline synthetic/API/SUMO smoke",
+  "smoke": {
+    "api": {
+      "citypack_id": "TOY-DUAL-CORRIDOR",
+      "export_sha256": "44530ac0086d6189ab89f0cf8c0bd6beca8551af270ea421d277e3d03136754e",
+      "health": {
+        "ontology_version": "1.0.0",
+        "status": "ok",
+        "version": "0.1.0"
+      },
+      "od_count": 1,
+      "ppr_converged": true,
+      "qwen_status": "BLOCKED_API_SETUP",
+      "scenario_status": "completed"
+    },
+    "model_egress": "disabled_by_environment_and_docker_network_none",
+    "python": "3.12.13",
+    "scope": "Linux installed image; synthetic city, actual local SUMO, API HTTP and export; no hosted model or measured-city claim",
+    "status": "PASS",
+    "sumo": {
+      "baseline_arrived": 1,
+      "demand_kind": "synthetic",
+      "engine": "real_local_sumo",
+      "event_arrived": 1,
+      "native_linker_missing_libraries": {
+        "netconvert": [],
+        "sumo": []
+      },
+      "network_sha256": "cc5821a1cb42ed20a93da20a8f449e8ee1af2fb1b9b3b7dbbacdeb6a17d121a4",
+      "version": "1.27.1"
+    },
+    "web_bundle": true
+  },
+  "status": "PASS"
+}
