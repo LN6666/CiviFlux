@@ -101,7 +101,7 @@ PYTHONPATH=core:. uv run --frozen python scripts/boundary_sensitivity.py
 
 已将第一外圈选为这 48 个候选目标的案例边界，并在它与第二外圈上通过真实产品 Action→路由→KG→固定 PPR 重跑 Road/Fire；执行 `PYTHONPATH=core:. uv run --frozen python scripts/formal_boundary_case.py`，核对[案例重放报告](../evidence/wp2/helsinki_formal_boundary_case.json)。原案例 51 个候选设施中另 3 个入口未能跨圈配对，2 个原生入口在扩大网络后会重新吸附；报告保留它们的未知状态。这个范围内的稳定性不能升级成全部设施、城市或历史事件有效性。
 
-本地 API 启动时，若上述外圈包存在，只在它的 SHA-256 与正式案例报告相符且报告标明外圈范围已完成受限重放时，才在 `/api/v1/citypacks` 登记它；网页从下拉框直接选择，不通过 10 MiB 浏览器上传接口。外圈文件不存在时仍可使用 toy/compact 包，不自动下载；文件存在但与冻结报告冲突时启动失败，需核对本地数据而非默默回退。包级 warning 明示仅 48 个原候选入口的当前网络 what-if 稳定性，另 3 个未配对入口与 2 个重新吸附入口仍待核验；分析结果和导出 ZIP 的 `result.json` 也携带同一条范围说明及案例报告 SHA-256，而源 CityPack 的快照哈希保持不变。`CIVIFLUX_TOY_ONLY=1` 仅供明确的 toy/CI 运行；它不构成 Helsinki 产品验收。
+本地 API 启动时，若上述外圈包存在，只在它的 SHA-256 与正式案例报告相符且报告标明外圈范围已完成受限重放时，才在 `/api/v1/citypacks` 登记它；网页从下拉框直接选择，不通过 10 MiB 浏览器上传接口。外圈文件不存在时仍可使用 toy/compact 包，不自动下载；文件存在但与冻结报告冲突时启动失败，需核对本地数据而非默默回退。包级 warning 明示仅 48 个原候选入口的当前网络 what-if 稳定性，另 3 个未配对入口与 2 个重新吸附入口仍待核验；新分析结果和导出 ZIP 的 `result.json` 也携带同一条范围说明及案例报告 SHA-256，而源 CityPack 的快照哈希保持不变。旧工作区中未绑定当前范围证据的结果保持原样，API 拒绝再次读取、导出或复用旧幂等键；需使用新的幂等键重新运行场景。`CIVIFLUX_TOY_ONLY=1` 仅供明确的 toy/CI 运行；它不构成 Helsinki 产品验收。
 
 历史事件回测须把来源事实、事发时路网/时刻、独立运营影响记录和独立数值观测分开验收；流程和指标见[回测协议](HISTORICAL_BACKTEST_PROTOCOL.md)。`python3 scripts/historical_backtest_preflight.py`只盘点当前证据，输出与[保存报告](../evidence/wp6/historical_backtest_preflight.json)可核对；它不会运行模型或把当前网络 what-if 评为历史预测。现有 R1 映射尚无人工接受，F1 实际警戒区未知，事发日期 GTFS 与独立实测目标均缺，历史数值结论继续 `NOT_VALIDATED`。
 

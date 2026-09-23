@@ -95,6 +95,7 @@ def test_formal_outer_pack_is_server_registered_and_visible_to_web(tmp_path):
         submitted = client.post(
             "/api/v1/runs",
             json={"citypack_id": outer_id, "scenario_id": scenario["scenario_id"]},
+            headers={"Idempotency-Key": "formal-outer-case"},
         )
         assert submitted.status_code == 202, submitted.text
         run_id = submitted.json()["run_id"]
@@ -110,6 +111,22 @@ def test_formal_outer_pack_is_server_registered_and_visible_to_web(tmp_path):
             saved_result = json.loads(bundle.read("result.json"))
         assert scope_warning in saved_result["limitations"]
         assert saved_result["source_snapshot_hash"] == source_hash
+
+        # An immutable result made before scope evidence was bound must be rerun,
+        # not silently relabelled with a report hash it never recorded.
+        result_path = tmp_path / "workspace" / "runs" / run_id / "result.json"
+        old_result = json.loads(result_path.read_text())
+        old_result["limitations"].remove(scope_warning)
+        result_path.write_text(json.dumps(old_result))
+        assert client.get(f"/api/v1/runs/{run_id}/results").status_code == 409
+        assert client.get(f"/api/v1/runs/{run_id}/export").status_code == 409
+        repeated = client.post(
+            "/api/v1/runs",
+            json={"citypack_id": outer_id, "scenario_id": scenario["scenario_id"]},
+            headers={"Idempotency-Key": "formal-outer-case"},
+        )
+        assert repeated.status_code == 409
+        assert "create a new run" in repeated.json()["message"]
 
 
 @pytest.mark.parametrize(

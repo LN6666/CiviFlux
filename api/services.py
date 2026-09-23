@@ -118,7 +118,10 @@ class RunService:
             if old:
                 if old[1] != request_hash:
                     raise ActionError("Idempotency key reused for different input")
-                return self.state(old[0])
+                old_state = self.state(old[0])
+                if old_state["status"] == "completed":
+                    self._read_result(old[0], old_state)
+                return old_state
             count = sum(
                 json.loads(r[0])["status"] in ("queued", "running")
                 for r in db.execute("SELECT state FROM runs")
@@ -240,10 +243,18 @@ class RunService:
             )
             return self._update(rid, stage="cancelling")
 
+    def _read_result(self, rid, state):
+        result = json.loads((self.root / "runs" / rid / "result.json").read_text())
+        scope_warning = self.citypack_scope_warnings.get(state["citypack_id"])
+        if scope_warning and scope_warning not in result.get("limitations", ()):
+            raise ActionError("Run predates current CityPack scope evidence; create a new run")
+        return result
+
     def result(self, rid):
-        if self.state(rid)["status"] != "completed":
+        state = self.state(rid)
+        if state["status"] != "completed":
             raise ActionError("Results unavailable until run completes")
-        return json.loads((self.root / "runs" / rid / "result.json").read_text())
+        return self._read_result(rid, state)
 
     def export(self, rid):
         state = self.state(rid)
