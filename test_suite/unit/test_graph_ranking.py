@@ -66,6 +66,69 @@ def test_no_event_delta_zero():
     assert all(x["delta_attention"] == 0 for x in compare(pair, ["bc"], weights)["records"])
 
 
+def test_projection_rejects_physical_facts_from_another_scenario():
+    city = toy_city()
+    closed = toy_scenario()
+    open_scenario = toy_scenario(closed=())
+    stale = Router().compare(city, closed)
+    assert stale["restrictions"] == ["bc"]
+    assert open_scenario.restrictions == ()
+    with pytest.raises(ValueError, match="Physical facts restrictions"):
+        paired_projection(city, open_scenario, stale, digest({}))
+
+
+def test_projection_rejects_stale_routes_after_seed_change():
+    from urbanimpact.contracts import Scenario
+
+    city = toy_city()
+    original = toy_scenario()
+    changed = Scenario.model_validate(
+        {**original.model_dump(mode="json"), "seed_spec": {"entity_ids": ["ad"]}}
+    )
+    stale = Router().compare(city, original)
+    assert stale["origins"] == ["B"]
+    assert Router().compare(city, changed)["origins"] == ["A"]
+    with pytest.raises(ValueError, match="Physical facts physical_context_hash"):
+        paired_projection(city, changed, stale, digest({}))
+
+
+def test_projection_reuses_physical_facts_for_policy_only_ablation():
+    from urbanimpact.contracts import Scenario
+    from urbanimpact.network import physical_context_hash
+
+    city = toy_city()
+    original = toy_scenario()
+    policy_only = Scenario.model_validate(
+        {
+            **original.model_dump(mode="json"),
+            "scenario_id": "toy-road-policy",
+            "ranking": "A1",
+            "objective": "transit_association",
+        }
+    )
+    facts = Router().compare(city, original)
+    assert physical_context_hash(city, original) == physical_context_hash(city, policy_only)
+    paired_projection(city, policy_only, facts, digest({}))
+
+
+@pytest.mark.parametrize(
+    ("field", "wrong"),
+    [
+        ("network_hash", "0" * 64),
+        ("analysis_at", "2025-01-01T00:00:00+00:00"),
+        ("vehicle_class", "bus"),
+        ("restrictions", []),
+    ],
+)
+def test_projection_rejects_unbound_physical_fact_context(field, wrong):
+    city = toy_city()
+    scenario = toy_scenario()
+    facts = Router().compare(city, scenario)
+    facts[field] = wrong
+    with pytest.raises(ValueError, match=f"Physical facts {field}"):
+        paired_projection(city, scenario, facts, digest({}))
+
+
 def test_policy_multi_type_and_single_type_invariance(pair):
     g = pair["baseline"]
     a = {t: 1 for t in RELATION_DEFINITIONS}
