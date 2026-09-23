@@ -41,6 +41,19 @@ def _verified_formal_outer(root: Path) -> tuple[CityPack, str]:
     target_count = report.get("fixed_candidate_target_count")
     if type(target_count) is not int or target_count <= 0:
         raise ValueError("Formal Helsinki boundary target count is invalid")
+    original_count = report.get("inner_original_candidate_facilities")
+    excluded = report.get("excluded_candidate_targets")
+    resnapped = report.get("native_entrance_resnap_ids", {}).get("outer")
+    if (
+        type(original_count) is not int
+        or not isinstance(excluded, list)
+        or not isinstance(resnapped, list)
+        or target_count + len(excluded) != original_count
+        or not all(isinstance(item, dict) and isinstance(item.get("facility_id"), str) for item in excluded)
+        or not all(isinstance(item, str) for item in resnapped)
+        or len(set(resnapped)) != len(resnapped)
+    ):
+        raise ValueError("Formal Helsinki boundary entrance coverage is incomplete")
     expected_hash = report.get("crop_citypack_sha256", {}).get("outer")
     if not isinstance(expected_hash, str) or len(expected_hash) != 64:
         raise ValueError("Formal Helsinki outer CityPack hash is missing")
@@ -60,8 +73,9 @@ def _verified_formal_outer(root: Path) -> tuple[CityPack, str]:
         raise ValueError("Formal Helsinki outer CityPack identity or source differs from evidence")
     scope = (
         f"Outer boundary comparison covers only {target_count} frozen candidate entrances "
-        "in the recorded Road/Fire cases; new scenarios and citywide or historical "
-        "claims remain unvalidated."
+        "in the recorded Road/Fire cases. Original candidate entrances excluded: "
+        f"{len(excluded)}; native-crop resnaps: {len(resnapped)}. New scenarios and "
+        "citywide or historical claims remain unvalidated."
     )
     return city, scope
 

@@ -46,6 +46,9 @@ def fake_formal_pack(root: Path) -> tuple[Path, Path, str]:
                 "crop_citypack_sha256": {"outer": hashlib.sha256(raw).hexdigest()},
                 "source_sha256": source.sha256,
                 "fixed_candidate_target_count": 1,
+                "inner_original_candidate_facilities": 2,
+                "excluded_candidate_targets": [{"facility_id": "excluded-test"}],
+                "native_entrance_resnap_ids": {"outer": ["resnapped-test"]},
                 "cases": {
                     kind: {"outer_vs_further": {"observed_fixed_od_metric_stability": True}}
                     for kind in ("road", "fire")
@@ -63,7 +66,8 @@ def test_formal_outer_pack_is_server_registered_and_visible_to_web(tmp_path):
         packs = client.get("/api/v1/citypacks").json()
         assert {pack["citypack_id"] for pack in packs} == {"TOY-DUAL-CORRIDOR", outer_id}
         listed = next(pack for pack in packs if pack["citypack_id"] == outer_id)
-        assert any("new scenarios and citywide" in warning for warning in listed["warnings"])
+        assert any("Original candidate entrances excluded: 1" in warning for warning in listed["warnings"])
+        assert any("New scenarios and citywide" in warning for warning in listed["warnings"])
         geometry = client.get(f"/api/v1/citypacks/{outer_id}")
         assert geometry.status_code == 200
         assert geometry.json()["geojson"]["features"]
@@ -93,7 +97,7 @@ def test_formal_outer_pack_is_server_registered_and_visible_to_web(tmp_path):
         assert client.get(f"/api/v1/runs/{run_id}/results").json()["attention"]["convergence"]
 
 
-@pytest.mark.parametrize("tamper", ["pack", "report_status", "report_path", "missing_report", "unstable_case"])
+@pytest.mark.parametrize("tamper", ["pack", "report_status", "report_path", "missing_report", "unstable_case", "coverage"])
 def test_unverified_formal_pack_fails_closed(tmp_path, tamper):
     pack_path, report_path, _ = fake_formal_pack(tmp_path)
     if tamper == "pack":
@@ -106,6 +110,8 @@ def test_unverified_formal_pack_fails_closed(tmp_path, tamper):
             report["status"] = "NOT_VALIDATED"
         elif tamper == "report_path":
             report["crop_paths"]["outer"] = "../../untrusted.json"
+        elif tamper == "coverage":
+            report["excluded_candidate_targets"] = []
         else:
             report["cases"]["fire"]["outer_vs_further"]["observed_fixed_od_metric_stability"] = False
         report_path.write_text(json.dumps(report))
