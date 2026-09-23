@@ -431,6 +431,8 @@
         "evidence/wp1/citypack_audit.json",
         "test_suite/unit/test_network.py",
         "evidence/wp2/helsinki_boundary_sensitivity.json",
+        "evidence/wp2/helsinki_formal_boundary_case.json",
+        "scripts/formal_boundary_case.py",
         "scripts/boundary_sensitivity.py"
       ],
       "loop": "L1",
@@ -439,9 +441,9 @@
         "make test-scenarios",
         "make demo-road-fire"
       ],
-      "assessment": "已用同一冻结 OSM 字节独立重建更大 Helsinki 路网，并固定 origin、限制边及候选设施入口比较；Road/Fire 各 48 个可配对 OD 分别出现 3/8 个阶段差异，另 3 个候选入口不可配对。不可达仍为 null，不虚构零值。该负结果证明当前小范围边界尚不稳定。",
+      "assessment": "同一冻结 OSM 字节的三层路网检验发现内圈→外圈 Road/Fire 各 48 个固定 OD 有 3/8 个阶段差异。选取最小稳定外圈后，真实产品在外圈和第二外圈重跑 typed Actions、路由、KG/PPR；每案 96 个阶段在 1 秒阈值下无差异、路径不变。共有边权重/转向仍变化，3 个候选入口不可配对、2 个原生入口会重新吸附；不可达仍为 null。仅支持固定 OD 的当前网络 what-if，不证明全城/历史收敛。",
       "remaining_steps": [
-        "选定足以覆盖关键 OD 的正式分析边界并复核稳定性，再重跑受影响的城市案例；当前结果只可作为有边界的 what-if。"
+        "对 3 个被排除的候选入口和 2 个重新吸附的入口进行独立来源/人工核验或明确接受更窄的 48 目标案例范围；在此之前不宣称完整原案例覆盖。"
       ],
       "assessed_at": "2026-09-24",
       "assessment_basis": "New bounded product or artifact validation in this branch; scope and unresolved limitations stated explicitly."
@@ -663,11 +665,14 @@
       "work_package": "WP3",
       "title": "防装饰消融钩子",
       "acceptance": "neutral/permute/no-PPR modes及单relation取消反例",
-      "status": "PARTIAL",
+      "status": "PASS",
       "required_for_v1": true,
       "evidence_files": [
         "evidence/wp6/ablation_report.json",
+        "evidence/wp6/policy_permutation_control.json",
         "test_suite/unit/test_graph_ranking.py",
+        "test_suite/review/test_policy_permutation_control.py",
+        "scripts/offline_policy_permutation.py",
         "core/urbanimpact/pipeline.py"
       ],
       "loop": "L1",
@@ -675,15 +680,14 @@
         "make test-graph",
         "make test-ppr",
         "make test-systemone-contract",
+        "make policy-permutation-control",
         "make demo-ranking",
         "make systemone-preflight"
       ],
-      "assessment": "neutral/no-PPR 分支及单一 relation 权重抵消检查存在；未执行真实模型权重 permutation 负对照。",
-      "remaining_steps": [
-        "在真实冻结 policy 可用且对应实验获准后补 permutation 对照；不能把 A5 neutral 当作完整模型负对照。"
-      ],
+      "assessment": "neutral/no-PPR 分支及单一 relation 权重抵消反例保留；冻结真实免费 SimpleJev 策略的 6! 种离线关系分数置换已执行，物理 facts 固定、每个 policy 内 baseline/event 可比。仅证明敏感性，不是 A3/A4 完整模型消融或模型增益。",
+      "remaining_steps": [],
       "assessed_at": "2026-09-24",
-      "assessment_basis": "Existing produced artifacts and inspected product checks; no new runtime validation during this documentation audit.",
+      "assessment_basis": "New bounded offline product analysis and focused tests; no API inference, paid calls, or model-quality claim.",
       "legacy_tests_scope": [
         "make test-graph",
         "make test-ppr",
@@ -1132,7 +1136,9 @@
       "required_for_v1": false,
       "evidence_files": [
         "evidence/wp1/missing_data_report.json",
-        "evidence/wp6/report.json"
+        "evidence/wp6/report.json",
+        "evidence/wp6/historical_backtest_preflight.json",
+        "docs/HISTORICAL_BACKTEST_PROTOCOL.md"
       ],
       "loop": "L1",
       "tests_scope": [
@@ -1141,7 +1147,7 @@
         "make benchmark",
         "make report"
       ],
-      "assessment": "未获得合格独立历史交通观测；数值验证明确 NOT_VALIDATED，两次外部失败后停止。",
+      "assessment": "只读回测证据预检已将 R1/F1 来源、历史路网/GTFS、独立运营标签及数值观测分层；当前没有合格独立历史交通观测，数值验证保持 NOT_VALIDATED，两次外部失败后停止。",
       "remaining_steps": [
         "取得事件日期/地点/单位/时间覆盖匹配的独立观测后才能验证数值预测；当前不为该缺口继续空转。"
       ],
@@ -1201,11 +1207,15 @@
       "work_package": "WP7",
       "title": "clean checkout重建",
       "acceptance": "locks/container、文档命令实际可跑",
-      "status": "PARTIAL",
+      "status": "PASS",
       "required_for_v1": true,
       "evidence_files": [
         "evidence/wp7/clean_checkout.json",
         "evidence/wp7/clean_checkout_offline.json",
+        "evidence/wp7/container_ci_initial_fail.json",
+        "evidence/wp7/container_ci_linker_fail.json",
+        "evidence/wp7/container_ci_atomic_fail.json",
+        "evidence/wp7/container_ci_pass.json",
         "deploy/Dockerfile"
       ],
       "loop": "L1",
@@ -1214,12 +1224,10 @@
         "make security-check",
         "make release-check"
       ],
-      "assessment": "干净 committed HEAD 的 native 固定依赖、toy 和安装 wheel 通过；Docker 尚不可用且镜像未固定 digest。",
-      "remaining_steps": [
-        "在可用 Docker 环境构建并执行容器 smoke，固定解析后的 base/image digest；不得将 native PASS 扩为容器 PASS。"
-      ],
+      "assessment": "较早提交 7d217b8 的 native 干净检出固定依赖、toy 和安装 wheel 通过；GitHub Actions 35898788800 从当前 PR 代码在 Linux amd64 构建锁定基础镜像、记录本地镜像内容摘要（未发布 registry 镜像），并在无网络只读容器通过真实 API/export 与合成需求 SUMO 1.27.1 smoke。先前缺库失败保留为回归证据。此项不覆盖历史实测或付费模型。",
+      "remaining_steps": [],
       "assessed_at": "2026-09-24",
-      "assessment_basis": "Existing produced artifacts and inspected product checks; no new runtime validation during this documentation audit."
+      "assessment_basis": "GitHub Actions 35898788800 container reproduction artifact, pinned image digest and passing offline API/SUMO smoke; prior native clean checkout evidence."
     },
     {
       "id": "G702",
@@ -1230,7 +1238,8 @@
       "required_for_v1": true,
       "evidence_files": [
         "evidence/current_product_release.json",
-        "evidence/wp7/release_check.log"
+        "evidence/wp7/release_check.log",
+        "evidence/wp7/release_check_after_container.log"
       ],
       "loop": "L1",
       "tests_scope": [
@@ -1238,9 +1247,9 @@
         "make security-check",
         "make release-check"
       ],
-      "assessment": "contracts/network/graph/PPR/SUMO/web/security 有实际通过；全部 must gates 尚未满足。",
+      "assessment": "contracts/network/graph/PPR/SUMO/web/security/reproduce 有实际通过；全部 must gates 尚未满足。",
       "remaining_steps": [
-        "处理 production SimpleJev/完整消融、人工真实城市映射及容器复现缺口；strict release-check 当前应继续非零。"
+        "处理 production SimpleJev/完整消融与人工真实城市映射缺口；strict release-check 当前应继续非零。"
       ],
       "assessed_at": "2026-09-24",
       "assessment_basis": "Existing produced artifacts and inspected product checks; no new runtime validation during this documentation audit.",
@@ -1367,9 +1376,9 @@
         "make test-ontology",
         "make compare-neighbors"
       ],
-      "assessment": "ontology/action/replay/projection、比较来源、NOTICE 与 SBOM 均有证据；容器复现和未过的完整 release gates 仍阻止完整 v1 签发。",
+      "assessment": "ontology/action/replay/projection、比较来源、NOTICE、SBOM 与 Linux 容器复现均有证据；未过的外部及付费模型 release gates 仍阻止完整 v1 签发。",
       "remaining_steps": [
-        "完成 G701/G702 的外部与环境闸门后再签完整 v1 发布包；当前交付继续标明部分验收。"
+        "完成 G702 的外部与付费模型闸门后再签完整 v1 发布包；当前交付继续标明部分验收。"
       ],
       "assessed_at": "2026-09-24",
       "assessment_basis": "New bounded product or artifact validation in this branch; scope and unresolved limitations stated explicitly."
@@ -1377,8 +1386,8 @@
   ],
   "assessment_date": "2026-09-24",
   "status_counts": {
-    "PASS": 42,
-    "PARTIAL": 10,
+    "PASS": 44,
+    "PARTIAL": 8,
     "DEFERRED_USER": 1,
     "BLOCKED_EXTERNAL": 1
   },

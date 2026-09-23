@@ -8,6 +8,7 @@ from __future__ import annotations
 from collections import deque as RealDeque
 from copy import deepcopy
 from datetime import datetime
+from itertools import pairwise
 
 import pytest
 from urbanimpact.actions import ActionError, Workspace
@@ -107,6 +108,93 @@ def test_current_road_links_intersect_edge_and_turn_vehicle_permissions():
         ], "Operational graph asserted a legal passenger turn through a bus-only segment"
 
 
+def test_derived_links_cite_actual_road_facility_and_transit_sources():
+    data = toy_city().model_dump(mode="json")
+    template = data["sources"][0]
+    data["sources"] = [
+        {**template, "id": "UNRELATED", "sha256": "0" * 64},
+        template,
+        {**template, "id": "OTHER-ROAD", "sha256": "1" * 64},
+        {**template, "id": "HOSPITAL-DATA", "sha256": "2" * 64},
+        {**template, "id": "TRANSIT-DATA", "sha256": "3" * 64},
+    ]
+    next(edge for edge in data["edges"] if edge["id"] == "bc")["source_id"] = "OTHER-ROAD"
+    data["facilities"][0]["source_id"] = "HOSPITAL-DATA"
+    data["transit"]["routes"][0]["source_id"] = "TRANSIT-DATA"
+    city = CityPack.model_validate(data)
+    scenario = toy_scenario(closed=())
+    facts = Router().compare(city, scenario, origins=["A"])
+    pair = paired_projection(city, scenario, facts, digest({t: 1.0 for t in RELATION_DEFINITIONS}))
+
+    def find(side, relation, src, dst):
+        return next(
+            link
+            for link in pair[side]["links"]
+            if (link["relation_type"], link["src"], link["dst"]) == (relation, src, dst)
+        )
+
+    assert find("baseline", "ROAD_CONNECTS_TO", "ab", "bc")["evidence_refs"] == [
+        "OTHER-ROAD",
+        "SYNTHETIC-TOY",
+    ]
+    route_sources = ["HOSPITAL-DATA", "OTHER-ROAD", "SYNTHETIC-TOY"]
+    assert find("baseline", "SEGMENT_ACCESS_TO_FACILITY", "ch", "hospital")["evidence_refs"] == route_sources
+    assert find("baseline", "FACILITY_ACCESSED_VIA", "hospital", "ch")["evidence_refs"] == route_sources
+    assert find("dependency_evidence", "ROUTE_USES_SEGMENT", "bus_route", "bc")["evidence_refs"] == [
+        "OTHER-ROAD",
+        "TRANSIT-DATA",
+    ]
+    assert all(
+        "UNRELATED" not in link["evidence_refs"]
+        for graph in pair.values()
+        if isinstance(graph, dict) and "links" in graph
+        for link in graph["links"]
+    )
+
+
+def test_shared_od_links_aggregate_all_routes_independent_of_record_order():
+    city = toy_city()
+    scenario = toy_scenario()
+    facts = Router().compare(city, scenario, origins=["A", "B"])
+    policy = {t: 1.0 for t in RELATION_DEFINITIONS}
+    original = paired_projection(city, scenario, facts, digest(policy))
+    reordered = paired_projection(
+        city, scenario, {**facts, "od": list(reversed(facts["od"]))}, digest(policy)
+    )
+    assert original == reordered
+
+    contributors = sorted("routing:" + digest(od) for od in facts["od"] if "ch" in od["baseline"]["edge_ids"])
+    assert len(contributors) == 2
+    shared = [
+        link
+        for link in original["baseline"]["links"]
+        if (link["relation_type"], link["src"], link["dst"])
+        == ("SEGMENT_ACCESS_TO_FACILITY", "ch", "hospital")
+    ]
+    assert len(shared) == 1
+    assert shared[0]["derivation_id"] == "aggregate:" + digest(contributors)
+    assert compare(original, ["bc"], policy)["records"] == compare(reordered, ["bc"], policy)["records"]
+
+
+def test_shared_od_link_uses_conservative_confidence_independent_of_order():
+    city = toy_city()
+    scenario = toy_scenario()
+    facts = Router().compare(city, scenario, origins=["A", "B"])
+    facts["od"][0]["entrance_status"] = "candidate"
+    policy_hash = digest({t: 1.0 for t in RELATION_DEFINITIONS})
+    original = paired_projection(city, scenario, facts, policy_hash)
+    reordered = paired_projection(city, scenario, {**facts, "od": list(reversed(facts["od"]))}, policy_hash)
+    assert original == reordered
+    shared = [
+        link
+        for link in original["baseline"]["links"]
+        if (link["relation_type"], link["src"], link["dst"])
+        == ("SEGMENT_ACCESS_TO_FACILITY", "ch", "hospital")
+    ]
+    assert len(shared) == 1
+    assert shared[0]["confidence_status"] == "candidate"
+
+
 def test_witness_search_bounds_pending_paths_not_only_completed_visits(monkeypatch):
     """A small layered DAG must not create >10k pending copied paths before its visit budget."""
     import urbanimpact.graph as graph_module
@@ -119,8 +207,8 @@ def test_witness_search_bounds_pending_paths_not_only_completed_visits(monkeypat
     monkeypatch.setattr(graph_module, "deque", BoundedDeque)
     layers = [["seed"]] + [[f"{depth}:{i}" for i in range(40)] for depth in range(3)]
     links = [
-        dict(id=f"{source}->{target}", src=source, dst=target, evidence_refs=["synthetic"])
-        for first, second in zip(layers, layers[1:])
+        {"id": f"{source}->{target}", "src": source, "dst": target, "evidence_refs": ["synthetic"]}
+        for first, second in pairwise(layers)
         for source in first
         for target in second
     ]
@@ -171,7 +259,7 @@ def test_action_failure_after_candidate_does_not_commit_partial_overlay(tmp_path
     )
     with pytest.raises(ValueError):
         # Record validation fails after the candidate write, requiring transaction rollback.
-        workspace.commit(request, timestamp=datetime(2026, 1, 1))
+        workspace.commit(request, timestamp=datetime(2026, 1, 1))  # noqa: DTZ001 - tests naive input
     with pytest.raises(ActionError):
         workspace.scenario(scenario.scenario_id)
     assert workspace.history(scenario.scenario_id) == []

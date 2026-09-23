@@ -1,4 +1,6 @@
-# 05 · Qwen System-One：本地 Jev-style 决策层（Reflex 参考实现）
+# 05 · Qwen System-One：原工程包的本地 Reflex 方案（历史参考）
+
+**当前不执行本页的本地部署、权重下载或发布 pin 指令。** 用户随后指定了 Featherless 托管 SimpleJev Qwen classifier；当前操作契约见 [用户决定](../execution/USER_DECISIONS.md) 和 [adapter 文档](../adapters/system_one/README.md)。以下保留为方案来源与对照，不构成当前实施步骤。
 
 核查日期：2026-09-23。[S22–S24] 第一版不再依赖 closed Jev provider/Jev 注册、密钥、付费 API 或供应商可用性。UrbanImpact 自己定义 `QwenSystemOneBackend` 契约；第一版参考运行时采用 **Reflex + Qwen3.5-4B**，在部署者环境内本地推理。Reflex 是参考实现，不应成为核心算法的不可替换依赖。
 

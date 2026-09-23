@@ -1,6 +1,7 @@
 # 8个大工作包 / 54 goals
 
 每个WP一次推进完整能力；goals用来验收，不要求54轮对话。
+本文件的工作包结构沿用原始工程包；模型运行路径以 [USER_DECISIONS.md](USER_DECISIONS.md) 为准：托管 Featherless SimpleJev API，禁止本地 Qwen，生产调用暂缓。实时进度以 [STATE.md](STATE.md) 和 `goals.json` 为准。
 
 ## WP0 一次打通工程骨架、契约、toy运行与Qwen System-One预检
 前置：[]。Prompt：prompts/01_WP0.md
@@ -8,7 +9,7 @@
 - **G001** 建立可运行monorepo与锁文件：Python API、TypeScript component构建，版本/许可可追溯，不只空目录
 - **G002** 冻结Scenario/Result/KG契约：JSON Schema/Pydantic/TS一致性测试与无效输入拒绝
 - **G003** 贯通toy纵向运行：scenario→route facts→graph→PPR→ResultBundle，从API可取实际数值
-- **G004** 真实Qwen System-One环境预检：检查本地Reflex/Qwen endpoint、模型/commit pin、device与calibration；能跑则真实smoke；不能则精确BLOCKED_ENVIRONMENT
+- **G004** 托管 SimpleJev 环境预检：检查官方 endpoint、指定 classifier、凭据、egress 与调用预算；未授权则精确 `DEFERRED_USER`，不下载或启动本地模型
 - **G005** 测试与命令入口：创建make与CI层级，参考oracle与产品tests隔离
 - **G006** 记录状态和边界：STATE、能力清单、初始release manifest无假PASS
 
@@ -66,7 +67,7 @@
 前置：['WP1', 'WP3', 'WP4', 'WP5']。Prompt：prompts/07_WP6.md
 
 - **G601** 冻结48情景与独立labels：按母题/走廊split，模型无heldout访问
-- **G602** 公平运行A0–A5：physical cache共享，real local Qwen System-One response冻结，负对照完整
+- **G602** 公平运行A0–A5：physical cache共享，真实托管 SimpleJev 响应及 provenance 冻结，生产付费调用须先授权，负对照完整
 - **G603** R1源事实复现审计：边界/方向/时间精度与公告对照，非数值准确性
 - **G604** F1真实地点情景审计：incident事实与假设分开，不冒称实际管制/响应
 - **G605** 如有观测则独立数值验证：取得才评估，否则NOT_VALIDATED，不停工空转

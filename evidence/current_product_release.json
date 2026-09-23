@@ -208,7 +208,7 @@
         },
         {
           "path": "evidence/wp1/case_review.json",
-          "sha256": "bcfbb1e71bd65fd0771b0dfb5852e79141ee8efd424d16eb1f889ba0d962d84e"
+          "sha256": "1542d6b47ca71b40368c2699f70b1af71589eb89eadcebd5b4d0700e1bb2cfcc"
         },
         {
           "path": "evidence/wp2/helsinki_road_product.json",
@@ -277,12 +277,16 @@
       "scope": "Bounded automated API/input/egress/cache/export checks; repository credential heuristic and npm vulnerability audit, not a penetration test"
     },
     "GATE-REPRODUCE": {
-      "status": "BLOCKED_ENVIRONMENT",
+      "status": "PASS",
       "producer": "actual_product_validation",
-      "commit": "7d217b8dec9280a4a44d3774f16a0cfe88ed3a6c",
+      "commit": "3cd96acabb6b93afdc1756593d128f274045a215",
       "commands": [
         {
           "command": "PYTHONPATH=core:. uv run --frozen python scripts/clean_checkout.py --allow-dependency-downloads --out evidence/wp7/clean_checkout.json",
+          "exit_code": 0
+        },
+        {
+          "command": "GitHub Actions run 35898788800: python3 deploy/container_repro.py --out .runtime/container-ci/reproduction.json",
           "exit_code": 0
         }
       ],
@@ -294,10 +298,14 @@
         {
           "path": "evidence/wp7/clean_checkout_offline.json",
           "sha256": "c6850a3d679ddc0f2eba16b30eaa12969017b1eebedfff020c6c200646a0f501"
+        },
+        {
+          "path": "evidence/wp7/container_ci_pass.json",
+          "sha256": "f6ff4ccf04724bb52117ea9002c68c3543920da5b631d6113a469f93d508bec7"
         }
       ],
-      "executed_at": "2026-09-23T15:24:11.273911+00:00",
-      "scope": "Fresh committed native installation, actual toy pipeline and installed wheel PASS; container daemon/image digest reproduction not yet verified"
+      "executed_at": "2026-09-23T17:54:17.524515+00:00",
+      "scope": "Earlier commit 7d217b8 native clean checkout, toy pipeline and installed wheel PASS; PR #2 head 97ece0d Linux CI merge checkout built an amd64 image from pinned bases, recorded local image content digest sha256:63a1c22134a0266e7c64b14d4e61438f45092b5b7f1f070423f0c30806ac34d3 (not a published registry digest), and passed network-disabled read-only API/export plus real synthetic SUMO smoke. This does not validate historical city impacts or paid model calls."
     }
   },
   "claims": {
