@@ -7,7 +7,8 @@
 1. `execution/USER_DECISIONS.md`：用户决定优先于旧 pack；Qwen 必须 API；当前 System-One 为 Featherless SimpleJev；暂不付费；GitHub 公开仓库已授权。
 2. `README.md` → `docs/index.md` → `docs/CURRENT_ARCHITECTURE.md` / `docs/CURRENT_RUNBOOK.md`。
 3. `docs/ARCHITECTURE_GUARDRAILS.md`：用户指定第 9–20 节风险对应的工程约束。
-4. `evidence/current_product_release.json`：严格 release gate；尚未完成的 gate 不伪造 PASS。
+4. `docs/CODEX_HANDOFF.md` 与 `docs/USER_REQUIREMENTS_TRACE.md`：其他账户的执行入口和本次用户要求逐项落实位置。
+5. `evidence/current_product_release.json`：严格 release gate；尚未完成的 gate 不伪造 PASS。
 
 ## 已落地
 
@@ -18,11 +19,11 @@
 - SimpleJev 远程 typed classifier 适配器；真实免费 demo 与 toy/Helsinki 图应用已通过限定范围验证（免费请求3次，付费0次）；生产 paid 调用关闭。普通 Qwen chat API 仅为可选备用接口，不能替代 SimpleJev 验收。
 - 固定场景消融、独立路由 oracle、PPR 数值 oracle、ontology 回归检查、核心性能与外部开源系统的受限 smoke。
 
-## 本轮仍在收尾
+## 已发布与核验
 
 - 最终 Python 检查207通过（包括66项原参考检查）；浏览器6通过。干净检出、冻结依赖安装和隔离 wheel 运行均通过（7d217b8）。
-- 同步 release manifest 与实际检查结果，保留用户推迟的 gate。
-- GitHub 已认证为 LN6666；当前正准备已授权的公开仓库发布。
+- 54 项验收逐项记录在 `execution/ACCEPTANCE.md`：38 PASS、14 PARTIAL、1 DEFERRED_USER、1 BLOCKED_EXTERNAL；strict release manifest 保留四项未过 gate，`engineering_complete=false`。
+- [公开 GitHub 仓库](https://github.com/LN6666/CiviFlux) 的 `main` 已推送；[首次 GitHub Actions](https://github.com/LN6666/CiviFlux/actions/runs/35886546155) 在提交 `5758ff4` 的锁定安装、Python/数据/SUMO/安全、Web 构建及浏览器检查全部通过。后续提交须以对应 run 的实际结果为准。
 
 ## 明确缺口
 

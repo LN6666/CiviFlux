@@ -1,8 +1,16 @@
 # CiviFlux 轮替交接：给下一位 Codex
 
-这是当前项目的**执行入口**。先读本文件，再看 [`execution/STATE.md`](../execution/STATE.md)、[`execution/ACCEPTANCE.md`](../execution/ACCEPTANCE.md) 和 [`evidence/current_product_release.json`](../evidence/current_product_release.json)。旧 `MASTER_PLAN.md`、编号设计文档、旧 prompt 和 `evidence/product_release.json` 是导入时的历史基线，不能覆盖当前用户决定或运行状态。
+这是当前项目的**执行入口**。先读本文件及[用户要求对照](USER_REQUIREMENTS_TRACE.md)，再看 [`execution/STATE.md`](../execution/STATE.md)、[`execution/ACCEPTANCE.md`](../execution/ACCEPTANCE.md) 和 [`evidence/current_product_release.json`](../evidence/current_product_release.json)。旧 `MASTER_PLAN.md`、编号设计文档、旧 prompt 和 `evidence/product_release.json` 是导入时的历史基线，不能覆盖当前用户决定或运行状态。
 
-仓库目标：`https://github.com/LN6666/CiviFlux`，公开。所有人可读；其他账号贡献时 fork 或创建有权限的分支并提交 PR，由仓库维护者审核。不得假定自己拥有原始账号的 Featherless、GitHub 或本机凭据。`main` 是集成线；开发分支使用 `codex/` 前缀。先读 `git status`、最近提交和 CI，不重做已完成实验，也不改写共享历史。
+仓库：[LN6666/CiviFlux](https://github.com/LN6666/CiviFlux)，公开。所有人可读；其他账号贡献时 fork 或创建有权限的分支并提交 PR，由仓库维护者审核。不得假定自己拥有原始账号的 Featherless、GitHub 或本机凭据，也不能自动继承本次 Codex 会话的 goal 状态。`main` 是集成线；开发分支使用 `codex/` 前缀。先读 `git status`、最近提交和 CI，不重做已完成实验，也不改写共享历史。
+
+## 新账户的第一步
+
+1. 在自己的机器执行 `git clone https://github.com/LN6666/CiviFlux.git`，在 Codex 中把克隆出的 `CiviFlux` 目录作为项目打开。公开仓库可匿名克隆；提交 PR 时才需要自己的 GitHub 身份或 fork。
+2. 依次读本文件、[用户要求对照](USER_REQUIREMENTS_TRACE.md)、[当前状态](../execution/STATE.md)、[验收清单](../execution/ACCEPTANCE.md)、[用户决定](../execution/USER_DECISIONS.md)；然后看 `git status`、`git log -1` 和仓库最新 [CI](https://github.com/LN6666/CiviFlux/actions)。历史 Master Plan 只在细节争议时查阅。
+3. 将本文件末尾的“新会话起始提示”发给新 Codex，并说明要进入 goal 模式。当前账户的 goal 状态不会跨账户复制；新代理应以 54 项目标和实际 release gate 继续，勿把已通过内容重新标为待办。
+4. 配好 Python 3.12、`uv` 0.11.23、Node 22 后运行 `make bootstrap`；先运行与所改模块相关的测试，再按[运行手册](CURRENT_RUNBOOK.md)运行需交付的检查。初始 clone 不含 ignored 城市原始数据；需要 Helsinki 案例时按[数据说明](../data/README.md)获取和重建。
+5. 无仓库写权限时在自己的 GitHub 账户 fork，开 `codex/` 主题分支并向 `main` 发 PR；有写权限也按[版本规则](VERSIONING.md)执行。PR 说明须注明目标 ID、变更、命令/退出码、证据及剩余限制。不要复制原账户的本地 `.env`、Key、运行缓存或把线上模型调用当作 CI 默认步骤。
 
 ## 用户已确定的决定
 
@@ -31,6 +39,6 @@
 
 ## 新会话可以直接使用的起始提示
 
-> 继续公开仓库 `LN6666/CiviFlux` 的 Road & Fire GIS v1。先读取 `docs/CODEX_HANDOFF.md`、`execution/STATE.md`、`execution/ACCEPTANCE.md`、`execution/USER_DECISIONS.md` 和 `evidence/current_product_release.json`，检查当前 Git/CI。沿当前未完成目标做最小有证据的实现与修复，完成相应测试、文档和 PR。Featherless SimpleJev Qwen3.8-27B 只通过托管 API；免费 Demo 三次已用完，生产付费未经授权，预算为零，不本地部署模型。保持本体只服务 v1、物理 facts 与语义 attention 分离、不能将候选数据或模型评分当成核验事实。不要重跑未受变更影响的冻结实验；不能完成的外部 gate 如实标记并继续独立工作。
+> 请进入 goal 模式，继续公开仓库 `LN6666/CiviFlux` 的 Road & Fire GIS v1。先读取 `docs/CODEX_HANDOFF.md`、`docs/USER_REQUIREMENTS_TRACE.md`、`execution/STATE.md`、`execution/ACCEPTANCE.md`、`execution/USER_DECISIONS.md` 和 `evidence/current_product_release.json`，检查当前 Git/CI。沿当前未完成目标做最小有证据的实现与修复，完成相应测试、文档和 PR。Featherless SimpleJev Qwen3.8-27B 只通过托管 API；免费 Demo 三次已用完，生产付费未经授权，预算为零，不本地部署模型。保持本体只服务 v1、物理 facts 与语义 attention 分离、不能将候选数据或模型评分当成核验事实。不要重跑未受变更影响的冻结实验；不能完成的外部 gate 如实标记并继续独立工作。
 
 这是一份项目工作说明，不代替来自当前用户的新指示。接手者应以本次任务中的用户要求为准，保留已作出的授权和费用边界。

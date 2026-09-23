@@ -10,6 +10,7 @@ CiviFlux 是部署者本地运行的道路限制与火灾**外部交通影响**�
 
 - [文档导航与用户决定](docs/index.md)：当前实现、迁移覆盖关系与历史来源入口。
 - [Codex 轮替交接](docs/CODEX_HANDOFF.md)：其他人或其他账户接手时的读取顺序、未完成目标、账号与费用边界。
+- [用户要求对照](docs/USER_REQUIREMENTS_TRACE.md)：本次对话中的工程、模型、数据、版本和交接要求逐项对应实现与缺口。
 - [当前运行手册](docs/CURRENT_RUNBOOK.md)：环境、测试、真实 SUMO、数据、Qwen 和故障处理。
 - [当前实现架构](docs/CURRENT_ARCHITECTURE.md)：模块职责、数据流、扩展位置和结果语义。
 - [工程决策](docs/adr/0001-current-architecture.md)：不可变城市快照、Action overlay、成对计算与 API 边界。

@@ -6,6 +6,7 @@
 |---|---|
 | 项目现在是什么、怎样开始 | [README](../README.md) |
 | 其他 Codex 账户如何轮替接手 | [CODEX_HANDOFF](CODEX_HANDOFF.md) |
+| 本次对话每项用户要求落实在哪里 | [USER_REQUIREMENTS_TRACE](USER_REQUIREMENTS_TRACE.md) |
 | 用户决定及旧方案覆盖关系 | [USER_DECISIONS](../execution/USER_DECISIONS.md) |
 | 怎样安装、运行、测试、看失败 | [CURRENT_RUNBOOK](CURRENT_RUNBOOK.md) |
 | 代码职责、数据流、扩展位置 | [CURRENT_ARCHITECTURE](CURRENT_ARCHITECTURE.md) |
