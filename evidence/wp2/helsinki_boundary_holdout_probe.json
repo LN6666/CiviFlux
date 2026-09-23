@@ -1,0 +1,160 @@
+{
+  "status": "HELDOUT_PROBE_EXECUTED",
+  "claim_boundary": "Current OSM fixed-weight passenger routing from eight deterministic road-junction probes to the 48 original shared candidate entrance nodes. This is not independent observed OD demand, verified facility access, citywide convergence or historical validation.",
+  "selection_method": "Before routing, take two shared, coordinate-identical passenger junctions with incoming and outgoing edges per quadrant of the original inner bbox; exclude original case origins and every original candidate entrance; order candidates by SHA256(salt + ':' + node_id). No outcome-based filtering.",
+  "selection_salt": "g205-heldout-origins-v1",
+  "origins_per_quadrant": 2,
+  "heldout_origins": [
+    {
+      "node_id": "osm:node:1529213719:48062e18",
+      "lon": 24.95386794483401,
+      "lat": 60.1806056746995,
+      "quadrant": "SW"
+    },
+    {
+      "node_id": "osm:node:250089901:f44e6982",
+      "lon": 24.931029060146543,
+      "lat": 60.176389376198905,
+      "quadrant": "SW"
+    },
+    {
+      "node_id": "osm:node:1375811127:b7bd83fe",
+      "lon": 24.95832135030987,
+      "lat": 60.17598930852285,
+      "quadrant": "SE"
+    },
+    {
+      "node_id": "osm:node:8856631481:a965ea2a",
+      "lon": 24.956440043715972,
+      "lat": 60.172705804452285,
+      "quadrant": "SE"
+    },
+    {
+      "node_id": "osm:node:1279666009:7b998fa0",
+      "lon": 24.942016689899692,
+      "lat": 60.19245059836803,
+      "quadrant": "NW"
+    },
+    {
+      "node_id": "osm:node:1012264344:4bca0a4c",
+      "lon": 24.93627338569128,
+      "lat": 60.19265501849299,
+      "quadrant": "NW"
+    },
+    {
+      "node_id": "osm:node:1526055725:8b124f4b",
+      "lon": 24.958907235907503,
+      "lat": 60.18608796587763,
+      "quadrant": "NE"
+    },
+    {
+      "node_id": "osm:node:470416985:4aa3e7e4",
+      "lon": 24.964659906971075,
+      "lat": 60.18380278932648,
+      "quadrant": "NE"
+    }
+  ],
+  "inner_bbox": [
+    24.921,
+    60.1695,
+    24.988,
+    60.193
+  ],
+  "source_sha256": "07489394d83e34003a64f3aabc0b05669b6345bc3d02fbc550fc851c9f123c6d",
+  "source_license": "ODbL-1.0, © OpenStreetMap contributors; imported via HSL",
+  "crop_citypack_sha256": {
+    "outer": "e659642825c7f7fa54340d164e6b7db4f4fb8a8ddafb90065809f54c148b33dd",
+    "further": "dd1582a8b5c9fbaaca1013ccbac4e430875d3623c11487b159cd4228258fc6ab"
+  },
+  "fixed_candidate_target_count": 48,
+  "fixed_candidate_target_hash": "70049b8953721abda67bbed28dfe367deba6a87d5fc312c7601052e4a9c03323",
+  "excluded_candidate_targets": [
+    {
+      "facility_id": "osm:facility-way:1076884314:9d04b1e0",
+      "reason": "candidate entrance unknown in inner crop"
+    },
+    {
+      "facility_id": "osm:facility-way:1100772558:880fe8fc",
+      "reason": "inner candidate entrance node absent in outer,further graph"
+    },
+    {
+      "facility_id": "osm:facility-way:33538166:a29160b4",
+      "reason": "inner candidate entrance node absent in outer,further graph"
+    }
+  ],
+  "boundary_report_sha256": "59a3500b722889ebabbe918c2d1a9640c7f407b540bc4416d59e65ec6562eefd",
+  "formal_case_report_sha256": "4b55948b1981c45300f028b792f9573effa12eee68b976b580943731a6f2ed48",
+  "cases": {
+    "road": {
+      "od_count": 384,
+      "stage_comparisons": 768,
+      "threshold_seconds": 1.0,
+      "status_counts": {
+        "outer": {
+          "baseline": {
+            "available": 384
+          },
+          "event": {
+            "available": 376,
+            "unreachable": 8
+          }
+        },
+        "further": {
+          "baseline": {
+            "available": 384
+          },
+          "event": {
+            "available": 376,
+            "unreachable": 8
+          }
+        }
+      },
+      "comparable_available_stage_count": 760,
+      "path_changed_when_both_available_count": 0,
+      "max_abs_travel_time_change_s_when_both_available": 0.8676532719297825,
+      "difference_count": 0,
+      "differences": [],
+      "observed_metric_stability": true,
+      "missing_metrics_remain_null": true,
+      "scenario_file_sha256": "9e07776ca748e47d28847bcb341f0be6540cb9897f048b77123e801b96cab404"
+    },
+    "fire": {
+      "od_count": 384,
+      "stage_comparisons": 768,
+      "threshold_seconds": 1.0,
+      "status_counts": {
+        "outer": {
+          "baseline": {
+            "available": 384
+          },
+          "event": {
+            "available": 384
+          }
+        },
+        "further": {
+          "baseline": {
+            "available": 384
+          },
+          "event": {
+            "available": 384
+          }
+        }
+      },
+      "comparable_available_stage_count": 768,
+      "path_changed_when_both_available_count": 0,
+      "max_abs_travel_time_change_s_when_both_available": 0.8676532719297825,
+      "difference_count": 0,
+      "differences": [],
+      "observed_metric_stability": true,
+      "missing_metrics_remain_null": true,
+      "scenario_file_sha256": "6f7432bf92036de2055ab625f0be772c31c93517c7ed831afa8f6df03b1cf350"
+    }
+  },
+  "reproduce_command": "PYTHONPATH=core:. .venv/bin/python scripts/boundary_holdout_probe.py",
+  "limitations": [
+    "The probes reuse the frozen OSM snapshot and unverified candidate entrance nodes; they are held out only from the original origin-based boundary selection.",
+    "Eight junctions cannot establish citywide or historical convergence and do not replace human/source review of three excluded and two resnapped entrances.",
+    "Road/fire restrictions, class and analysis time are the two declared what-if scenarios, not measured event ground truth."
+  ],
+  "script_sha256": "c8380138d190d2d44631888c7973822e3879462a8f4cb05ff83b239a9ba2c7b5"
+}
