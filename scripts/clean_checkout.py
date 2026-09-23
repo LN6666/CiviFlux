@@ -217,10 +217,16 @@ def verify(repo: Path, timeout: int, report: dict, allow_dependency_downloads: b
                     timeout,
                     temp,
                 )
-            # Building the local project and all subsequent work remain offline even with the flag.
+            # Install the local project as a wheel: an editable build needs the
+            # separate `editables` backend helper, which the frozen runtime lock
+            # does not populate in a fresh offline cache. The smoke below checks
+            # the installed wheel again from outside the checkout.
             command(
                 "offline_sync",
-                ["uv", "sync", "--frozen", "--offline", "--python", "3.12", "--no-python-downloads"],
+                [
+                    "uv", "sync", "--frozen", "--offline", "--no-editable",
+                    "--python", "3.12", "--no-python-downloads",
+                ],
                 checkout,
                 env,
                 checks,
