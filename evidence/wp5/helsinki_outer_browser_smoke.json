@@ -1,0 +1,58 @@
+{
+  "status": "PASS_SCOPED_LOCAL_BROWSER_SMOKE",
+  "recorded_at_utc": "2026-09-23T20:39:48Z",
+  "tested_code_commit": "0ef38d7a253ab1754a6db62af898b452a6feaa5a",
+  "tested_code_tree": "bf2879a5e6f862c32db1c24f66401e7357f3478d",
+  "environment": {
+    "browser": "Playwright 1.63.0 / Chromium 153.0.8010.12, headless macOS",
+    "provider_egress_enabled": false,
+    "external_browser_requests": 0,
+    "page_errors": 0,
+    "console_errors": 0,
+    "network_failures": 0
+  },
+  "inputs": {
+    "citypack_path": "data/citypacks/helsinki-boundary-outer/citypack.json",
+    "citypack_sha256": "e659642825c7f7fa54340d164e6b7db4f4fb8a8ddafb90065809f54c148b33dd",
+    "formal_case_report_path": "evidence/wp2/helsinki_formal_boundary_case.json",
+    "formal_case_report_sha256": "4b55948b1981c45300f028b792f9573effa12eee68b976b580943731a6f2ed48",
+    "citypack_is_unbundled_local_data": true
+  },
+  "checks": {
+    "selected_outer_citypack": true,
+    "map_rendered": true,
+    "map_road_selection": true,
+    "a2_routing_run_completed": true,
+    "attention_rows_per_page": 100,
+    "attention_records_in_result_and_export": 27108,
+    "scope_warning_in_citypack_ui": true,
+    "scope_warning_in_browser_evidence": true,
+    "scope_warning_in_api_result": true,
+    "scope_warning_in_zip_result": true,
+    "scope_warning_counts": {
+      "frozen_candidate_entrances": 48,
+      "excluded_entrances": 3,
+      "native_crop_resnaps": 2
+    },
+    "zip_file_count": 7,
+    "od_records_in_result_and_export": 151
+  },
+  "observed_ms": {
+    "citypack_selection": 1209,
+    "map_render": 44,
+    "map_click": 35,
+    "analysis_to_result": 14105,
+    "attention_tab": 59,
+    "zip_export": 1315
+  },
+  "downloaded_artifacts_not_committed": {
+    "zip_sha256": "4df457e91f4bb3a1711cec8576c0ce42969772150f17aadc474e955b3507fbeb",
+    "result_json_sha256": "5cf6dad98dc1645efeb527422f63cfdfd5dc365b9f37581bf0f7cb5aacbacbfc"
+  },
+  "limits": [
+    "One local headless-browser run on a current OSM/GTFS snapshot; timings are not a cross-device performance guarantee.",
+    "The 48/3/2 boundary evidence covers the frozen Road/Fire candidate cases, not all Helsinki entrances or new scenarios.",
+    "Facility entrances, event-date network state, observed traffic effects, and historical prediction remain unvalidated.",
+    "The paid SimpleJev classifier and complete paid-model ablation were not exercised."
+  ]
+}
