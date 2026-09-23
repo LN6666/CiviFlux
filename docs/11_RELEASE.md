@@ -18,7 +18,11 @@ GATE-REPRODUCE：clean checkout命令、lockfile、container固定、结果manif
 
 ## evidence manifest
 
-每gate字段status(PASS|FAIL|NOT_RUN|BLOCKED_ENVIRONMENT|BLOCKED_EXTERNAL)、producer、commit、commands[{command,exit_code}]、evidence_files[{path,sha256}]、executed_at、scope。PASS必须有真实证据文件，schema脚本只做必要检查，不证明文件内容真实；CI和review必须检查内容，不得生成文字写“通过”代替日志。
+每gate字段status(PASS|FAIL|NOT_RUN|BLOCKED_ENVIRONMENT|BLOCKED_EXTERNAL)、producer、commit、commands[{command,exit_code}]、evidence_files[{path,sha256}]、executed_at、scope。PASS必须有真实证据文件。`check_release.py` 的结构层核对字段、状态和证据文件哈希；`make release-check` 还要求 PASS 的完整 Git commit 可解析、是当前 HEAD 的祖先，且该提交至 HEAD 的产品、测试、数据 fixture、依赖与构建输入未变，工作树内这些输入也没有未提交或未跟踪改动。文档与证据提交本身不会让相同代码的 PASS 失效。旧 CI 临时 merge commit 若不在当前 Git 历史中，不能仅凭 SHA 字符串沿用作当前 PASS。
+
+上述校验是必要条件，不证明清单里自填的命令退出码对应真实运行，也不证明证据文件内容和验收范围正确。完成发布前仍须核对可信 CI/人工运行记录的 commit、日志、产物和 gate 范围；不能生成文字写“通过”代替日志。干净 Git 检出和足够的提交历史是当前修订校验的前提；浅检出缺少被引用的 commit 时会拒绝 PASS。
+
+当前 `evidence/current_product_release.json` 中已有 PASS 是**所记旧提交及限定范围下当时的结果**。本轮代码、测试与构建输入已继续变化，旧证据不能自动升级为当前 HEAD 的 PASS；在相关受控输入上重跑并记录可信结果前，`make release-check` 应把它们列为 stale，同时继续列出未完成的生产模型、真实城市及消融 gate。不得为了消除 stale 而只改清单里的 commit、状态或 `engineering_complete`。
 
 `evidence/product_release.json` 初始所有NOT_RUN；`scripts/check_release.py` 返回非零。WP7更新路径哈希并用CI独立运行。
 

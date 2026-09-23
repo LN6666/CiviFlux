@@ -1,6 +1,7 @@
 name: CiviFlux checks
 on:
   push:
+    branches: [main]
   pull_request:
 permissions:
   contents: read
@@ -37,4 +38,20 @@ jobs:
         with:
           name: linux-sbom-evidence
           path: .runtime/sbom-host/
+  container:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: python3 deploy/container_repro.py --out .runtime/container-ci/reproduction.json
+        env:
+          QWEN_API_ALLOW_EGRESS: '0'
+          QWEN_API_MAX_CALLS: '0'
+          SIMPLEJEV_ALLOW_EGRESS: '0'
+          SIMPLEJEV_MAX_CALLS: '0'
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: always()
+        with:
+          name: container-reproduction
+          path: .runtime/container-ci/
   # Live API and live data acquisition are explicit local/manual gates; CI has no API credentials.

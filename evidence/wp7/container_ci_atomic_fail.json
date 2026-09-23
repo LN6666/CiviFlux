@@ -1,0 +1,14 @@
+{
+  "status": "FAIL",
+  "scope": "Third Linux container CI smoke, not a release PASS",
+  "github_actions_run": 35898408085,
+  "source_report": ".runtime/ci-container-35898408085/reproduction.json",
+  "git_commit": "a8a524327738b76fb9677054f3c4e955adaa690e",
+  "docker_build": "PASS",
+  "image_inspect": "PASS",
+  "image_digest": "sha256:9a42da7f0ae8b34fbae10fa32c8dd895a1d1617a156688d6f8b6a24254f4d0fa",
+  "container_smoke": "FAIL",
+  "observed_missing_library": "libatomic.so.1",
+  "diagnosis": "After installing libxrender1, the native SUMO ELF dependency preflight found libatomic.so.1 missing in the runtime image.",
+  "fix_pending_ci": "Install libatomic1 from the same pinned Debian snapshot and keep linker errors concise."
+}

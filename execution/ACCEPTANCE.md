@@ -2,7 +2,7 @@
 
 更新：2026-09-24。状态对应 `execution/goals.json`；新补充的验证按具体范围记载，未完成的外部闸门继续保留。
 
-**当前计数：** PASS 42，PARTIAL 10，DEFERRED_USER 1，BLOCKED_EXTERNAL 1；合计 54。不是 54/54 完成。
+**当前计数：** PASS 44，PARTIAL 8，DEFERRED_USER 1，BLOCKED_EXTERNAL 1；合计 54。不是 54/54 完成。
 
 PASS 只覆盖该行写明的验收范围；PARTIAL 表示已有实现/证据但仍有条款未验证；DEFERRED_USER 是用户推迟的付费工作；BLOCKED_EXTERNAL 是来源/独立观测不可得。原始验收文本保留在 [goals.json](goals.json)，每项目标另列 assessment、remaining_steps 和证据。
 
@@ -11,7 +11,7 @@ PASS 只覆盖该行写明的验收范围；PARTIAL 表示已有实现/证据但
 - 以 [USER_DECISIONS.md](USER_DECISIONS.md) 为准：只用远程 Featherless SimpleJev `Qwen3.8-27B-classifier`，禁止本地模型下载/部署；普通 Qwen chat 不能替代 classifier。旧文档中的 local/Reflex gate 已明确覆盖。
 - 免费 demo 共 3 次请求，真实 typed policy 已用于 toy/Helsinki 图，物理事实不变。这是集成证据；生产 paid 调用、独立专家语义标签、校准、模型优越性仍未通过。不要再次消耗免费配额或自动开启 paid。
 - Ontology 仅服务 Road & Fire v1 所需概念、Actions 和投影；不扩展通用城市平台、调度、安全判断或 CFD。PPR 只表示 attention。
-- 当前完整 Python 检查 220 项通过（包含 66 项原参考检查与本轮 SUMO/SBOM 专项检查），真实浏览器套件 10 项通过。两类检查不混称产品独立验证。native clean checkout/wheel 通过，Docker 和 image digest 未验收。
+- 当前完整 Python 检查 225 项通过（包含 66 项原参考检查与本轮 SUMO/SBOM/置换专项检查），真实浏览器套件 10 项通过。两类检查不混称产品独立验证。native clean checkout/wheel 通过；[Linux CI](https://github.com/LN6666/CiviFlux/actions/runs/35898788800) 的 `core` 和无网络只读容器真实 API/SUMO smoke 均通过。
 - Helsinki 仅当前快照 what-if：人工道路/入口核验、历史网络/feed、真实交通观测和真实火场边界仍缺。选择起点的不可达不等于全市设施隔离。
 
 ## 逐项目标
@@ -35,7 +35,7 @@ PASS 只覆盖该行写明的验收范围；PARTIAL 表示已有实现/证据但
 | G202 | 独立可达性与路由比较 | PASS | 边状态 turn-aware 路由与独立枚举 oracle 一致；不可达时间为 null。 [final_python_junit.xml](../evidence/wp7/final_python_junit.xml)、[ablation_report.json](../evidence/wp6/ablation_report.json) |
 | G203 | 火灾外部限制输入 | PASS | 用户明确 polygon/道路及假设确认后创建火灾外部限制；缺范围拒绝，不生成物理火场。 [browser_validation.json](../evidence/wp5/browser_validation.json)、[workflow.spec.ts](../web/tests/workflow.spec.ts) |
 | G204 | 设施与公交影响facts | PASS | 设施入口状态和公交关联分级，全部声明 OD 均检查，未被排名 topK 裁剪。 [final_python_junit.xml](../evidence/wp7/final_python_junit.xml)、[ablation_report.json](../evidence/wp6/ablation_report.json) |
-| G205 | 边界与不完整数据处理 | PARTIAL | 冻结 OSM 字节重建更大 Helsinki 路网；Road/Fire 各 48 个固定 OD 出现 3/8 个阶段差异，3 个候选入口不可配对，故当前小范围边界**未稳定**。未知值仍为 null。 **待补：**选定足够大的正式边界并重跑受影响的城市案例；当前仅可报告有边界的 what-if。 [helsinki_boundary_sensitivity.json](../evidence/wp2/helsinki_boundary_sensitivity.json)、[boundary_sensitivity.py](../scripts/boundary_sensitivity.py) |
+| G205 | 边界与不完整数据处理 | PARTIAL | 冻结 OSM 字节重建两层更大 Helsinki 路网；内圈→外圈 Road/Fire 各 48 个固定 OD 仍有 3/8 个阶段差异。按最小稳定外圈作为**48 个候选目标的案例边界**重跑 typed Action→路由→KG→PPR，外圈→第二外圈每案 96 个阶段在 1 秒阈值下差异为 0，已配对路径不变。共有边权重/转向仍变化，3 个入口无法配对、2 个原生入口会重新吸附；不可达值保持 null。 **待补：**独立核验/映射被排除的入口和重新吸附入口，完整原案例覆盖仍未通过；不作全城或历史收敛主张。 [helsinki_boundary_sensitivity.json](../evidence/wp2/helsinki_boundary_sensitivity.json)、[helsinki_formal_boundary_case.json](../evidence/wp2/helsinki_formal_boundary_case.json) |
 | G206 | oracle和反例全覆盖 | PASS | 单向/桥/转向/平面交叉/no-op/车种反例和独立枚举 oracle 已执行。 [final_python_junit.xml](../evidence/wp7/final_python_junit.xml)、[ablation_report.json](../evidence/wp6/ablation_report.json) |
 | G207 | Road/Fire全部通过typed Actions形成Scenario overlay | PASS | Road/Fire 经 typed Actions 事务提交、记录、重放；失败不部分提交且 baseline 不变。 [final_python_junit.xml](../evidence/wp7/final_python_junit.xml)、[ontology_review.md](../evidence/wp0/ontology_review.md) |
 | G301 | 真实typed temporal KG投影 | PASS | 版本化 typed temporal 投影具来源、方向和有效窗；公交静态依赖与 operational 图分开。 [final_python_junit.xml](../evidence/wp7/final_python_junit.xml)、[ontology_review.md](../evidence/wp0/ontology_review.md) |
@@ -43,7 +43,7 @@ PASS 只覆盖该行写明的验收范围；PARTIAL 表示已有实现/证据但
 | G303 | paired delta可比较 | PASS | 比较上下文、node universe/seed/policy/图哈希均校验，no-op delta 为 0。 [final_python_junit.xml](../evidence/wp7/final_python_junit.xml)、[ontology_review.md](../evidence/wp0/ontology_review.md) |
 | G304 | 真实远程 SimpleJev（用户覆盖） System-One协议与PPR pipeline | PARTIAL | 3 次免费 SimpleJev 请求取得真实 typed policy，并在 toy/Helsinki 图应用且物理事实不变；仅集成证据。 **待补：**生产 endpoint 真实验证须待用户另行启用 paid 配额。 托管服务器/权重版本未报告；专家语义标签、校准与泛化验证未完成。 [simplejev_graph_integration.json](../evidence/wp3/simplejev_graph_integration.json)、[systemone_simplejev_relations_policy.json](../evidence/wp3/systemone_simplejev_relations_policy.json) |
 | G305 | 解释路径和类型内显示 | PASS | witness 引用实际图边且搜索有界；UI 按类型显示 attention，不冒充风险。 [final_python_junit.xml](../evidence/wp7/final_python_junit.xml)、[ontology_review.md](../evidence/wp0/ontology_review.md) |
-| G306 | 防装饰消融钩子 | PARTIAL | neutral/no-PPR 分支及单一 relation 权重抵消检查存在；未执行真实模型权重 permutation 负对照。 **待补：**在真实冻结 policy 可用且对应实验获准后补 permutation 对照；不能把 A5 neutral 当作完整模型负对照。 [ablation_report.json](../evidence/wp6/ablation_report.json)、[test_graph_ranking.py](../test_suite/unit/test_graph_ranking.py) |
+| G306 | 防装饰消融钩子 | PASS | neutral/no-PPR 分支及单一 relation 权重抵消反例保留。冻结真实免费 SimpleJev policy 的 720 种关系分数置换在合成图离线运行，物理 facts 固定、每种策略内 baseline/event 可比；事件图因单一关系权重抵消。它仅证明敏感性，不是 A3/A4 完整模型消融或排序质量增益。 [policy_permutation_control.json](../evidence/wp6/policy_permutation_control.json)、[offline_policy_permutation.py](../scripts/offline_policy_permutation.py) |
 | G307 | Ontology ProjectionSpec生成scenario graph | PASS | 显式 ProjectionSpec 包含时间/空间范围/无隐含 hop 截断；audit/run/evidence 默认不进 PPR 并验证 hash。 [final_python_junit.xml](../evidence/wp7/final_python_junit.xml)、[ontology_review.md](../evidence/wp0/ontology_review.md) |
 | G401 | 真实binary安装和adapter | PASS | 真实 SUMO 1.27.1 固定依赖，命令数组、日志和时间/车辆/输出预算已检查。 [validation.json](../evidence/wp4/validation.json)、[uv.lock](../uv.lock) |
 | G402 | network/demand映射 | PASS | 有向 edge 映射、相同 seed/demand 和 synthetic 声明随 paired 运行记录。 [validation.json](../evidence/wp4/validation.json)、[sumo_pair.json](../evidence/wp4/sumo_pair.json) |
@@ -62,22 +62,22 @@ PASS 只覆盖该行写明的验收范围；PARTIAL 表示已有实现/证据但
 | G602 | 公平运行A0–A5 | DEFERRED_USER | A0/A1/A2/A5 共 192 行共享 48 套物理事实；A3/A4 共 96 行未跑；免费图 smoke 不能替代完整消融。 **待补：**待生产调用获用户配额授权且独立模型评估设计冻结后执行 A3/A4 及完整负对照；保持相同 physical cache。 [ablation_report.json](../evidence/wp6/ablation_report.json)、[final_gate.json](../evidence/wp6/final_gate.json) |
 | G603 | R1源事实复现审计 | PARTIAL | R1 来源和机器候选映射审计已保存；human_accepted=0，source replay 未验证，时间未知保持未知。 **待补：**独立人工逐条确认道路边界/方向并记录 reviewer；来源缺失的时段/豁免保留 unknown。 [case_review.json](../evidence/wp1/case_review.json)、[directed_road_review.html](../evidence/wp1/directed_road_review.html) |
 | G604 | F1真实地点情景审计 | PASS | 真实 Leonkatu 地点情景已运行，实际火场、管制和响应没有被冒称复原。 [case_review.json](../evidence/wp1/case_review.json)、[helsinki_fire_product.json](../evidence/wp2/helsinki_fire_product.json) |
-| G605 | 如有观测则独立数值验证 | BLOCKED_EXTERNAL | 未获得合格独立历史交通观测；数值验证明确 NOT_VALIDATED，两次外部失败后停止。 **待补：**取得事件日期/地点/单位/时间覆盖匹配的独立观测后才能验证数值预测；当前不为该缺口继续空转。 [missing_data_report.json](../evidence/wp1/missing_data_report.json)、[report.json](../evidence/wp6/report.json) |
+| G605 | 如有观测则独立数值验证 | BLOCKED_EXTERNAL | [回测协议](../docs/HISTORICAL_BACKTEST_PROTOCOL.md)把来源事实、事发时网络、独立运营影响和独立数值观测分开；[只读预检](../evidence/wp6/historical_backtest_preflight.json)显示 R1 人工接受映射 0/3、F1 实际警戒区未知、历史 GTFS 不覆盖、独立实测目标 0。数值验证继续 `NOT_VALIDATED`；两次外部来源访问失败后停止。 **待补：**取得事件日期/地点/方向/单位/时间覆盖匹配的独立观测及对照后才能评价数值，当前不为该缺口空转。 |
 | G606 | 成本性能与负结果 | PASS | raw metrics/latency/RSS/预算和分组描述区间已保存，明确非置信区间/非端到端性能，无模型增益主张。 [ablation_report.json](../evidence/wp6/ablation_report.json)、[benchmark.json](../evidence/wp6/benchmark.json) |
 | G607 | 竞争功能矩阵与公平benchmark/reproduction | PASS | 152 格 source-backed matrix、内部 200k-edge benchmark、固定外部 OSS 真 smoke 与限制均保存，不作异任务总分。 [feature_matrix.csv](../comparison/feature_matrix.csv)、[SUMO_LLM_Agent.md](../comparison/reproduction_notes/SUMO_LLM_Agent.md) |
-| G701 | clean checkout重建 | PARTIAL | 干净 committed HEAD 的 native 固定依赖、toy 和安装 wheel 通过；Docker 尚不可用且镜像未固定 digest。 **待补：**在可用 Docker 环境构建并执行容器 smoke，固定解析后的 base/image digest；不得将 native PASS 扩为容器 PASS。 [clean_checkout.json](../evidence/wp7/clean_checkout.json)、[clean_checkout_offline.json](../evidence/wp7/clean_checkout_offline.json) |
-| G702 | 全部must gates | PARTIAL | contracts/network/graph/PPR/SUMO/web/security 有实际通过；全部 must gates 尚未满足。 **待补：**处理 production SimpleJev/完整消融、人工真实城市映射及容器复现缺口；strict release-check 当前应继续非零。 [current_product_release.json](../evidence/current_product_release.json)、[release_check.log](../evidence/wp7/release_check.log) |
+| G701 | clean checkout重建 | PASS | 较早提交 `7d217b8` 的 native 干净检出固定依赖、toy 和安装 wheel 通过；[GitHub Linux CI](https://github.com/LN6666/CiviFlux/actions/runs/35898788800) 从当前 PR 代码构建固定 base 的 amd64 镜像，记录本地镜像内容摘要（未发布 registry 镜像），在无网络只读容器完成真实 API/export 与合成需求 SUMO 1.27.1 smoke，原生 SUMO/netconvert 无缺失库。此项不验证历史城市影响或付费模型。先前缺库失败证据保留。 [clean_checkout.json](../evidence/wp7/clean_checkout.json)、[container_ci_pass.json](../evidence/wp7/container_ci_pass.json) |
+| G702 | 全部must gates | PARTIAL | contracts/network/graph/PPR/SUMO/web/security/reproduce 有实际通过；全部 must gates 尚未满足。 **待补：**处理 production SimpleJev/完整消融与人工真实城市映射缺口；strict release-check 仍按预期非零。 [current_product_release.json](../evidence/current_product_release.json)、[release_check_after_container.log](../evidence/wp7/release_check_after_container.log) |
 | G703 | 独立审查与mutation | PASS | 独立子代理审查保留原反例，typed/context/hash/事务/witness/Object View 修复后回归通过；不是人类专家审查。 [ontology_review.md](../evidence/wp0/ontology_review.md)、[final_python_junit.xml](../evidence/wp7/final_python_junit.xml) |
 | G704 | 许可隐私与数据分发 | PASS | CycloneDX 1.6 SBOM 包含 47 个 Python、99 个 npm 锁定包及本机 437 个原生文件哈希；机器可读清单保存 116 个许可证/NOTICE 文本，未知许可归属显式列出。架构/锁一致性及篡改反例通过；不作法律兼容性或跨平台原生文件审计结论。 [bom.cdx.json](../evidence/wp7/sbom/bom.cdx.json)、[license_inventory.json](../evidence/wp7/sbom/license_inventory.json)、[unknown_licenses.json](../evidence/wp7/sbom/unknown_licenses.json) |
 | G705 | 完成用户文档和演示 | PASS | 当前 README/runbook/architecture 及截图覆盖本地安装、模式、证据和负结果；旧手交文档以用户决定和当前文档为准。 [README.md](../README.md)、[CURRENT_RUNBOOK.md](../docs/CURRENT_RUNBOOK.md) |
 | G706 | 准确声明完成与缺口 | PASS | 工程部分验收与历史观测声明分开；记录 paid 推迟和已授权 GitHub 发布，不宣称 v1 全部完成。 [STATE.md](../execution/STATE.md)、[USER_DECISIONS.md](../execution/USER_DECISIONS.md) |
-| G707 | Ontology/竞争比较发布审计 | PARTIAL | ontology/action/replay/projection、外部比较、NOTICE 和 SBOM 已具证据；完整 release artifacts 仍缺容器与未过的外部 gates。 **待补：**完成 G701/G702 后再签完整 v1 发布包；目前交付只能标明部分验收。 [ontology_review.md](../evidence/wp0/ontology_review.md)、[feature_matrix.csv](../comparison/feature_matrix.csv)、[bom.cdx.json](../evidence/wp7/sbom/bom.cdx.json) |
+| G707 | Ontology/竞争比较发布审计 | PARTIAL | ontology/action/replay/projection、外部比较、NOTICE、SBOM 和 Linux 容器复现已有证据；完整 release artifacts 仍缺外部及付费模型 gates。 **待补：**完成 G702 后再签完整 v1 发布包；目前交付只能标明部分验收。 [ontology_review.md](../evidence/wp0/ontology_review.md)、[feature_matrix.csv](../comparison/feature_matrix.csv)、[bom.cdx.json](../evidence/wp7/sbom/bom.cdx.json) |
 
 ## 接手顺序
 
 1. 先读本清单与用户决定，再查看 strict [release manifest](../evidence/current_product_release.json)。发布源码已获用户授权，不代表全部 v1 gate 通过。
-2. 独立专项检查已补齐组件重挂载、浏览器取消、多硬封闭环路反例和 SBOM；在 Docker 可用环境仍需容器构建与 digest 复现。不要因此扩展 ontology 或产品范围。
-3. 扩大真实 Helsinki ROI 后结果不稳定；需选择正式边界并重跑相关案例。人工还须确认公告边界/方向和设施入口。历史数值验证必须取得合格观测；无数据时维持 NOT_VALIDATED。
+2. 独立专项检查已补齐组件重挂载、浏览器取消、多硬封闭环路反例和 SBOM；Linux CI 的 Docker 构建及无网络只读容器 smoke 已通过。不要因此扩展 ontology 或产品范围。
+3. Helsinki 内圈→第一外圈的固定 OD 曾出现差异；已选第一外圈对 48 个可配对目标重跑真实 Action→路由→KG→PPR，且与第二外圈比较在 1 秒阈值下稳定。仍需人工确认不能配对/重新吸附的设施入口及公告边界/方向，不能扩展为全城主张。历史数值验证必须取得合格观测；无数据时维持 NOT_VALIDATED。
 4. 生产模型工作保持 DEFERRED_USER；用户明确启用配额后才做真实 A3/A4、冻结 policy/负对照和独立语义评估。专家标签与合成路径 oracle 是不同证据，不可互换。
 5. 复用未变输入/源码的证据；只运行受后续变更影响的检查。更改 ontology 输入或模型策略应建立新 run，保留旧哈希和来源。
 
