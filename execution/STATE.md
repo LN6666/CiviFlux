@@ -40,6 +40,7 @@
 - R1 人工审阅交接由 `scripts/road_mapping_review.py` 生成空表并校验提交记录；代码只核对来源、候选完整性与自述字段，不能证明审阅者身份、真实封路时段或历史路网。历史预检不接受机器文件中的运行/路网验证布尔值替代独立证据，不会因为填表而变为历史回测通过。
 - PR #4 的官方服务地图只使 Tölö gymnasium 得到单位身份候选。Aurora 官方 unit 26110 写 `rak. 15`，入口 21577 距 OSM `Aurora 14` 轮廓 1.98 m；最近服务路导入边不允许 passenger/emergency。7 个已检查的官方入口点及道路几何、导入权限和转弯覆盖可供人工审查，但入口所属设施、实际建筑到道路连接及历史通行均未验证，G102/G205 仍 `PARTIAL`。R1 公告来源卡片与机器候选映射现在逐事实关联，但人工有向边核验仍为 0，G104/G603 仍 `PARTIAL`。市政年度平均交通量不能替代 2026 年 5 月事件小时的独立观测；G605 仍 `BLOCKED_EXTERNAL`。
 - 本机 Docker daemon 不可用；PR #2 的 GitHub Linux 已完成固定基础镜像构建、本地镜像内容 digest 检查，以及无网络、只读容器中的真实 API/export/SUMO smoke。该 digest 不是已发布 registry 的 `RepoDigest`。G701 可在此受限范围内标 PASS；它不构成历史城市预测或生产模型验收。
+- 当前 PR #7 树的本机原生离线 clean-checkout 重试因缓存缺少 `sumo-data`、随后缺少构建依赖 `editables` 而分别记录为 `BLOCKED_ENVIRONMENT`，见 `evidence/wp7/clean_checkout_0fa_offline_blocked.json` 和 `clean_checkout_0fa_dependency_attempt_blocked.json`；不把早期树的成功记录冒充本轮成功。当前 `GATE-REPRODUCE` 的 PASS 只覆盖 [run 35917742069](https://github.com/LN6666/CiviFlux/actions/runs/35917742069) 的 Linux 固定镜像构建与禁网只读容器 API/export/真实 SUMO 烟测，不覆盖本机离线安装或生产部署。
 
 ## 接手操作
 
