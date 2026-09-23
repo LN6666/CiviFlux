@@ -500,13 +500,17 @@ def test_simplejev_demo_schema_cache_and_usage_are_not_billing(tmp_path, monkeyp
     assert not backend.last_provenance["paid_call_this_run"]
     assert not backend.last_provenance["runtime_pins_independently_verified"]
     assert not backend.last_provenance["release_gate_complete"]
+    assert backend.last_provenance["response_freshness"] == "live_provider_response"
+    captured_at = backend.last_provenance["response_captured_at"]
     assert set(requests[0]) == {"model", "state", "questions"}
     assert requests[0]["model"] == SIMPLEJEV_MODEL
     assert config.ready
-    replay = SimpleJevBackend(config).score_relations(
-        "facility_access", {"ACCESS_FOR": "A road accesses a facility"}
-    )
+    replay_backend = SimpleJevBackend(config)
+    replay = replay_backend.score_relations("facility_access", {"ACCESS_FOR": "A road accesses a facility"})
     assert replay["provider_mode"] == "replay" and len(requests) == 1
+    assert replay_backend.last_provenance["response_freshness"] == "frozen_replay_not_current_provider"
+    assert replay_backend.last_provenance["response_captured_at"] == captured_at
+    assert not replay_backend.last_provenance["remote_call_this_run"]
     assert json.loads(config.budget_ledger.read_text())[config.budget_id]["attempted_calls"] == 1
 
 
@@ -623,6 +627,8 @@ def test_simplejev_endpoint_allowlist_and_demo_batch_limit():
             validate_simplejev_endpoint(url)
     with pytest.raises(ValueError):
         SimpleJevConfig(max_questions=7)
+    with pytest.raises(ValueError, match="selected Qwen classifier"):
+        SimpleJevConfig(model="featherless-ai/Other-classifier")
     with pytest.raises(ValueError):
         build_simplejev_request("access", {"X": '"geometry": [1, 2]'}, SimpleJevConfig())
 
@@ -650,3 +656,30 @@ def test_simplejev_cache_binds_ontology_definitions_objective_and_code_version(t
     backend.score_relations("access", {"ACCESS_FOR": "access"})
     assert len(calls) == 5
     assert calls[1]["state"]["ontology_version"] == "1.1.0"
+
+
+def test_simplejev_shared_contract_change_invalidates_cached_answer(tmp_path, monkeypatch):
+    calls = []
+
+    def send(_self, payload):
+        calls.append(json.loads(payload))
+        return json.dumps(simplejev_response()).encode()
+
+    monkeypatch.setattr(SimpleJevBackend, "_request", send)
+    config = simplejev_config(tmp_path)
+    first = SimpleJevBackend(config)
+    first.score_relations("access", {"ACCESS_FOR": "access"})
+    first_revision = first.last_provenance["client_revision"]
+
+    original_read = Path.read_bytes
+
+    def changed_helper_read(path):
+        content = original_read(path)
+        return content + b"\n# changed shared contract\n" if path.name == "reflex.py" else content
+
+    monkeypatch.setattr(Path, "read_bytes", changed_helper_read)
+    second = SimpleJevBackend(config)
+    second.score_relations("access", {"ACCESS_FOR": "access"})
+    assert second.last_provenance["client_revision"] != first_revision
+    assert not second.last_provenance["cache_hit"]
+    assert len(calls) == 2

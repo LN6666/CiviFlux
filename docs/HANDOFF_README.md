@@ -1,5 +1,7 @@
 # UrbanImpact · Road & Fire GIS v1 — Codex 工程执行包
 
+> **历史快照，不是当前接手或运行指南。** 本页保留原始工程包文字以供追溯；其中的本地 Reflex/Qwen、下载权重及“未实现”状态已被用户决定替代。当前项目禁止本地部署 Qwen。接手请从 [当前 README](../README.md)、[用户决定](../execution/USER_DECISIONS.md)、[执行状态](../execution/STATE.md) 和 [跨账户交接](CODEX_HANDOFF.md) 开始；不要执行本页第 3 步或本地模型命令。
+
 版本：2026-09-23 / handoff-3-operational-ontology。项目名为工作名，未验证商标或包名可用性。
 
 **本包是完整工程任务书、Codex 调度指令、数据证据登记和可执行参考测试；不是已经实现的城市插件。**

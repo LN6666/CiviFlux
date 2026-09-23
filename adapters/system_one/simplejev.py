@@ -48,6 +48,15 @@ PROBABILITY_TOLERANCE = 1e-6
 EXPECTATION_TOLERANCE = 1e-5
 
 
+def _client_contract_revision() -> str:
+    """Bind cached answers to this adapter and its shared request/transport helpers."""
+    source_dir = Path(__file__).parent
+    source_hashes = {
+        name: sha256((source_dir / name).read_bytes()).hexdigest() for name in ("simplejev.py", "reflex.py")
+    }
+    return "client_sha256:" + _digest(source_hashes)
+
+
 def validate_endpoint(base_url: str) -> tuple[str, str]:
     if not isinstance(base_url, str) or len(base_url) > 2048 or any(ord(c) < 33 for c in base_url):
         raise ValueError("invalid SimpleJev origin")
@@ -98,10 +107,8 @@ class SimpleJevConfig:
             r"[A-Za-z0-9_.-]{1,96}", self.ontology_version
         ):
             raise ValueError("invalid ontology version")
-        if not isinstance(self.model, str) or not re.fullmatch(
-            r"featherless-ai/[A-Za-z0-9_.-]+-classifier", self.model
-        ):
-            raise ValueError("invalid SimpleJev classifier model identifier")
+        if self.model != SIMPLEJEV_MODEL:
+            raise ValueError("SimpleJev model must match the selected Qwen classifier")
         if self.api_key is not None and (
             not isinstance(self.api_key, str)
             or not self.api_key
@@ -221,7 +228,7 @@ class SimpleJevBackend:
         self.endpoint, self.provider_mode = validate_endpoint(self.config.base_url)
         self.last_provenance: dict = {}
         self.attempted_calls = 0
-        self._client_revision = "client_sha256:" + sha256(Path(__file__).read_bytes()).hexdigest()
+        self._client_revision = _client_contract_revision()
         self._cache: dict = {}
         self._lock = threading.Lock()
 
@@ -331,6 +338,11 @@ class SimpleJevBackend:
             if hit:
                 if entry.get("key") != key or entry.get("response_sha256") != _digest(entry.get("response")):
                     raise ProtocolError("SimpleJev cache integrity mismatch")
+                if (
+                    not isinstance(entry.get("response_captured_at"), str)
+                    or not entry["response_captured_at"]
+                ):
+                    raise ProtocolError("SimpleJev cache lacks response capture provenance")
                 response = entry["response"]
                 wire_hash = entry.get("wire_response_sha256")
             else:
@@ -347,6 +359,7 @@ class SimpleJevBackend:
                     "response": safe_response,
                     "response_sha256": _digest(safe_response),
                     "wire_response_sha256": wire_hash,
+                    "response_captured_at": datetime.now(UTC).isoformat(),
                 }
                 self._cache[key] = copy.deepcopy(entry)
                 if path:
@@ -376,6 +389,8 @@ class SimpleJevBackend:
             "calibration_status": "NOT_CALIBRATED_FOR_URBAN_RELATIONS",
             "cache_hit": hit,
             "cache_key": key,
+            "response_captured_at": entry["response_captured_at"],
+            "response_freshness": "frozen_replay_not_current_provider" if hit else "live_provider_response",
             "remote_call_this_run": not hit,
             "request_sha256": sha256(payload).hexdigest(),
             "wire_response_sha256": wire_hash,
