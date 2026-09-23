@@ -35,7 +35,7 @@ uv run --frozen python -m api --port 8765
 
 服务默认只绑定 `127.0.0.1`。Web 客户端从 `/api/v1/session` 取得本进程随机 token，并通过 Bearer header 调用其余 API。token 不是 Qwen API key；不要把 Qwen key 填入浏览器。`CIVIFLUX_WORKSPACE` 可指定应用工作区，默认 `.runtime/app/`，其中包含 SQLite 工作区、jobs、cache 和 run artifacts。
 
-典型流程：选择 citypack → 查看数据时期/缺失 → 创建道路或火灾情景 → 选择方向、时间、车种并确认假设 → Validate/commit Action → Run → 查看 baseline/event facts、attention 和 Object View → Export。取消按钮终止该任务，SUMO 取消会结束子进程树。
+典型流程：选择 citypack → 查看数据时期/缺失 → 创建道路或火灾情景 → 选择方向、时间、车种并确认假设 → Validate/commit Action → Run → 查看 baseline/event facts、attention 和 Object View → Export。注意力表每页显示 100 条，可搜索完整结果集；ZIP 仍包含全部记录。取消按钮终止该任务，SUMO 取消会结束子进程树。
 
 `A0/A1/A2/A5` 的本地计算不要求模型账号。`A3/A4` 所需的 System-One 服务为远程 SimpleJev Qwen classifier；生产付费调用已由用户暂缓，公开 demo 状态单列。界面必须显示该状态，不能用普通生成式 Qwen、rules 或 mock 顶替模型成功。
 
