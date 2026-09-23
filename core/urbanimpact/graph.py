@@ -40,7 +40,7 @@ def city_objects(city: CityPack) -> list[OntologyObject]:
             )
         )
     for r in city.transit.get("routes", []):
-        source = r.get("source_id", city.sources[0].id)
+        source = r["source_id"]
         objects.append(
             OntologyObject(
                 object_id=r["id"],
@@ -69,9 +69,9 @@ def project(objects: list[OntologyObject], links: list[Link], spec: ProjectionSp
     if spec.projection_id not in profiles:
         raise ValueError("Unregistered projection profile")
     profile = profiles[spec.projection_id]
-    if set(x.value for x in spec.allowed_object_types) - set(profile["allowed_object_types"]):
+    if {x.value for x in spec.allowed_object_types} - set(profile["allowed_object_types"]):
         raise ValueError("Projection cannot admit audit objects")
-    if set(x.value for x in spec.allowed_link_types) - set(profile["allowed_link_types"]):
+    if {x.value for x in spec.allowed_link_types} - set(profile["allowed_link_types"]):
         raise ValueError("Projection cannot admit audit links")
     selected = sorted(
         [
@@ -126,24 +126,24 @@ def paired_projection(city: CityPack, scenario: Scenario, facts: dict, policy_ha
 
     objects = city_objects(city)
     profile = MANIFEST["projections"][0]
-    links = {"baseline": [], "event": [], "dependency_evidence": []}
-    link_ids = {side: set() for side in links}
-    all_edge_ids = {e.id for e in city.edges}
+    link_inputs = {"baseline": {}, "event": {}, "dependency_evidence": {}}
+    edges = {e.id: e for e in city.edges}
+    facilities = {f.id: f for f in city.facilities}
 
-    def add(side, src, dst, relation, source, derivation, confidence="verified"):
-        link = Link(
-            id="link:" + digest([src, dst, relation])[:24],
-            src=src,
-            dst=dst,
-            relation_type=relation,
-            evidence_refs=(source,),
-            asserted_or_derived="derived",
-            derivation_id=derivation,
-            confidence_status=confidence,
+    def add(side, src, dst, relation, sources, derivation, confidence="verified"):
+        # One semantic edge may be supported by multiple OD routes. Retain all
+        # contributors without adding duplicate edges (which would change PPR).
+        key = (src, dst, relation)
+        entry = link_inputs[side].setdefault(
+            key, {"sources": set(), "derivations": set(), "confidence": confidence}
         )
-        if link.id not in link_ids[side]:
-            links[side].append(link)
-            link_ids[side].add(link.id)
+        # A shared semantic edge is only verified when every supporting OD
+        # record verifies access; a candidate must not inherit another OD's
+        # stronger label because it happened to appear first.
+        if confidence == "candidate":
+            entry["confidence"] = "candidate"
+        entry["sources"].update(sources)
+        entry["derivations"].add(derivation)
 
     blocked = set(expected_context["restrictions"])
     # Router-derived connections change only the operational graph; restricted assets remain in U.
@@ -157,23 +157,38 @@ def paired_projection(city: CityPack, scenario: Scenario, facts: dict, policy_ha
         for side in ("baseline", "event"):
             if side == "event" and (c.from_edge in blocked or c.to_edge in blocked):
                 continue
-            add(side, c.from_edge, c.to_edge, "ROAD_CONNECTS_TO", city.sources[0].id, "network-connection")
+            add(
+                side,
+                c.from_edge,
+                c.to_edge,
+                "ROAD_CONNECTS_TO",
+                (edges[c.from_edge].source_id, edges[c.to_edge].source_id),
+                "network-connection",
+            )
     for od in facts.get("od", []):
         fid = od.get("facility_id")
         if not fid:
             continue
+        if fid not in facilities:
+            raise ValueError("Physical route references unknown facility")
+        derivation = "routing:" + digest(od)
         for side in ("baseline", "event"):
             route = od.get(side, {})
             if route.get("status") != "available":
                 continue
-            for eid in route.get("edge_ids", []):
+            route_edges = route.get("edge_ids", [])
+            if any(eid not in edges for eid in route_edges):
+                raise ValueError("Physical route references unknown edge")
+            route_sources = {facilities[fid].source_id}
+            route_sources.update(edges[eid].source_id for eid in route_edges)
+            for eid in route_edges:
                 add(
                     side,
                     eid,
                     fid,
                     "SEGMENT_ACCESS_TO_FACILITY",
-                    city.sources[0].id,
-                    "routing:" + digest(od),
+                    route_sources,
+                    derivation,
                     "verified" if od.get("entrance_status") == "verified" else "candidate",
                 )
                 add(
@@ -181,8 +196,8 @@ def paired_projection(city: CityPack, scenario: Scenario, facts: dict, policy_ha
                     fid,
                     eid,
                     "FACILITY_ACCESSED_VIA",
-                    city.sources[0].id,
-                    "routing:" + digest(od),
+                    route_sources,
+                    derivation,
                     "verified" if od.get("entrance_status") == "verified" else "candidate",
                 )
     # Static alignment belongs to dependency evidence, not a simulated operational bus route.
@@ -190,14 +205,14 @@ def paired_projection(city: CityPack, scenario: Scenario, facts: dict, policy_ha
         if route.get("match_status") != "verified":
             continue
         for eid in route.get("edge_ids", []):
-            if eid not in all_edge_ids:
+            if eid not in edges:
                 raise ValueError("Verified transit route references unknown edge")
             add(
                 "dependency_evidence",
                 route["id"],
                 eid,
                 "ROUTE_USES_SEGMENT",
-                route.get("source_id", city.sources[0].id),
+                (route["source_id"], edges[eid].source_id),
                 "verified-transit-alignment",
             )
             add(
@@ -205,11 +220,29 @@ def paired_projection(city: CityPack, scenario: Scenario, facts: dict, policy_ha
                 eid,
                 route["id"],
                 "SEGMENT_USED_BY_ROUTE",
-                route.get("source_id", city.sources[0].id),
+                (route["source_id"], edges[eid].source_id),
                 "verified-transit-alignment",
             )
+    links = {}
+    for side, entries in link_inputs.items():
+        links[side] = []
+        for (src, dst, relation), entry in sorted(entries.items()):
+            derivations = sorted(entry["derivations"])
+            derivation = derivations[0] if len(derivations) == 1 else "aggregate:" + digest(derivations)
+            links[side].append(
+                Link(
+                    id="link:" + digest([src, dst, relation])[:24],
+                    src=src,
+                    dst=dst,
+                    relation_type=relation,
+                    evidence_refs=tuple(sorted(entry["sources"])),
+                    asserted_or_derived="derived",
+                    derivation_id=derivation,
+                    confidence_status=entry["confidence"],
+                )
+            )
     pair = {}
-    for side in links:
+    for side, side_links in links.items():
         spec = ProjectionSpec(
             projection_id="road_fire_operational",
             projection_kind="dependency_evidence" if side == "dependency_evidence" else "operational",
@@ -222,13 +255,19 @@ def paired_projection(city: CityPack, scenario: Scenario, facts: dict, policy_ha
             relation_policy_hash=policy_hash,
             source_snapshot_hash=expected_context["network_hash"],
         )
-        pair[side] = project(objects, links[side], spec)
+        pair[side] = project(objects, side_links, spec)
     if pair["baseline"]["node_universe_hash"] != pair["event"]["node_universe_hash"]:
         raise ValueError("Paired graph universe mismatch")
     before = {e["id"]: e for e in pair["baseline"]["links"]}
     after = {e["id"]: e for e in pair["event"]["links"]}
+    # OD records are a set of origin/facility observations; their input order is
+    # not an evidence change. Preserve duplicate records while canonicalizing it.
+    canonical_facts = {**facts}
+    if "od" in canonical_facts:
+        canonical_facts["od"] = sorted(canonical_facts["od"], key=digest)
+    facts_hash = digest(canonical_facts)
     pair["graph_delta_log"] = [
-        {"id": i, "before": before.get(i), "after": after.get(i), "facts_hash": digest(facts)}
+        {"id": i, "before": before.get(i), "after": after.get(i), "facts_hash": facts_hash}
         for i in sorted(set(before) | set(after))
         if before.get(i) != after.get(i)
     ]
