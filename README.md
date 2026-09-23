@@ -1,61 +1,63 @@
-# UrbanImpact · Road & Fire GIS v1 — Codex 工程执行包
+# CiviFlux — Road & Fire GIS
 
-版本：2026-09-23 / handoff-3-operational-ontology。项目名为工作名，未验证商标或包名可用性。
+CiviFlux 是部署者本地运行的道路限制与火灾**外部交通影响**分析工具。Python 分析内核提供有向路由、真实 SUMO 配对仿真、typed operational ontology 和确定性 PPR；Web Component 通过本地 HTTP API 嵌入地图或普通网页。
 
-**本包是完整工程任务书、Codex 调度指令、数据证据登记和可执行参考测试；不是已经实现的城市插件。**
-真实 Qwen System-One 请求、Helsinki 数据文件下载、SUMO 实际联调、浏览器产品验收需要在开发仓库执行；不能将随包的参考测试替代它们。
+当前仓库已经包含产品实现、真实 Helsinki 数据构建和 SUMO 运行证据。**是否达到完整 v1，以 `execution/STATE.md`、当次测试日志和 release evidence 为准。** 随工程包附带的参考测试通过，不等于产品或真实 Qwen 集成通过。
 
-## 先做什么
+当前用户指定的模型方案是 **Featherless SimpleJev 的 Qwen classifier**，通过远程 typed API 使用；不在本地部署或下载模型。普通 DashScope/Model Studio 生成式 Qwen API 仅保留为可选比较，不能替代该 classifier。生产付费调用按用户决定为 `DEFERRED_USER`；公开 demo 的检查单独记录，不冒充生产验证。详见 [模型 adapter 状态](adapters/system_one/README.md) 与 [运行手册](docs/CURRENT_RUNBOOK.md)。
 
-1. 在新仓库根目录解压本包；已有代码时先保留现有工作、检查差异，不覆盖用户文件。根目录 `AGENTS.md` 是项目规则。
-2. 将 `prompts/00_MASTER.md` 的内容交给 Codex。让它执行完整大工作包，而不是只复述方案。
-3. 第一版的 System-One 不再依赖任何注册/付费 API：使用部署者本地的 **Qwen System-One backend**；第一版参考实现为 **Reflex + Qwen3.5-4B**。首次可从 Hugging Face 下载权重，正式离线部署应预取/镜像；运行时城市数据不需要出网。远程廉价 LLM 仍是可选 BYOK。
-4. 按 `execution/work_packages.json` 推进 WP0–WP7；每个工作包一次交付完整纵向能力、测试、证据和可运行结果。`execution/goals.json` 是 54 项可核验目标，不是 54 次独立聊天。
+## 从这里开始
 
-## 第一版完成的定义
+- [文档导航与用户决定](docs/index.md)：当前实现、迁移覆盖关系与历史来源入口。
+- [当前运行手册](docs/CURRENT_RUNBOOK.md)：环境、测试、真实 SUMO、数据、Qwen 和故障处理。
+- [当前实现架构](docs/CURRENT_ARCHITECTURE.md)：模块职责、数据流、扩展位置和结果语义。
+- [工程决策](docs/adr/0001-current-architecture.md)：不可变城市快照、Action overlay、成对计算与 API 边界。
+- [贡献约定](CONTRIBUTING.md)：文件归属、验证与可复现交付。
+- [变更记录](CHANGELOG.md)：当前实现与来源工程包的区别。
 
-一个 **可嵌入 Web 的 GIS 插件**，可导入 Helsinki 路网/设施/公交数据，编辑道路限制和火灾外部影响情景，真实执行：
+## 本地验证
 
-`Scenario → Routing / SUMO → typed temporal KG → fixed / Qwen-System-One-conditioned PPR → facts + attention + evidence → Web map / export`
-
-固定规则、普通 PPR、Qwen-System-One-PPR 都必须存在；Qwen System-One 必须完成**真实本地 Qwen 模型推理**、进入真实投影计算并留下 model/config/calibration provenance；mock/replay 不能满足发布闸门。
-
-**不做** QGIS 桌面插件、3D/BIM 平台、火灾 CFD、实际消防调度、个人风险画像、作者 SaaS、机构账号/协作/集群。机构自己承担服务器和运维。
-
-## 文件导航
-
-- `AGENTS.md`：短而强的不可越界规则。
-- `docs/00_PRODUCT.md`：范围与最终验收。
-- `docs/01_ARCHITECTURE.md`：模块、依赖、数据流、接口和 repo 布局。
-- `docs/02_DATA_CASES.md`：Helsinki 真实事件与数据获取/分级验证。
-- `docs/03_CONTRACTS.md`、`contracts/`：具体数据和 API 契约。
-- `docs/04_KG_PPR.md`：图语义、PPR 数学、可比较性、防伪消融。
-- `docs/05_QWEN_SYSTEM_ONE.md`：本地 Reflex/Qwen3.5 System-One 运行、校准、硬件、协议和真实联调。
-- `docs/06_ROAD_FIRE_SUMO.md`：路网、消防事件边界和仿真陷阱。
-- `docs/07_WEB_SECURITY.md`：Web 插件、数据本地化、安全与部署边界。
-- `docs/08_TESTING.md`、`docs/09_VALIDATION_ABLATION.md`：代码、成果、真实事件、消融测试。
-- `docs/10_EXECUTION.md`：大步推进、六个有停止条件的 loop、token 预算。
-- `docs/11_RELEASE.md`：可执行发布闸门与证据要求。
-- `docs/12_RISKS_DECISIONS.md`：技术决策与风险处置。
-- `docs/13_JEV_TO_QWEN_MIGRATION.md`：从 closed Jev 依赖迁移到本地 Qwen System-One 的变更清单。
-- `docs/14_OPERATIONAL_ONTOLOGY.md`：object/link/action/function 驱动的开放 operational ontology 规范。
-- `docs/15_COMPETITIVE_BENCHMARK.md`：相邻项目、机构背景、产品差异和公平比较方案。
-- `prompts/`：总指令、8 个工作包 prompt、恢复/诊断/审查/验证 prompt。
-- `sources/registry.json`、`sources/SOURCES.md`：已核验来源与未核验数据，禁止重新发明出处。
-- `cases/`：真实道路证据候选、真实地点火灾候选和合成最小反例；不是伪造的真实数据。
-- `verification/`、`tests/`：本包自带的可运行独立 oracle、Qwen System-One 协议验证、发布闸门测试。
-- `evidence/PACK_TEST_REPORT.md`：本次实际执行结果；与未来产品测试分开。
-- `MASTER_PLAN.md`：合并阅读版，不建议每次把全部内容注入模型上下文。
-
-## 本包参考测试（现在就可执行）
+需要 Python 3.12、`uv` 和 Node.js。`uv.lock` 与 `web/package-lock.json` 固定本地依赖。SUMO 由 Python 依赖提供，adapter 要求实际 binary 为 **1.27.1**。
 
 ```bash
-python -m pip install -r requirements-verification.txt
-python -m pytest -q tests
-python scripts/audit_pack.py
-python scripts/check_release.py evidence/product_release.json
+uv sync --frozen
+export PYTHONPATH="$PWD/core:$PWD"
+uv run --frozen python -m pytest -q test_suite/unit/test_network.py
+uv run --frozen python -m pytest -q test_suite/sumo/test_sumo.py
+uv run --frozen python scripts/demo_sumo.py
 ```
 
-最后一条在当前状态**必须失败**：产品尚未实现，不能冒充 v1 完成。该脚本是状态+证据文件完整性门卫，不是代替人工/CI审查的真实性证明。
+最后一条实际启动本地 `netconvert` 和 `sumo`，将配对结果、命令、日志、输入和哈希写入 `evidence/wp4/`。它使用明确标注的合成双通道网络；无模型、无 API 费用，不触发城市数据下载。
 
-`make test-unit` 等产品命令是 WP0 必须创建的接口，不是声称本包已实现这些产品命令。参考测试使用 `python -m pytest tests`，与未来产品 `test_suite/` 分离。
+本仓库的 Python 开发命令显式设置 `PYTHONPATH`。在当前 macOS 环境，隐藏属性的 editable `.pth` 文件可能被 Python 启动逻辑跳过；无需修改系统安全设置。发布安装应使用构建的 wheel，并独立验证干净环境。
+
+## 目录
+
+| 路径 | 职责 |
+|---|---|
+| `core/urbanimpact/` | 契约、immutable snapshot、Actions、路由、graph projection、PPR、analysis use case |
+| `api/` | 本地服务、token、任务/取消、对象查看与导出 |
+| `web/` | Web Component、MapAdapter、MapLibre 参考宿主和普通 HTML 宿主 |
+| `adapters/` | OSM、GTFS、SUMO、SimpleJev/可选生成式 Qwen 的边界适配 |
+| `ontology/` | 对象、关系、接口、Action 的版本化注册表 |
+| `test_suite/` | 当前产品测试，真实 SUMO/browser/API gates 分开报告 |
+| `tests/`, `verification/` | 原工程包独立参考检查，保留且不冒充产品 |
+| `data/`, `evidence/` | 本地输入、来源日期/哈希、真实运行记录；大文件是否纳入分发由发布流程决定 |
+| `execution/` | 当前 checkpoint、工作包、目标和 release 状态 |
+
+## 解释结果
+
+- 路由输出是固定权重下的距离、网络行程时间和可达性；没有路径时为 `null` / `unreachable`，入口未知时为 `unavailable`。
+- SUMO 默认 `SYNTHETIC_DEMAND_WHATIF`。报告包含全部需求分母、到达、未完成、teleport 和 rejected departures；只对到达车辆求均值时明确说明分母。
+- PPR 是关联注意力，不是风险、因果、撤离安全或应急响应预测。Qwen 只能调整软语义相关性。
+- 当前 OSM/GTFS 不构成历史事故当天真值。公告事实、人工映射、假设封路和测量验证分别标记。
+- Helsinki 来源公告到有向道路的映射仍待独立人工复核（`evidence/wp1/case_review.json`）；机器候选不构成已验收案例。选定 origin 到全部设施的检查也不等于全市所有起点的可达性保证。
+- 火灾边界由用户确认或导入。系统不从“严重程度”生成消防半径，也不自动放宽应急车辆权限。
+
+## 当前文档与来源方案
+
+`docs/00_PRODUCT.md`–`docs/15_COMPETITIVE_BENCHMARK.md`、`prompts/`、`MASTER_PLAN.md` 保留工程包的验收来源。它们包含原始的“必须本地 Reflex + Qwen”文字；本地部署选择已由当前用户的 **远程 SimpleJev classifier、生产付费调用暂缓** 决定替代。当前 typed contract 以 SimpleJev adapter 和已核对文档为准；普通生成式 Qwen API 不能顶替。模型真实性、预算、证据和物理结果隔离等要求继续适用。
+
+阅读顺序为：本 README → 当前运行手册/架构 → `execution/STATE.md` → 当前工作包需要的来源文档。原始 README 保存在 [HANDOFF_README.md](docs/HANDOFF_README.md)。不要从旧计划中的 `NOT_IMPLEMENTED` 或旧模型 gate 推断当前运行状态，也不要把当前工程完成误写成历史交通预测已验证。
+
+项目不提供作者代运营 SaaS，也不承担市政账号、SSO、HA、备份或应急指挥。未经明确授权，不运行付费 API、不推送、发布或联系第三方。
