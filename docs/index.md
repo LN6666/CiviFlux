@@ -5,11 +5,13 @@
 | 问题 | 入口 |
 |---|---|
 | 项目现在是什么、怎样开始 | [README](../README.md) |
+| 其他 Codex 账户如何轮替接手 | [CODEX_HANDOFF](CODEX_HANDOFF.md) |
 | 用户决定及旧方案覆盖关系 | [USER_DECISIONS](../execution/USER_DECISIONS.md) |
 | 怎样安装、运行、测试、看失败 | [CURRENT_RUNBOOK](CURRENT_RUNBOOK.md) |
 | 代码职责、数据流、扩展位置 | [CURRENT_ARCHITECTURE](CURRENT_ARCHITECTURE.md) |
 | 新开发者如何接手 | [DEVELOPMENT](../DEVELOPMENT.md) |
 | 工程约束与交付标准 | [CONTRIBUTING](../CONTRIBUTING.md) |
+| Git、版本与交接规则 | [VERSIONING](VERSIONING.md) |
 | 已接受的架构决策 | [ADR 0001](adr/0001-current-architecture.md) |
 | PPR 算法选择与误差边界 | [ADR 0002](adr/0002-pagerank.md) |
 | 范围、证据与工程风险约束 | [ARCHITECTURE_GUARDRAILS](ARCHITECTURE_GUARDRAILS.md) |

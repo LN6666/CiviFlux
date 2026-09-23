@@ -41,7 +41,7 @@ def check_release(document: dict, root: Path) -> list[str]:
     return errors
 
 if __name__ == '__main__':
-    source = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT/'evidence/product_release.json'
+    source = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT/'evidence/current_product_release.json'
     try:
         errors = check_release(json.loads(source.read_text()), ROOT)
     except (ValueError, OSError) as e:

@@ -19,7 +19,8 @@
                 "FAIL",
                 "NOT_RUN",
                 "BLOCKED_ENVIRONMENT",
-                "BLOCKED_EXTERNAL"
+                "BLOCKED_EXTERNAL",
+                "DEFERRED_USER"
               ]
             },
             "producer": {
@@ -106,7 +107,8 @@
                 "FAIL",
                 "NOT_RUN",
                 "BLOCKED_ENVIRONMENT",
-                "BLOCKED_EXTERNAL"
+                "BLOCKED_EXTERNAL",
+                "DEFERRED_USER"
               ]
             },
             "producer": {
@@ -193,7 +195,8 @@
                 "FAIL",
                 "NOT_RUN",
                 "BLOCKED_ENVIRONMENT",
-                "BLOCKED_EXTERNAL"
+                "BLOCKED_EXTERNAL",
+                "DEFERRED_USER"
               ]
             },
             "producer": {
@@ -280,7 +283,8 @@
                 "FAIL",
                 "NOT_RUN",
                 "BLOCKED_ENVIRONMENT",
-                "BLOCKED_EXTERNAL"
+                "BLOCKED_EXTERNAL",
+                "DEFERRED_USER"
               ]
             },
             "producer": {
@@ -367,7 +371,8 @@
                 "FAIL",
                 "NOT_RUN",
                 "BLOCKED_ENVIRONMENT",
-                "BLOCKED_EXTERNAL"
+                "BLOCKED_EXTERNAL",
+                "DEFERRED_USER"
               ]
             },
             "producer": {
@@ -454,7 +459,8 @@
                 "FAIL",
                 "NOT_RUN",
                 "BLOCKED_ENVIRONMENT",
-                "BLOCKED_EXTERNAL"
+                "BLOCKED_EXTERNAL",
+                "DEFERRED_USER"
               ]
             },
             "producer": {
@@ -541,7 +547,8 @@
                 "FAIL",
                 "NOT_RUN",
                 "BLOCKED_ENVIRONMENT",
-                "BLOCKED_EXTERNAL"
+                "BLOCKED_EXTERNAL",
+                "DEFERRED_USER"
               ]
             },
             "producer": {
@@ -628,7 +635,8 @@
                 "FAIL",
                 "NOT_RUN",
                 "BLOCKED_ENVIRONMENT",
-                "BLOCKED_EXTERNAL"
+                "BLOCKED_EXTERNAL",
+                "DEFERRED_USER"
               ]
             },
             "producer": {
@@ -715,7 +723,8 @@
                 "FAIL",
                 "NOT_RUN",
                 "BLOCKED_ENVIRONMENT",
-                "BLOCKED_EXTERNAL"
+                "BLOCKED_EXTERNAL",
+                "DEFERRED_USER"
               ]
             },
             "producer": {
@@ -802,7 +811,8 @@
                 "FAIL",
                 "NOT_RUN",
                 "BLOCKED_ENVIRONMENT",
-                "BLOCKED_EXTERNAL"
+                "BLOCKED_EXTERNAL",
+                "DEFERRED_USER"
               ]
             },
             "producer": {
@@ -889,7 +899,8 @@
                 "FAIL",
                 "NOT_RUN",
                 "BLOCKED_ENVIRONMENT",
-                "BLOCKED_EXTERNAL"
+                "BLOCKED_EXTERNAL",
+                "DEFERRED_USER"
               ]
             },
             "producer": {

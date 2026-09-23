@@ -9,6 +9,7 @@ CiviFlux 是部署者本地运行的道路限制与火灾**外部交通影响**�
 ## 从这里开始
 
 - [文档导航与用户决定](docs/index.md)：当前实现、迁移覆盖关系与历史来源入口。
+- [Codex 轮替交接](docs/CODEX_HANDOFF.md)：其他人或其他账户接手时的读取顺序、未完成目标、账号与费用边界。
 - [当前运行手册](docs/CURRENT_RUNBOOK.md)：环境、测试、真实 SUMO、数据、Qwen 和故障处理。
 - [当前实现架构](docs/CURRENT_ARCHITECTURE.md)：模块职责、数据流、扩展位置和结果语义。
 - [工程决策](docs/adr/0001-current-architecture.md)：不可变城市快照、Action overlay、成对计算与 API 边界。
@@ -60,4 +61,4 @@ uv run --frozen python scripts/demo_sumo.py
 
 阅读顺序为：本 README → 当前运行手册/架构 → `execution/STATE.md` → 当前工作包需要的来源文档。原始 README 保存在 [HANDOFF_README.md](docs/HANDOFF_README.md)。不要从旧计划中的 `NOT_IMPLEMENTED` 或旧模型 gate 推断当前运行状态，也不要把当前工程完成误写成历史交通预测已验证。
 
-项目不提供作者代运营 SaaS，也不承担市政账号、SSO、HA、备份或应急指挥。未经明确授权，不运行付费 API、不推送、发布或联系第三方。
+项目不提供作者代运营 SaaS，也不承担市政账号、SSO、HA、备份或应急指挥。用户已授权将本仓库公开发布到 `LN6666/CiviFlux`；这不包含付费 API、对外发消息或完整 v1 release 授权。

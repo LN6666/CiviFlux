@@ -69,7 +69,7 @@ report:
 compare-neighbors:
 	$(PY) scripts/evaluate.py external
 release-check:
-	$(PY) scripts/check_release.py evidence/product_release.json
+	$(PY) scripts/check_release.py evidence/current_product_release.json
 
 security-check:
 	$(PY) scripts/check_repository.py

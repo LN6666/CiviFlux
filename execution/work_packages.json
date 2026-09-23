@@ -34,9 +34,29 @@
         "G006",
         "G007"
       ],
-      "status": "NOT_STARTED",
+      "status": "PARTIAL",
       "prompt": "prompts/01_WP0.md",
-      "max_same_failure_repair_iterations": 3
+      "max_same_failure_repair_iterations": 3,
+      "status_counts": {
+        "PASS": 6,
+        "PARTIAL": 1
+      },
+      "evidence_files": [
+        "evidence/wp7/clean_checkout.json",
+        "evidence/wp5/browser_validation.json",
+        "evidence/wp7/final_python_junit.xml",
+        "evidence/wp7/contracts_check.log",
+        "evidence/wp0/walking_skeleton.json",
+        "evidence/wp3/simplejev_graph_integration.json",
+        "evidence/wp3/systemone_simplejev_demo_smoke.json",
+        "evidence/current_product_release.json",
+        "evidence/wp0/ontology_review.md"
+      ],
+      "remaining_goal_ids": [
+        "G004"
+      ],
+      "assessed_at": "2026-09-24",
+      "decision_authority": "execution/USER_DECISIONS.md"
     },
     {
       "id": "WP1",
@@ -66,9 +86,29 @@
         "G105",
         "G106"
       ],
-      "status": "NOT_STARTED",
+      "status": "PARTIAL",
       "prompt": "prompts/02_WP1.md",
-      "max_same_failure_repair_iterations": 3
+      "max_same_failure_repair_iterations": 3,
+      "status_counts": {
+        "PASS": 4,
+        "PARTIAL": 2
+      },
+      "evidence_files": [
+        "evidence/wp1/citypack_audit.json",
+        "evidence/wp1/missing_data_report.json",
+        "evidence/wp6/final_checks.log",
+        "evidence/wp1/case_review.json",
+        "evidence/wp1/directed_road_review.html",
+        "evidence/wp1/directed_road_mapping.csv",
+        "evidence/wp1/fire_scenario.json",
+        "evidence/wp1/evaluation_split_manifest.json"
+      ],
+      "remaining_goal_ids": [
+        "G102",
+        "G104"
+      ],
+      "assessed_at": "2026-09-24",
+      "decision_authority": "execution/USER_DECISIONS.md"
     },
     {
       "id": "WP2",
@@ -101,9 +141,27 @@
         "G206",
         "G207"
       ],
-      "status": "NOT_STARTED",
+      "status": "PARTIAL",
       "prompt": "prompts/03_WP2.md",
-      "max_same_failure_repair_iterations": 3
+      "max_same_failure_repair_iterations": 3,
+      "status_counts": {
+        "PASS": 6,
+        "PARTIAL": 1
+      },
+      "evidence_files": [
+        "evidence/wp7/final_python_junit.xml",
+        "evidence/wp6/ablation_report.json",
+        "evidence/wp2/network_comparison.json",
+        "evidence/wp5/browser_validation.json",
+        "evidence/wp1/citypack_audit.json",
+        "evidence/wp0/ontology_review.md",
+        "evidence/wp6/ontology_ablation.json"
+      ],
+      "remaining_goal_ids": [
+        "G205"
+      ],
+      "assessed_at": "2026-09-24",
+      "decision_authority": "execution/USER_DECISIONS.md"
     },
     {
       "id": "WP3",
@@ -125,9 +183,9 @@
         "make test-graph",
         "make test-ppr",
         "make test-systemone-contract",
-        "make test-systemone-local",
         "make demo-ranking",
-        "make test-ontology"
+        "make test-ontology",
+        "make systemone-preflight"
       ],
       "artifact": "evidence/wp3/ranking_integration.json",
       "goal_ids": [
@@ -139,9 +197,37 @@
         "G306",
         "G307"
       ],
-      "status": "NOT_STARTED",
+      "status": "PARTIAL",
       "prompt": "prompts/04_WP3.md",
-      "max_same_failure_repair_iterations": 3
+      "max_same_failure_repair_iterations": 3,
+      "status_counts": {
+        "PASS": 5,
+        "PARTIAL": 2
+      },
+      "evidence_files": [
+        "evidence/wp7/final_python_junit.xml",
+        "evidence/wp0/ontology_review.md",
+        "evidence/wp2/helsinki_road_product.json",
+        "evidence/wp6/benchmark.json",
+        "evidence/wp6/ablation_report.json",
+        "evidence/wp3/simplejev_graph_integration.json",
+        "evidence/wp3/systemone_simplejev_relations_policy.json",
+        "evidence/wp5/browser_validation.json"
+      ],
+      "remaining_goal_ids": [
+        "G304",
+        "G306"
+      ],
+      "assessed_at": "2026-09-24",
+      "decision_authority": "execution/USER_DECISIONS.md",
+      "legacy_commands": [
+        "make test-graph",
+        "make test-ppr",
+        "make test-systemone-contract",
+        "make test-systemone-local",
+        "make demo-ranking",
+        "make test-ontology"
+      ]
     },
     {
       "id": "WP4",
@@ -171,9 +257,24 @@
         "G405",
         "G406"
       ],
-      "status": "NOT_STARTED",
+      "status": "PARTIAL",
       "prompt": "prompts/05_WP4.md",
-      "max_same_failure_repair_iterations": 3
+      "max_same_failure_repair_iterations": 3,
+      "status_counts": {
+        "PASS": 5,
+        "PARTIAL": 1
+      },
+      "evidence_files": [
+        "evidence/wp4/validation.json",
+        "evidence/wp4/sumo_pair.json",
+        "evidence/wp4/helsinki_sumo_pair.json",
+        "evidence/wp7/final_python_junit.xml"
+      ],
+      "remaining_goal_ids": [
+        "G403"
+      ],
+      "assessed_at": "2026-09-24",
+      "decision_authority": "execution/USER_DECISIONS.md"
     },
     {
       "id": "WP5",
@@ -198,7 +299,7 @@
         "make demo-local",
         "make test-object-view"
       ],
-      "artifact": "evidence/wp5/browser_e2e.json",
+      "artifact": "evidence/wp5/browser_validation.json",
       "goal_ids": [
         "G501",
         "G502",
@@ -208,9 +309,26 @@
         "G506",
         "G507"
       ],
-      "status": "NOT_STARTED",
+      "status": "PARTIAL",
       "prompt": "prompts/06_WP5.md",
-      "max_same_failure_repair_iterations": 3
+      "max_same_failure_repair_iterations": 3,
+      "status_counts": {
+        "PARTIAL": 2,
+        "PASS": 5
+      },
+      "evidence_files": [
+        "evidence/wp5/browser_validation.json",
+        "evidence/wp7/final_python_junit.xml",
+        "evidence/wp6/ontology_ablation.json",
+        "evidence/wp7/repository_hygiene.json",
+        "evidence/wp0/ontology_review.md"
+      ],
+      "remaining_goal_ids": [
+        "G501",
+        "G503"
+      ],
+      "assessed_at": "2026-09-24",
+      "decision_authority": "execution/USER_DECISIONS.md"
     },
     {
       "id": "WP6",
@@ -247,9 +365,35 @@
         "G606",
         "G607"
       ],
-      "status": "NOT_STARTED",
+      "status": "PARTIAL",
       "prompt": "prompts/07_WP6.md",
-      "max_same_failure_repair_iterations": 3
+      "max_same_failure_repair_iterations": 3,
+      "status_counts": {
+        "PASS": 4,
+        "DEFERRED_USER": 1,
+        "PARTIAL": 1,
+        "BLOCKED_EXTERNAL": 1
+      },
+      "evidence_files": [
+        "evidence/wp6/ablation_report.json",
+        "evidence/wp6/final_gate.json",
+        "evidence/wp3/simplejev_graph_integration.json",
+        "evidence/wp1/case_review.json",
+        "evidence/wp1/directed_road_review.html",
+        "evidence/wp2/helsinki_fire_product.json",
+        "evidence/wp1/missing_data_report.json",
+        "evidence/wp6/report.json",
+        "evidence/wp6/benchmark.json",
+        "evidence/wp6/REPORT.md",
+        "evidence/wp6/external_reproduction.json"
+      ],
+      "remaining_goal_ids": [
+        "G602",
+        "G603",
+        "G605"
+      ],
+      "assessed_at": "2026-09-24",
+      "decision_authority": "execution/USER_DECISIONS.md"
     },
     {
       "id": "WP7",
@@ -272,7 +416,7 @@
         "make release-check",
         "make compare-neighbors"
       ],
-      "artifact": "evidence/wp7/release_review.json",
+      "artifact": "evidence/current_product_release.json",
       "goal_ids": [
         "G701",
         "G702",
@@ -282,9 +426,41 @@
         "G706",
         "G707"
       ],
-      "status": "NOT_STARTED",
+      "status": "PARTIAL",
       "prompt": "prompts/08_WP7.md",
-      "max_same_failure_repair_iterations": 3
+      "max_same_failure_repair_iterations": 3,
+      "status_counts": {
+        "PARTIAL": 4,
+        "PASS": 3
+      },
+      "evidence_files": [
+        "evidence/wp7/clean_checkout.json",
+        "evidence/wp7/clean_checkout_offline.json",
+        "evidence/current_product_release.json",
+        "evidence/wp7/release_check.log",
+        "evidence/wp0/ontology_review.md",
+        "evidence/wp7/final_python_junit.xml",
+        "evidence/wp7/repository_hygiene.json",
+        "evidence/wp5/map-workspace.png",
+        "evidence/wp6/REPORT.md"
+      ],
+      "remaining_goal_ids": [
+        "G701",
+        "G702",
+        "G704",
+        "G707"
+      ],
+      "assessed_at": "2026-09-24",
+      "decision_authority": "execution/USER_DECISIONS.md"
     }
-  ]
+  ],
+  "assessment_date": "2026-09-24",
+  "decision_authority": "execution/USER_DECISIONS.md",
+  "goal_status_counts": {
+    "PASS": 38,
+    "PARTIAL": 14,
+    "DEFERRED_USER": 1,
+    "BLOCKED_EXTERNAL": 1
+  },
+  "all_work_packages_passed": false
 }

@@ -7,7 +7,7 @@
 1. `execution/USER_DECISIONS.md`：用户决定优先于旧 pack；Qwen 必须 API；当前 System-One 为 Featherless SimpleJev；暂不付费；GitHub 公开仓库已授权。
 2. `README.md` → `docs/index.md` → `docs/CURRENT_ARCHITECTURE.md` / `docs/CURRENT_RUNBOOK.md`。
 3. `docs/ARCHITECTURE_GUARDRAILS.md`：用户指定第 9–20 节风险对应的工程约束。
-4. `evidence/product_release.json`：严格 release gate；尚未完成的 gate 不伪造 PASS。
+4. `evidence/current_product_release.json`：严格 release gate；尚未完成的 gate 不伪造 PASS。
 
 ## 已落地
 
@@ -15,14 +15,14 @@
 - Directed turn routing、真实 SUMO adapter、operational / dependency-evidence 图分离、可验证的稀疏 personalized PageRank。
 - 本地 API、后台运行/取消、对象视图和可下载 evidence bundle；Lit 插件支持 MapLibre 与无地图宿主。
 - 已下载 HSL/OSM/GTFS 数据，构建 Helsinki citypack；真实城市道路与火灾当前网络 what-if 已运行。
-- SimpleJev 远程 typed classifier 适配器；真实免费 demo 联调正在执行；生产 paid 调用关闭。普通 Qwen chat API 仅为可选备用接口，不能替代 SimpleJev 验收。
+- SimpleJev 远程 typed classifier 适配器；真实免费 demo 与 toy/Helsinki 图应用已通过限定范围验证（免费请求3次，付费0次）；生产 paid 调用关闭。普通 Qwen chat API 仅为可选备用接口，不能替代 SimpleJev 验收。
 - 固定场景消融、独立路由 oracle、PPR 数值 oracle、ontology 回归检查、核心性能与外部开源系统的受限 smoke。
 
 ## 本轮仍在收尾
 
-- 全量离线/真实 SUMO/浏览器回归、证据冻结、版本化提交与干净检出复现。
+- 最终 Python 检查207通过（包括66项原参考检查）；浏览器6通过。干净检出、冻结依赖安装和隔离 wheel 运行均通过（7d217b8）。
 - 同步 release manifest 与实际检查结果，保留用户推迟的 gate。
-- GitHub 登录待用户完成；仓库尚未创建或推送，不声称已上传。
+- GitHub 已认证为 LN6666；当前正准备已授权的公开仓库发布。
 
 ## 明确缺口
 

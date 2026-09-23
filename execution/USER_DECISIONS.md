@@ -26,3 +26,9 @@ The user's screenshots identify **Featherless SimpleJev with Qwen3.8-27B-classif
 - Registration: https://featherless.ai/register ; key: https://featherless.ai/account/api-keys ; pricing: https://featherless.ai/docs/request-pricing-and-credits .
 - Official contract verified at https://simple-jev.featherless.ai/docs . Expected-index score is normalized by `(rubric_levels - 1)` for semantic policy; it is not a calibrated probability.
 - Latest architecture screenshot reconfirms ontology → runtime KG → GIS/SUMO projections → typed System-One semantic relation policy → personalized PageRank → optional language interface → embedded Web GIS. Physical metrics remain independent of semantic policy.
+
+## 交接与账号边界 — 2026-09-24
+
+- 用户要求让其他人、其他账户的 Codex 轮替继续本项目。公开 GitHub 仓库、可复现文档、明确的当前验收状态和不含凭据的证据是交接载体。其他账户需自行使用其 GitHub 权限/fork 与本机环境；原账户的密钥和原始数据不随仓库转移。
+- 用户已在 Featherless 登录，但未授权购买订阅或进行生产付费调用；免费 SimpleJev Demo 限额三次已经全部使用。当前建议不购买套餐。将来如确需生产 API，Developer 是可用于 API 的方案，Chat 方案只供购买者交互聊天。
+- GitHub CLI 现已认证为 `LN6666`，公开仓库发布已获用户明确授权。发布后的地址及实际 CI 状态以仓库和 `execution/STATE.md` 为准。
