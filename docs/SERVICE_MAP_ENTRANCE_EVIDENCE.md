@@ -37,12 +37,15 @@ Distances are from each entrance point to the closest point on each directed edg
 
 For example, Tölö gymnasium's official entrance `19489` is 35.22 m from its nearest directed road edge in the current CityPack, while Aurora unit entrance `21577` is 1.45 m from an edge whose imported classes include delivery, bicycle and pedestrian but **not passenger or emergency**. Aurora's nearest imported passenger/emergency-permitted edge is instead 52.66 m away. These values are geometric candidates only. They do not establish a driveway, permitted passage from the building, current operational access, or May 2026 event-time access. An imported turn count only describes the modeled edge-to-edge network, not a turn from the building into that road.
 
-Rebuild this report offline after obtaining the local Helsinki CityPack:
+The saved report also checks the exact frozen HSL OSM PBF bytes against their recorded SHA256 and keeps nearby OSM building and service-way candidates separate from the CityPack edges. Aurora's official unit `26110` states `Nordenskiöldinkatu 20, rak. 15`, but entrance `21577` is 1.98 m from the outline of OSM `Aurora 14` (`way/26818356`); OSM `Aurora 15` (`way/26818363`) is 31.42 m away. The nearest raw OSM service way, `way/155739174`, is 3.05 m from the point and is tagged `access=destination`. Its two imported directed CityPack edges have **no modeled passenger or emergency permission and zero such turns**. This is a conflict and review lead, not proof that the official address is wrong or that real emergency vehicles are forbidden. The official unit-to-OSM hospital-site identity and a continuous building-to-road path remain unresolved.
+
+Rebuild the saved report offline after obtaining both local files using the [Helsinki data workflow](../data/README.md). The OSM source hash must match the frozen Service Map snapshot:
 
 ```sh
 PYTHONPATH=core:. uv run --frozen python scripts/service_map_road_candidates.py \
-  --citypack /absolute/path/to/data/citypacks/helsinki-current/citypack.json
+  --citypack /absolute/path/to/data/citypacks/helsinki-current/citypack.json \
+  --osm-pbf /absolute/path/to/data/raw/hsl.osm.pbf
 PYTHONPATH=core:. uv run --frozen pytest -q test_suite/data/test_service_map_road_candidates.py
 ```
 
-The command requires the CityPack path explicitly and makes no network or model calls. The saved report remains `CANDIDATES_ONLY_NOT_VERIFIED`; G102 and G205 remain `PARTIAL`. A reviewer still needs a source-backed unit/site correspondence, an actual building-to-road access path, directed road permissions and event-time applicability before promoting any connection.
+The command makes no network or model calls. Omitting `--osm-pbf` generates a smaller road-distance queue with `frozen_osm_geometry_review=NOT_RUN`; it does **not** reproduce the saved building-context review. The saved report remains `CANDIDATES_ONLY_NOT_VERIFIED`; G102 and G205 remain `PARTIAL`. A reviewer still needs a source-backed unit/site correspondence, an actual building-to-road access path, directed road permissions and event-time applicability before promoting any connection.
