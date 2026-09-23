@@ -4,15 +4,16 @@ from __future__ import annotations
 
 import json
 import shutil
+from collections.abc import Callable
 from importlib.metadata import version
 from pathlib import Path
 from threading import Event
-from typing import Callable, Protocol
+from typing import Protocol
 
 from .contracts import MANIFEST, CityPack, ResultBundle, Scenario
 from .graph import paired_projection
 from .network import Router
-from .ranking import RELATION_DEFINITIONS, compare
+from .ranking import RELATION_DEFINITIONS, compare, direct_relation_rank
 from .util import atomic_json, digest, file_hash
 
 
@@ -146,12 +147,8 @@ class AnalysisService:
                 "convergence": None,
             }
         elif scenario.ranking == "A4":
-            attention = {
-                "kind": "relation_policy_without_ppr",
-                "relation_scores": scores,
-                "records": [],
-                "convergence": None,
-            }
+            attention = direct_relation_rank(pair, scores, [facility.id for facility in city.facilities])
+            policy["applied_transition_hash"] = digest(attention["transition_hashes"])
         else:
             attention = {"kind": "physical_facts_only", "records": [], "convergence": None}
         attention["variant"] = scenario.ranking

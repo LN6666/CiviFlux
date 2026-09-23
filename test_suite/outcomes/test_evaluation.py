@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 from experiments.dataset import freeze, make_case
-from experiments.evaluation import recall_at
+from experiments.evaluation import rank_facilities, recall_at
 from experiments.oracle import labels
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[2]
 def test_oracle_is_independent_and_known_answers():
     source = (ROOT / "experiments/oracle.py").read_text()
     imports = [n.module for n in ast.walk(ast.parse(source)) if isinstance(n, ast.ImportFrom)]
-    assert not any(m and (m.startswith("urbanimpact") or m.startswith("adapters")) for m in imports)
+    assert not any(m and m.startswith(("urbanimpact", "adapters")) for m in imports)
     dual = make_case("dual_corridor", 0)
     answer = labels(dual["city"], dual["scenario"])
     hospital = next(r for r in answer["od"] if r["facility_id"] == "hospital")
@@ -45,6 +45,36 @@ def test_empty_and_short_retrieval_metrics():
     score = recall_at(["a", "b"], {"a", "c"}, 10)
     assert score["k_requested"] == 10 and score["k_returned"] == 2 and score["candidate_count"] == 2
     assert score["recall"] == score["precision"] == 0.5
+
+
+def test_a4_direct_control_scores_every_frozen_facility_without_ppr():
+    from types import SimpleNamespace
+
+    from urbanimpact.contracts import CityPack, Scenario
+    from urbanimpact.graph import paired_projection
+    from urbanimpact.network import Router
+    from urbanimpact.ranking import RELATION_DEFINITIONS, direct_relation_rank
+    from urbanimpact.util import digest as product_digest
+
+    case = make_case("dual_corridor", 0)
+    city = CityPack.model_validate(case["city"])
+    scenario = Scenario.model_validate(case["scenario"])
+    physical_facts = Router().compare(city, scenario)
+    results = []
+    for access_score in (0, 1):
+        policy = {name: 1.0 for name in RELATION_DEFINITIONS}
+        policy["SEGMENT_ACCESS_TO_FACILITY"] = access_score
+        pair = paired_projection(city, scenario, physical_facts, product_digest(policy))
+        attention = direct_relation_rank(pair, policy, [facility.id for facility in city.facilities])
+        ranking = rank_facilities(SimpleNamespace(attention={**attention, "variant": "A4"}), case)
+        assert set(ranking) == {facility.id for facility in city.facilities}
+        assert len(ranking) == len(city.facilities)
+        results.append(attention)
+    assert results[0]["transition_hashes"] != results[1]["transition_hashes"]
+    by_id = [{row["object_id"]: row for row in result["records"]} for result in results]
+    assert by_id[0]["hospital"]["delta_attention"] != by_id[1]["hospital"]["delta_attention"]
+    assert by_id[0]["isolated_clinic"]["delta_attention"] == 0
+    assert by_id[1]["isolated_clinic"]["delta_attention"] == 0
 
 
 def test_actual_ablation_has_shared_facts_zero_violations_and_deferred_models():

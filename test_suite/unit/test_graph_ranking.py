@@ -1,13 +1,14 @@
 import copy
+
 import networkx as nx
 import numpy as np
 import pytest
 from scipy import sparse
+from urbanimpact.contracts import ProjectionSpec
 from urbanimpact.fixtures import toy_city, toy_scenario
+from urbanimpact.graph import city_objects, paired_projection, project
 from urbanimpact.network import Router
-from urbanimpact.graph import paired_projection, project, city_objects
-from urbanimpact.contracts import ProjectionSpec, MANIFEST
-from urbanimpact.ranking import transition, ppr, compare, RELATION_DEFINITIONS
+from urbanimpact.ranking import RELATION_DEFINITIONS, compare, direct_relation_rank, ppr, transition
 from urbanimpact.util import digest
 
 
@@ -64,6 +65,57 @@ def test_no_event_delta_zero():
     weights = {t: 1 for t in RELATION_DEFINITIONS}
     pair = paired_projection(city, s, Router().compare(city, s), digest(weights))
     assert all(x["delta_attention"] == 0 for x in compare(pair, ["bc"], weights)["records"])
+
+
+def test_a4_direct_relation_control_has_candidates_without_ppr(tmp_path, monkeypatch):
+    from urbanimpact.contracts import Scenario
+    from urbanimpact.pipeline import AnalysisService
+
+    class FrozenPolicy:
+        def score_relations(self, objective, definitions):
+            assert objective == "facility_access" and set(definitions) == set(RELATION_DEFINITIONS)
+            return {
+                "provider_mode": "mock_test",
+                "scores": {name: (0.2 if name == "ROAD_CONNECTS_TO" else 0.8) for name in definitions},
+            }
+
+    city = toy_city()
+    scenario = Scenario.model_validate({**toy_scenario().model_dump(mode="json"), "ranking": "A4"})
+    monkeypatch.setattr(
+        "urbanimpact.ranking.ppr", lambda *_a, **_k: (_ for _ in ()).throw(AssertionError("PPR called"))
+    )
+    result = AnalysisService(tmp_path / "cache", FrozenPolicy()).run(
+        city,
+        scenario,
+        "a4-direct",
+        tmp_path / "run",
+        overlay_hash=digest(scenario),
+        action_log_hash=digest([]),
+    )
+    attention = result.attention
+    assert attention["kind"] == "direct_relation_relevance_not_risk"
+    assert attention["candidate_ids"] == ["hospital"]
+    assert len(attention["records"]) == 1
+    assert np.isfinite(attention["records"][0]["delta_attention"])
+    assert attention["convergence"] is None and attention["comparable"] is True
+    assert result.policy["applied_transition_hash"] == digest(attention["transition_hashes"])
+    assert result.provider_mode == "mock_test"
+
+
+def test_a4_no_event_direct_delta_zero_and_rejects_tampered_pair():
+    city = toy_city()
+    scenario = toy_scenario(closed=())
+    scores = {name: 0.5 for name in RELATION_DEFINITIONS}
+    pair = paired_projection(city, scenario, Router().compare(city, scenario), digest(scores))
+    result = direct_relation_rank(pair, scores, ["hospital"])
+    assert result["records"][0]["delta_attention"] == 0
+    assert result["records"][0]["baseline_attention"] == result["records"][0]["attention_score"]
+    with pytest.raises(ValueError, match="Duplicate direct-ranking candidate"):
+        direct_relation_rank(pair, scores, ["hospital", "hospital"])
+    changed = copy.deepcopy(pair)
+    changed["event"]["links"].pop()
+    with pytest.raises(ValueError, match="Projection content hash mismatch"):
+        direct_relation_rank(changed, scores, ["hospital"])
 
 
 def test_projection_rejects_physical_facts_from_another_scenario():

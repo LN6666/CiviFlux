@@ -54,6 +54,26 @@ def test_failed_model_is_not_fake_pass(client):
     assert state['status']=='failed' and state['error']['code']=='BLOCKED_API_SETUP'
     assert client.get('/api/v1/runs/'+rid+'/results').status_code==409
 
+
+def test_a4_direct_control_uses_test_policy_without_ppr_or_paid_egress(tmp_path):
+    class FixedTestPolicy:
+        def score_relations(self, objective, definitions):
+            assert objective == 'facility_access'
+            return {'provider_mode': 'mock_test', 'scores': {name: 0.5 for name in definitions}}
+
+    with TestClient(create_app(tmp_path, [toy_city()], policy_backend=FixedTestPolicy())) as api:
+        api.headers['Authorization'] = 'Bearer ' + api.get('/api/v1/session').json()['token']
+        scenario = create(api, 'A4', 'a4-offline-control')
+        run_id = run(api, scenario)
+        result = api.get('/api/v1/runs/' + run_id + '/results').json()
+        assert result['provider_mode'] == 'mock_test'
+        assert result['attention']['kind'] == 'direct_relation_relevance_not_risk'
+        assert result['attention']['candidate_ids'] == ['hospital']
+        assert len(result['attention']['records']) == 1
+        assert result['attention']['convergence'] is None
+        assert result['facts']['od'][0]['event']['status'] == 'unreachable'
+        assert api.get('/api/v1/runs/' + run_id + '/export').status_code == 200
+
 def test_auth_origin_host_and_no_arbitrary_crud(client):
     assert client.get('/api/v1/citypacks',headers={'Authorization':'bad'}).status_code==401
     assert client.get('/api/v1/session',headers={'Origin':'https://evil.example'}).status_code==403

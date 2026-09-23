@@ -110,7 +110,7 @@ def matrix_hash(matrix):
     )
 
 
-def compare(pair, seeds, scores, *, alpha=0.85, epsilon=0.1):
+def _validated_pair_nodes(pair, scores):
     before = pair["baseline"]
     after = pair["event"]
     from .contracts import MANIFEST, Link, OntologyObject, ProjectionSpec
@@ -146,6 +146,13 @@ def compare(pair, seeds, scores, *, alpha=0.85, epsilon=0.1):
     nodes = [o["object_id"] for o in before["nodes"]]
     if nodes != [o["object_id"] for o in after["nodes"]]:
         raise ValueError("Paired universe differs")
+    return nodes
+
+
+def compare(pair, seeds, scores, *, alpha=0.85, epsilon=0.1):
+    nodes = _validated_pair_nodes(pair, scores)
+    before = pair["baseline"]
+    after = pair["event"]
     if set(seeds) - set(nodes) or not seeds or len(seeds) != len(set(seeds)):
         raise ValueError("Seeds outside projection")
     seed = np.array([1 / len(seeds) if n in seeds else 0 for n in nodes])
@@ -201,4 +208,71 @@ def compare(pair, seeds, scores, *, alpha=0.85, epsilon=0.1):
         "delta_sum": float((a - b).sum()),
         "comparable": True,
         "structural_change_identified": bool(pair["graph_delta_log"]),
+    }
+
+
+def direct_relation_rank(pair, scores, candidate_ids, *, epsilon=0.1):
+    """One transition from a fixed road prior to facilities; no iterative PPR.
+
+    This is the A4 direct-relevance control. It uses the same typed projection
+    and relation-mixture policy as A3, but deliberately has no diffusion. A
+    missing facility edge yields zero direct relevance, not a physical claim.
+    """
+    nodes = _validated_pair_nodes(pair, scores)
+    candidates = sorted(set(candidate_ids))
+    if len(candidates) != len(candidate_ids):
+        raise ValueError("Duplicate direct-ranking candidate")
+    node_types = {o["object_id"]: o["object_type"] for o in pair["baseline"]["nodes"]}
+    if any(
+        node_types.get(identity) not in {"Facility", "Hospital", "FireStation"} for identity in candidates
+    ):
+        raise ValueError("Direct-ranking candidates must be projected facilities")
+    road_indices = [i for i, identity in enumerate(nodes) if node_types[identity] == "RoadSegment"]
+    if not road_indices:
+        raise ValueError("Direct-ranking requires projected road segments")
+    prior = np.zeros(len(nodes), dtype=float)
+    prior[road_indices] = 1 / len(road_indices)
+    calculated = {}
+    hashes = {}
+    for side in ("baseline", "event"):
+        matrix = transition(pair[side], scores, epsilon)
+        calculated[side] = np.asarray(prior @ matrix).ravel()
+        hashes[side] = matrix_hash(matrix)
+    index = {identity: i for i, identity in enumerate(nodes)}
+    ranks = {
+        identity: position + 1
+        for facility_type in {node_types[identity] for identity in candidates}
+        for position, identity in enumerate(
+            sorted(
+                (identity for identity in candidates if node_types[identity] == facility_type),
+                key=lambda identity: (-calculated["event"][index[identity]], identity),
+            )
+        )
+    }
+    records = [
+        {
+            "object_id": identity,
+            "object_type": node_types[identity],
+            "baseline_attention": float(calculated["baseline"][index[identity]]),
+            "attention_score": float(calculated["event"][index[identity]]),
+            "delta_attention": float(
+                calculated["event"][index[identity]] - calculated["baseline"][index[identity]]
+            ),
+            "rank_within_type": ranks[identity],
+            "explanation_paths": [],
+        }
+        for identity in candidates
+    ]
+    return {
+        "kind": "direct_relation_relevance_not_risk",
+        "method": "one_transition_from_uniform_road_prior_no_ppr",
+        "records": records,
+        "candidate_ids": candidates,
+        "policy_hash": digest(scores),
+        "node_universe_hash": pair["baseline"]["node_universe_hash"],
+        "prior_hash": digest(prior.tolist()),
+        "epsilon": epsilon,
+        "transition_hashes": hashes,
+        "convergence": None,
+        "comparable": True,
     }

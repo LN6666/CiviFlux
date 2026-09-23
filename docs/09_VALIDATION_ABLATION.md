@@ -29,10 +29,12 @@ Synthetic：至少12个有独立答案的拓扑母题（双路、单桥、孤区
 | A1 | 相同 | typed KG | bounded reachability/explicit rule | 无 | 语义关系的增量 |
 | A2 | 相同 | 同一KG | fixed typed PPR | 无 | diffusion增量 |
 | A3 | 相同 | 同一KG | SimpleJev-conditioned typed PPR | 经授权的真实托管 policy 冻结 | System-One 增量 |
-| A4 | 相同 | 同一候选事实 | 固定候选的 SimpleJev 相关性排序，无 PPR | 重用 A3 的同一冻结真实 policy | 是否其实不需要 PPR |
+| A4 | 相同 | 同一候选事实 | 对所有设施候选从道路节点均匀先验做一次 typed 关系转移，比较前后直接相关性，无迭代 PPR | 重用 A3 的同一冻结真实 policy | 是否其实不需要 PPR 扩散 |
 | A5 | 相同 | 同一KG | neutral / permuted type weights PPR | 重用同一冻结 policy，不重复付费调用 | 是否权重语义真的有效 |
 
 primary contrast A2→A3；A0→A1、A1→A2、A4→A3为解释对照。不要对48scenario×所有alpha×多模型×城市全排列。先一个冻结profile+seed，再只对dev最敏感参数做有限敏感性（alpha0.7/0.85/0.95；epsilon0.1与0.25），test只跑选定配置一次；更改后新版本有记录。
+
+A4 的道路先验由同一投影中的全部 `RoadSegment` 均匀构成；候选集合固定为 CityPack 的全部设施。它使用 A3 的相同关系权重、typed baseline/event 图和 `epsilon`，各执行一次行随机转移，再按候选的绝对前后差排序（ID 打破并列）。无路段到候选的直接关系时分数为 0，并不表示设施物理不可达。A4 不调用 PPR，也不把 SimpleJev 的类型级评分伪装成设施级独立判断。这个核已能用离线固定策略测试；生产 A3/A4 共享真实冻结 policy 的完整消融仍为 `DEFERRED_USER`。
 
 ## 指标
 
