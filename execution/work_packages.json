@@ -13,7 +13,7 @@
         "docs/00_PRODUCT.md",
         "docs/01_ARCHITECTURE.md",
         "docs/03_CONTRACTS.md",
-        "docs/05_QWEN_SYSTEM_ONE.md",
+        "adapters/system_one/README.md",
         "docs/14_OPERATIONAL_ONTOLOGY.md"
       ],
       "commands": [
@@ -179,7 +179,7 @@
       ],
       "docs": [
         "docs/04_KG_PPR.md",
-        "docs/05_QWEN_SYSTEM_ONE.md",
+        "adapters/system_one/README.md",
         "docs/09_VALIDATION_ABLATION.md",
         "docs/14_OPERATIONAL_ONTOLOGY.md"
       ],
