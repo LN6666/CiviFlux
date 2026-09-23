@@ -1,3 +1,5 @@
+> 历史启动 Prompt。当前模型与公开 GitHub 管理决定以 [execution/USER_DECISIONS.md](../execution/USER_DECISIONS.md) 为准：只用 Featherless 托管 SimpleJev Qwen classifier API，不部署或下载本地 Qwen；生产付费调用未授权。下文与此冲突的本地 Reflex、无 API key、不得 push 等条款已被用户决定覆盖。
+
 你现在是 UrbanImpact Road & Fire GIS v1 的交付负责人和实现工程师。不是继续给我建议，而是在当前仓库执行本工程包。
 
 先读 AGENTS.md、README.md、docs/00_PRODUCT.md、docs/10_EXECUTION.md、docs/14_OPERATIONAL_ONTOLOGY.md、execution/work_packages.json、execution/STATE.md。已有仓库先检查git status和目录，不覆盖未提交工作。不要一次把所有文档注入上下文，后续按active WP读取。

@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""One-request smoke against a deployer-local Qwen System-One server.
+"""Historical reference-only smoke against a deployer-local Qwen System-One server.
 
 Reference backend: kshetrajna12/reflex serving Qwen3.5-4B. The script never starts
 or downloads a model and never sends city data. By default it refuses non-loopback
 endpoints. It validates typed probabilities and records reproducibility metadata.
+The user has superseded this path with a hosted Featherless SimpleJev API and
+prohibits local Qwen deployment. Current runs use scripts/systemone_preflight.py.
 """
 from __future__ import annotations
 import argparse, datetime, hashlib, json, os, sys, time, urllib.error, urllib.parse, urllib.request
