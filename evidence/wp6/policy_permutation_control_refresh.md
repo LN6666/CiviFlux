@@ -1,0 +1,9 @@
+# Offline policy-permutation evidence refresh
+
+This report was regenerated in the isolated combined-validation branch after integrating PR #2 through PR #5. No new model call was made. The input remains the frozen free SimpleJev policy at `evidence/wp3/systemone_simplejev_relations_policy.json` (SHA-256 `e3c8ba6060222fc33deab13a34e09eb17f0866930a11c6d998cff0e3bea5681e`).
+
+The previous report is preserved in Git at `f764feb:evidence/wp6/policy_permutation_control.json` (file SHA-256 `83dd88ed04a6ea5c4e998678c159e8c9a1a4b93a43de7e446c6737562560739f`). Its `fixed_inputs.physical_facts` hash was `fa8a187fb9676603dadef0eda4fd70a3e9fc3327e39b2a92b19a3e2a8517d3e9`.
+
+PR #5 added `physical_context_hash` to `Router.compare` so graph projection can reject facts from a different city or physical scenario. For the same toy city and scenario, removing **only** that new field from the current facts reproduces the previous hash exactly. The refreshed whole-facts hash is `b3de31f020b98090302d44a43045b10cce4f3a29afab1d376d3a29fe4f91269e`; the refreshed report file SHA-256 is `58d4a8f8c86b3d4e6a27beafd19aa78c0aaaae8b3c82140d6290901574b579c0`. A field-by-field comparison of the old and refreshed reports found no other difference: the 720 permutations, graph hashes, transition hashes, attention values, and sensitivity statistics are unchanged.
+
+Reproduce with `make policy-permutation-control`, then run `PYTHONPATH=core:. uv run --frozen pytest -q test_suite/review/test_policy_permutation_control.py`. This refresh does not upgrade the offline negative control into paid-production inference, expert semantic validation, or measured historical prediction. Older `evidence/wp3/simplejev_graph_integration.json` remains an immutable historical run with its original facts hash; it was not silently rewritten as a post-merge run.
