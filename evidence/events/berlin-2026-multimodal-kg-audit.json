@@ -1,0 +1,68 @@
+{
+  "status": "PASS_CURRENT_MULTIMODAL_LINEAR_CANDIDATE",
+  "case_id": "berlin-marathon-2026",
+  "citypack_id": "berlin-marathon-2026-multimodal-93dae9635a0c",
+  "citypack_sha256": "aed4fe582ac67f9e0bccce23b3b2407811e1b0fbe56a1e5d706dbca1ba47df9d",
+  "source_sha256": "ff4ac9a01c7d7c13dc3a9a47e4a5031152c82cfed36720fe2a1bf99543fb1a76",
+  "source_last_modified": "Tue, 22 Sep 2026 23:53:57 GMT",
+  "bbox": [
+    13.24,
+    52.45,
+    13.48,
+    52.56
+  ],
+  "counts": {
+    "junctions": 228123,
+    "directed_road_segments": 436764,
+    "turn_connections": 368294,
+    "candidate_facilities": 635,
+    "ontology_objects": 437400,
+    "evidence_links": 437399,
+    "bicycle_permitted_segments": 254663,
+    "pedestrian_permitted_segments": 321049,
+    "dedicated_nonmotor_segments": 201365
+  },
+  "knowledge_graph": {
+    "schema": "civiflux-city-kg-jsonl-v1",
+    "citypack_id": "berlin-marathon-2026-multimodal-93dae9635a0c",
+    "ontology_version": "1.0.0",
+    "objects": 437400,
+    "links_by_type": {
+      "FACILITY_ACCESSED_VIA": 2333,
+      "ROAD_CONNECTS_TO": 368294,
+      "SEGMENT_ACCESS_TO_FACILITY": 2333,
+      "SUPPORTED_BY_EVIDENCE": 437399
+    },
+    "skipped_turns_without_common_vehicle_class": 0,
+    "artifacts": [
+      {
+        "path": "kg_objects.jsonl.gz",
+        "sha256": "7aebc8ee89188e815649cbae1a1a1a9ee74749a46b5e50b6f4ddb7e0d94a1b24",
+        "size_bytes": 6784189
+      },
+      {
+        "path": "kg_links.jsonl.gz",
+        "sha256": "64c1517fc1e32927262a7ad08d77b189290ecb24dfcb8495dbda32e45be9cbe0",
+        "size_bytes": 25481074
+      }
+    ],
+    "interpretation": "candidate imported topology and facility access; operational PPR projections must re-filter vehicle permissions and scenario time"
+  },
+  "mode_specific_candidate_turns": {
+    "bus": 134770,
+    "bicycle": 365131,
+    "pedestrian": 139307
+  },
+  "claim_ceiling": "current ontology-typed multimodal linear network candidate inventory only; walking/cycling restriction mapping and event impact not validated",
+  "unresolved": [
+    "announced_closure_to_directed_edge_review",
+    "actual_closure_operation",
+    "independent_measured_event_outcomes",
+    "GTFS",
+    "boundary_sensitivity",
+    "pedestrian_area_geometry",
+    "mode_specific_access_review",
+    "crossing_connectivity_review",
+    "mode_specific_validation"
+  ]
+}

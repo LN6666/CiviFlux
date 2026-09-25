@@ -16,6 +16,7 @@
       <p id="status" role="status">正在载入本地数据…</p>
       <label>可选：导入另一份巴库对照包 JSON<input type="file" id="bundle-file" accept="application/json,.json"></label>
       <div id="summary"></div>
+      <div id="active-summary">正在载入步骑条件探针…</div>
       <fieldset>
         <legend>地图图层</legend>
         <label><input type="checkbox" data-layer="agreement" checked>绿色 · 与 AYNA 公告街名重合的计算绕行</label>
@@ -28,10 +29,14 @@
         <label><input type="checkbox" data-layer="cycle" checked>玫红线 · 自行车专用候选（未评估扰动）</label>
         <label><input type="checkbox" data-layer="walkCycle" checked>粉紫虚线 · 步骑共用候选（未评估扰动）</label>
         <label><input type="checkbox" data-layer="walkArea" checked>淡紫区域 · 步行区域候选（未评估扰动）</label>
+        <label><input type="checkbox" data-layer="activeWalkExposure" checked>深紫粗线 · 15 m 假设步行暴露（非实际封闭）</label>
+        <label><input type="checkbox" data-layer="activeCycleExposure" checked>深粉粗线 · 15 m 假设骑行暴露（非实际封闭）</label>
+        <label><input type="checkbox" data-layer="activeWalkBaseline">深紫虚线 · 合成步行基线路由</label>
+        <label><input type="checkbox" data-layer="activeCycleBaseline">深粉虚线 · 合成骑行基线路由</label>
       </fieldset>
       <button id="fit">定位对照范围</button>
       <section id="details" aria-label="Selected Baku road details">点击地图道路查看类型、街名和 OSM 路段 ID。</section>
-      <p class="source"><strong>比较等级：间接、回溯、合成起终点。</strong>BCC 公告是情景输入；AYNA 公告只在路由计算后按街名对照。绿色仅表示街名与计算绕行重合，不表示该公交线路实地经过，也不表示封路或车速被测量。公交计算只用机动车包的 bus 权限；步行/骑行专用线与步行区域来自另一个候选包，仅展示位置，未推断实际封闭或影响。</p>
+      <p class="source"><strong>比较等级：间接、回溯、合成起终点。</strong>BCC 公告是公交情景输入；AYNA 公告只在路由计算后按街名对照。绿色仅表示街名重合，不表示公交实地经过。步骑粗线和可达性数字来自另一个“整条 15 m 走廊受限”的假设探针；官方公告未确认这些步骑通道关闭，模型结果不是实际扰动。</p>
       <p class="source">路网几何：© OpenStreetMap contributors（ODbL）。公告来源：Baku City Circuit 与 Azerbaijan Land Transport Agency。原始页面及大型城市包保存在本机，不随公开仓库发布。</p>
     </section>
     <section class="map-wrap" aria-label="Baku indirect GIS map"><div id="map"></div></section>

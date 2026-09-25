@@ -32,13 +32,18 @@ The event builder imports **dated, pinned Geofabrik OSM PBF bytes** into a bound
 ```sh
 .venv/bin/python scripts/data_pipeline.py fetch --source berlin-osm --allow-egress
 .venv/bin/python scripts/build_event_citypack.py berlin-marathon-2026
+.venv/bin/python scripts/build_event_citypack.py berlin-marathon-2026 --multimodal
 .venv/bin/python scripts/map_berlin_closures.py
 
 .venv/bin/python scripts/data_pipeline.py fetch --source baku-osm --allow-egress
 .venv/bin/python scripts/build_event_citypack.py baku-f1-2026
 .venv/bin/python scripts/build_event_citypack.py baku-f1-2026 --multimodal
+.venv/bin/python scripts/baku_indirect_map.py
+.venv/bin/python scripts/baku_active_indirect_probe.py
 ```
 
 The Berlin source registration points to the frozen 22 September extract; its local filename reflects the original 24 September retrieval, not the OSM content date. The Baku source points to the 18 September extract, before the 19 September announced closure onset. Each `.source.json` records byte hash, source time and licence; a mismatch refuses silent replacement. The build audit in `data/citypacks/<case>/build_audit.json` records source and CityPack hashes, feature counts, KG file hashes and unverified boundaries. Rebuilds may change derived hashes if the converter environment changes; preserve an original audit for a frozen experiment.
+
+The [Berlin multimodal audit](../evidence/events/berlin-2026-multimodal-kg-audit.json) and [Baku multimodal audit](../evidence/events/baku-2026-multimodal-kg-audit.json) record local KG counts and exact derived hashes. The [Baku active-mode indirect probe](../evidence/events/baku-2026-active-indirect-probe.json) is a hypothetical corridor sensitivity with replayed typed Actions and fixed pedestrian/bicycle speeds. It never promotes the motor-road announcement into an observed walking/cycling restriction.
 
 Berlin's tracked [`closure-candidates.json`](event_cases/berlin-marathon-2026-closure-candidates.json) is **unreviewed**, machine-proposed street-to-directed-edge mapping from one official notice. The [pre-onset conditional probe](../evidence/events/berlin-2026-incremental-pre-onset-probe.json) froze a few synthetic OD routes before a planned 26 September closure; it is not an observed traffic effect. Other already-announced closures, vehicle exceptions, historical GTFS, measured demand, independent actual operation and event-hour directional road observations are missing. Do not run the freeze script again over its immutable output. For Baku source/validation limits see the [F1 audit](../docs/BAKU_2026_F1_DATA_FEASIBILITY.md). Neither case is a release-grade V2/V3 validation set yet.

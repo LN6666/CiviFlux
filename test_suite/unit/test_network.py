@@ -109,6 +109,37 @@ def test_hand_solved_and_unknown_entrance():
     assert Router().compare(city(), scenario(None))["od"][0]["delta_travel_time_s"] == 0
 
 
+def test_active_mode_costs_use_declared_speed_not_imported_motor_speed():
+    c = city()
+    c = c.model_copy(
+        update={
+            "edges": tuple(
+                e.model_copy(
+                    update={
+                        "allowed_vehicle_classes": ("passenger", "pedestrian", "bicycle"),
+                        "speed_kph": 90,
+                        "cost_s": 0.1,
+                    }
+                )
+                for e in c.edges
+            )
+        }
+    )
+    walk = Router().route(c, "A", "H", "pedestrian")
+    cycle = Router().route(c, "A", "H", "bicycle")
+    assert walk["edge_ids"] == cycle["edge_ids"] == ["ab", "bc", "ch"]
+    assert walk["distance_m"] == cycle["distance_m"] == 30
+    assert walk["travel_time_s"] == pytest.approx(30 / 1.4)
+    assert cycle["travel_time_s"] == pytest.approx(30 / 4.0)
+    assert Router().route(c, "A", "H", "passenger")["travel_time_s"] == pytest.approx(0.3)
+    compared = Router().compare(c, scenario(None), "pedestrian")
+    assert compared["cost_policy"] == {
+        "kind": "fixed_speed_assumption",
+        "speed_mps": 1.4,
+        "not_observed": True,
+    }
+
+
 def test_unique_bridge_unreachable_is_not_zero_and_direction():
     row = Router().compare(city(), scenario("ch"))["od"][0]
     assert row["event"]["status"] == "unreachable"
