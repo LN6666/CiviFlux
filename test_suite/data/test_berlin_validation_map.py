@@ -3,8 +3,10 @@ from __future__ import annotations
 import pytest
 
 from scripts.berlin_validation_map import (
+    _check_frozen_baseline,
     _comparison_timing,
     _receipt_feed_time,
+    _validate_traffic_binding,
     compare_snapshots,
     select_matched_controls,
     summarize_control_indicator,
@@ -68,8 +70,9 @@ def test_snapshot_comparison_does_not_score_reidentified_geometry_or_missing_eve
     by_id = {f["properties"]["unique_id"]: f["properties"] for f in features}
     assert by_id["changed"]["change_class"] == "unscored_geometry_changed"
     assert by_id["vanished"]["change_class"] == "unscored_missing_event"
-    assert by_id["vanished"]["predicted_overlap"] is None
+    assert by_id["vanished"]["predicted_overlap"] is True
     assert by_id["moved"]["change_class"] == "unscored_geometry_moved_out"
+    assert by_id["moved"]["predicted_overlap"] is False
     assert metrics["scored_segments"] == 0
     assert metrics["unscored"] == 3
     assert metrics["scored_matched_viz_segments"] == 0
@@ -88,6 +91,22 @@ def test_duplicate_viz_ids_and_stale_feed_cannot_produce_a_score() -> None:
         _receipt_feed_time(receipt, "event")
     receipt["traffic"]["feed_time_stamp"] = "2026-09-26T06:29:50Z"
     assert _receipt_feed_time(receipt, "event")[1] == 10
+
+
+def test_receipt_must_match_embedded_feed_time_and_feature_count() -> None:
+    receipt = {
+        "captured_at_utc": "2026-09-26T04:45:10+00:00",
+        "traffic": {"feed_time_stamp": "2026-09-26T04:45:00Z", "feature_count": 1},
+    }
+    traffic = {"type": "FeatureCollection", "timeStamp": "2026-09-26T04:45:00Z", "features": [road("x", 13.38, 30)]}
+    _validate_traffic_binding(receipt, traffic, "baseline")
+    with pytest.raises(ValueError, match="timestamp differs"):
+        _validate_traffic_binding(receipt, {**traffic, "timeStamp": "2026-09-25T04:45:00Z"}, "baseline")
+    with pytest.raises(ValueError, match="feature count differs"):
+        _validate_traffic_binding(receipt, {**traffic, "features": []}, "baseline")
+    receipt["captured_at_utc"] = "2026-09-26T05:01:00+00:00"
+    with pytest.raises(ValueError, match="stale or future-dated"):
+        _validate_traffic_binding(receipt, traffic, "baseline")
 
 
 def test_capture_and_feed_both_must_straddle_announced_onset() -> None:
@@ -156,3 +175,44 @@ def test_control_indicator_excludes_new_closures_from_speed_math() -> None:
     assert indicator["median_pair_adjusted_speed_drop_fraction"] is None
     assert indicator["newly_reported_closed_treated"] == 1
     assert indicator["newly_reported_closed_controls"] == 1
+
+
+def test_event_geometry_cannot_change_baseline_prediction_coverage() -> None:
+    prediction = road("prediction", 13.380, 20)
+    before = [road("baseline_match", 13.380, 40), road("baseline_miss", 13.380, 40)]
+    after = [road("baseline_match", 13.380, 20), road("baseline_miss", 13.380, 20)]
+    for feature, latitude in zip(before, (52.52010, 52.52025), strict=True):
+        for point in feature["geometry"]["coordinates"]:
+            point[1] = latitude
+    for feature, latitude in zip(after, (52.52024, 52.52012), strict=True):
+        for point in feature["geometry"]["coordinates"]:
+            point[1] = latitude
+    observed, metrics = compare_snapshots([prediction], before, after)
+    by_id = {f["properties"]["unique_id"]: f["properties"] for f in observed}
+    assert by_id["baseline_match"]["verdict"] == "hit"
+    assert by_id["baseline_miss"]["verdict"] == "miss"
+    assert metrics["predicted_edges_with_viz_match"] == 1
+    assert metrics["matched_viz_segments"] == 1
+
+
+def test_event_control_plan_requires_pre_onset_saved_baseline() -> None:
+    receipt = {"traffic": {"sha256": "baseline-bytes"}}
+    plan = {"groups": [{"treated_id": "treated", "control_ids": ["control"]}]}
+    controls = [{"type": "Feature", "properties": {"unique_id": "control"}}]
+    saved = {
+        "built_at_utc": "2026-09-26T04:50:00+00:00",
+        "status": "PRE_EVENT_BASELINE_ONLY",
+        "observation_snapshot": receipt,
+        "prediction_sha256": "prediction-bytes",
+        "citypack_sha256": "city-bytes",
+        "control_plan": plan,
+        "layers": {"viz_controls": {"type": "FeatureCollection", "features": controls}},
+    }
+    _check_frozen_baseline(saved, receipt, "prediction-bytes", "city-bytes", plan, controls)
+    with pytest.raises(ValueError, match="selected controls differ"):
+        _check_frozen_baseline(saved, receipt, "prediction-bytes", "city-bytes", {"groups": []}, controls)
+    with pytest.raises(ValueError, match="selected controls differ"):
+        _check_frozen_baseline(saved, {"traffic": {"sha256": "different"}}, "prediction-bytes", "city-bytes", plan, controls)
+    saved["built_at_utc"] = "2026-09-26T05:01:00+00:00"
+    with pytest.raises(ValueError, match="not built before"):
+        _check_frozen_baseline(saved, receipt, "prediction-bytes", "city-bytes", plan, controls)

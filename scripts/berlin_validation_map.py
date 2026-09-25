@@ -79,6 +79,14 @@ def _receipt_feed_time(receipt: dict, label: str) -> tuple[datetime, int]:
     return feed, age_s
 
 
+def _validate_traffic_binding(receipt: dict, traffic: dict, label: str) -> None:
+    if traffic.get("type") != "FeatureCollection" or traffic.get("timeStamp") != receipt["traffic"]["feed_time_stamp"]:
+        raise ValueError(f"{label} receipt feed timestamp differs from source bytes")
+    if len(traffic.get("features", [])) != receipt["traffic"]["feature_count"]:
+        raise ValueError(f"{label} receipt feature count differs from source bytes")
+    _receipt_feed_time(receipt, label)
+
+
 def _comparison_timing(baseline: dict, event: dict) -> dict:
     baseline_feed, baseline_age = _receipt_feed_time(baseline, "baseline")
     event_feed, event_age = _receipt_feed_time(event, "event")
@@ -100,6 +108,29 @@ def _comparison_timing(baseline: dict, event: dict) -> dict:
     }
 
 
+def _check_frozen_baseline(
+    saved: dict,
+    receipt: dict,
+    prediction_sha256: str,
+    citypack_sha256: str,
+    control_plan: dict,
+    control_features: list[dict],
+) -> None:
+    """Reject a post-onset or changed plan before publishing event metrics."""
+    built = datetime.fromisoformat(saved["built_at_utc"])
+    if built.tzinfo is None or built >= INCREMENTAL_ONSET:
+        raise ValueError("frozen baseline map was not built before announced onset")
+    if (
+        saved.get("status") != "PRE_EVENT_BASELINE_ONLY"
+        or saved.get("observation_snapshot") != receipt
+        or saved.get("prediction_sha256") != prediction_sha256
+        or saved.get("citypack_sha256") != citypack_sha256
+        or saved.get("control_plan") != control_plan
+        or saved.get("layers", {}).get("viz_controls") != _collection(control_features)
+    ):
+        raise ValueError("frozen baseline map or selected controls differ from current baseline")
+
+
 def compare_snapshots(predicted: list[dict], before: list[dict], after: list[dict]) -> tuple[list[dict], dict]:
     """Score matched VIZ segments; unknown/unmatched segments are not negatives."""
     prediction_lines = [_metric_line(f["geometry"]["coordinates"]) for f in predicted]
@@ -107,8 +138,21 @@ def compare_snapshots(predicted: list[dict], before: list[dict], after: list[dic
     evaluation_area = prediction_area.buffer(1000)
     earlier = _unique_features(before, "baseline")
     later = _unique_features(after, "event")
+    # Spatial coverage is a property of the frozen baseline, not of geometry
+    # that an event feed can add, omit, or move after the prediction was made.
+    baseline_matches: dict[str, list[int]] = {}
+    for key, feature in earlier.items():
+        geometry = _metric_line(feature["geometry"]["coordinates"])
+        if not geometry.intersects(evaluation_area):
+            continue
+        baseline_matches[key] = [
+            index for index, line in enumerate(prediction_lines)
+            if line.distance(geometry) <= 18
+            and _same_direction(line, geometry)
+            and line.buffer(18).intersection(geometry).length >= min(geometry.length * 0.25, 25)
+        ]
     observed = []
-    covered_predictions: set[int] = set()
+    covered_predictions = {index for matches in baseline_matches.values() for index in matches}
     counts = {"hit": 0, "miss": 0, "false_alarm": 0, "correct_negative": 0, "unscored": 0}
     for feature in after:
         props = feature["properties"]
@@ -116,15 +160,8 @@ def compare_snapshots(predicted: list[dict], before: list[dict], after: list[dic
         geometry = _metric_line(feature["geometry"]["coordinates"])
         if not geometry.intersects(evaluation_area):
             continue
-        matches = [
-            index for index, line in enumerate(prediction_lines)
-            if line.distance(geometry) <= 18
-            and _same_direction(line, geometry)
-            and line.buffer(18).intersection(geometry).length >= min(geometry.length * 0.25, 25)
-        ]
-        aligned = bool(matches)
-        covered_predictions.update(matches)
         old = earlier.get(key)
+        aligned = bool(baseline_matches.get(key, [])) if old else None
         old_p = old["properties"] if old else {}
         old_geometry = _metric_line(old["geometry"]["coordinates"]) if old else None
         old_speed = old_p.get("speedavg")
@@ -183,7 +220,7 @@ def compare_snapshots(predicted: list[dict], before: list[dict], after: list[dic
             "geometry": feature["geometry"],
             "properties": {
                 "unique_id": key,
-                "predicted_overlap": None,
+                "predicted_overlap": bool(baseline_matches.get(key, [])),
                 "change_class": "unscored_geometry_moved_out" if event_feature else "unscored_missing_event",
                 "verdict": "unscored",
                 "baseline_speed_kph": feature["properties"].get("speedavg"),
@@ -210,7 +247,7 @@ def compare_snapshots(predicted: list[dict], before: list[dict], after: list[dic
         ),
         "precision": counts["hit"] / positive if positive else None,
         "recall": counts["hit"] / actual if actual else None,
-        "rule": "Within 1 km of the frozen predicted paths; same travel direction (endpoint cosine >=0.5), geometric overlap within 18 m and at least min(25 m,25%) of VIZ segment; newly reported closure or >=30% lower positive nonclosed speed is a change. Different-hour snapshots cannot isolate the event effect.",
+        "rule": "Within 1 km of the frozen predicted paths; spatial overlap is fixed from baseline VIZ geometry, same travel direction (endpoint cosine >=0.5), within 18 m and at least min(25 m,25%) of the baseline VIZ segment. Same-ID event geometry must retain direction and stay within 25 m Hausdorff distance. Newly reported closure or >=30% lower positive nonclosed speed is a change. Different-hour snapshots cannot isolate the event effect.",
     }
     return observed, metrics
 
@@ -394,6 +431,7 @@ def capture(name: str) -> dict:
         },
         "interpretation": "VIZ live traffic fields are a time-stamped service snapshot. A zero speed on a closed link is not a measured speed. VIZ closure reports may be scheduled and are not proof of field execution.",
     }
+    _validate_traffic_binding(receipt, traffic, "capture")
     traffic_path.write_bytes(traffic_bytes)
     reports_path.write_bytes(reports_bytes)
     receipt_path.write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + "\n")
@@ -405,6 +443,8 @@ def build(snapshot_name: str, output: Path = LOCAL_BUNDLE, event_name: str | Non
     receipt = json.loads(receipt_path.read_text())
     traffic_path = ROOT / receipt["traffic"]["local_path"]
     reports_path = ROOT / receipt["reports"]["local_path"]
+    if traffic_path.resolve() != (RAW / f"{snapshot_name}-traffic.json").resolve() or reports_path.resolve() != (RAW / f"{snapshot_name}-reports.json").resolve():
+        raise ValueError("baseline receipt paths differ from immutable snapshot name")
     if sha256_file(traffic_path) != receipt["traffic"]["sha256"] or sha256_file(reports_path) != receipt["reports"]["sha256"]:
         raise ValueError("snapshot bytes changed after capture")
     city_path, probe_path, candidates_path = CITY, PROBE, CANDIDATES
@@ -444,6 +484,7 @@ def build(snapshot_name: str, output: Path = LOCAL_BUNDLE, event_name: str | Non
         if e["geometry"] and e["name"] and e["length_m"] >= 50 and _within(e["geometry"])
     ]
     traffic = json.loads(traffic_path.read_text())
+    _validate_traffic_binding(receipt, traffic, "baseline")
     predicted = [road_feature(eid, "predicted_route_impact") for eid in sorted(affected_ids)]
     restricted = [road_feature(eid, "restriction_input") for eid in sorted(candidate_ids)]
     baseline_comparison, pre_event_coverage = compare_snapshots(predicted, traffic["features"], traffic["features"])
@@ -457,6 +498,21 @@ def build(snapshot_name: str, output: Path = LOCAL_BUNDLE, event_name: str | Non
     control_plan["selection_sha256"] = hashlib.sha256(
         json.dumps(control_plan["groups"], sort_keys=True, separators=(",", ":")).encode()
     ).hexdigest()
+    frozen_baseline_sha256 = None
+    if event_name:
+        frozen_baseline_path = RAW / f"{snapshot_name}-baseline-map.json"
+        if output.resolve() == frozen_baseline_path.resolve():
+            raise ValueError("event output cannot overwrite the frozen baseline map")
+        saved = json.loads(frozen_baseline_path.read_text())
+        _check_frozen_baseline(
+            saved,
+            receipt,
+            sha256_file(probe_path),
+            sha256_file(city_path),
+            control_plan,
+            control_features,
+        )
+        frozen_baseline_sha256 = sha256_file(frozen_baseline_path)
     covered_indices = set(pre_event_coverage["matched_prediction_indices"])
     for index, feature in enumerate(predicted):
         feature["properties"]["viz_baseline_coverage"] = index in covered_indices
@@ -472,10 +528,13 @@ def build(snapshot_name: str, output: Path = LOCAL_BUNDLE, event_name: str | Non
     if event_name:
         event_receipt = json.loads((RAW / f"{event_name}-receipt.json").read_text())
         event_traffic_path = ROOT / event_receipt["traffic"]["local_path"]
+        if event_traffic_path.resolve() != (RAW / f"{event_name}-traffic.json").resolve():
+            raise ValueError("event receipt path differs from immutable snapshot name")
         if sha256_file(event_traffic_path) != event_receipt["traffic"]["sha256"]:
             raise ValueError("event traffic bytes changed after capture")
-        timing = _comparison_timing(receipt, event_receipt)
         event_traffic = json.loads(event_traffic_path.read_text())
+        _validate_traffic_binding(event_receipt, event_traffic, "event")
+        timing = _comparison_timing(receipt, event_receipt)
         observed_change, comparison_metrics = compare_snapshots(
             predicted,
             traffic["features"],
@@ -486,6 +545,7 @@ def build(snapshot_name: str, output: Path = LOCAL_BUNDLE, event_name: str | Non
     bundle = {
         "schema_version": "civiflux-validation-map-v1",
         "event_id": "berlin-marathon-2026",
+        "built_at_utc": datetime.now(UTC).isoformat(),
         "prediction_frozen_at_utc": probe["frozen_at_utc"],
         "prediction_sha256": sha256_file(probe_path),
         "citypack_sha256": sha256_file(city_path),
@@ -494,6 +554,7 @@ def build(snapshot_name: str, output: Path = LOCAL_BUNDLE, event_name: str | Non
         "status": "TWO_SNAPSHOT_SPATIAL_COMPARISON" if event_receipt else "PRE_EVENT_BASELINE_ONLY",
         "comparison_metrics": comparison_metrics,
         "control_plan": control_plan,
+        "frozen_baseline_map_sha256": frozen_baseline_sha256,
         "control_indicator": control_indicator,
         "pre_event_coverage": {
             "predicted_edges_with_viz_match": pre_event_coverage["predicted_edges_with_viz_match"],
