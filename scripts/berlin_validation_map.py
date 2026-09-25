@@ -13,6 +13,7 @@ import json
 import math
 import statistics
 import sys
+import tempfile
 import urllib.parse
 import urllib.request
 from datetime import UTC, datetime
@@ -104,6 +105,26 @@ def _comparison_timing(baseline: dict, event: dict) -> dict:
         "event_feed_utc": event_feed.isoformat(),
         "baseline_feed_age_s": baseline_age,
         "event_feed_age_s": event_age,
+        "maximum_allowed_feed_age_s": MAX_FEED_AGE_S,
+    }
+
+
+def _placebo_timing(baseline: dict, later: dict) -> dict:
+    """A pre-onset pair measures background variation, not event outcomes."""
+    baseline_feed, baseline_age = _receipt_feed_time(baseline, "placebo baseline")
+    later_feed, later_age = _receipt_feed_time(later, "placebo later")
+    baseline_capture = datetime.fromisoformat(baseline["captured_at_utc"])
+    later_capture = datetime.fromisoformat(later["captured_at_utc"])
+    if not baseline_capture < later_capture < INCREMENTAL_ONSET:
+        raise ValueError("placebo captures must both precede announced onset and be ordered")
+    if not baseline_feed < later_feed < INCREMENTAL_ONSET:
+        raise ValueError("placebo feeds must both precede announced onset and be ordered")
+    return {
+        "announced_onset_utc": INCREMENTAL_ONSET.isoformat(),
+        "baseline_feed_utc": baseline_feed.isoformat(),
+        "later_feed_utc": later_feed.isoformat(),
+        "baseline_feed_age_s": baseline_age,
+        "later_feed_age_s": later_age,
         "maximum_allowed_feed_age_s": MAX_FEED_AGE_S,
     }
 
@@ -379,9 +400,13 @@ def _download(url: str) -> tuple[bytes, str]:
         return response.read(), response.headers.get("Date", "")
 
 
-def capture(name: str) -> dict:
+def _validate_snapshot_name(name: str) -> None:
     if not name.isascii() or not name.replace("-", "").isalnum() or len(name) > 48:
         raise ValueError("name must be a short ASCII alphanumeric/hyphen label")
+
+
+def capture(name: str) -> dict:
+    _validate_snapshot_name(name)
     RAW.mkdir(parents=True, exist_ok=True)
     traffic_path = RAW / f"{name}-traffic.json"
     reports_path = RAW / f"{name}-reports.json"
@@ -439,6 +464,9 @@ def capture(name: str) -> dict:
 
 
 def build(snapshot_name: str, output: Path = LOCAL_BUNDLE, event_name: str | None = None) -> dict:
+    _validate_snapshot_name(snapshot_name)
+    if event_name:
+        _validate_snapshot_name(event_name)
     receipt_path = RAW / f"{snapshot_name}-receipt.json"
     receipt = json.loads(receipt_path.read_text())
     traffic_path = ROOT / receipt["traffic"]["local_path"]
@@ -586,6 +614,56 @@ def build(snapshot_name: str, output: Path = LOCAL_BUNDLE, event_name: str | Non
     return {"output": str(output), "counts": bundle["counts"], "status": bundle["status"]}
 
 
+def build_placebo(snapshot_name: str, later_name: str, output: Path) -> dict:
+    """Map same-rule pre-onset background changes without reporting a hit rate."""
+    _validate_snapshot_name(snapshot_name)
+    _validate_snapshot_name(later_name)
+    if snapshot_name == later_name:
+        raise ValueError("placebo requires two different snapshots")
+    baseline_receipt = json.loads((RAW / f"{snapshot_name}-receipt.json").read_text())
+    later_receipt = json.loads((RAW / f"{later_name}-receipt.json").read_text())
+    timing = _placebo_timing(baseline_receipt, later_receipt)
+    later_path = ROOT / later_receipt["traffic"]["local_path"]
+    if later_path.resolve() != (RAW / f"{later_name}-traffic.json").resolve():
+        raise ValueError("placebo receipt path differs from immutable snapshot name")
+    if sha256_file(later_path) != later_receipt["traffic"]["sha256"]:
+        raise ValueError("placebo traffic bytes changed after capture")
+    later_traffic = json.loads(later_path.read_text())
+    _validate_traffic_binding(later_receipt, later_traffic, "placebo later")
+    with tempfile.TemporaryDirectory(prefix="civiflux-berlin-placebo-") as directory:
+        baseline_path = Path(directory) / "baseline.json"
+        build(snapshot_name, baseline_path)
+        bundle = json.loads(baseline_path.read_text())
+    baseline_path = ROOT / baseline_receipt["traffic"]["local_path"]
+    baseline_traffic = json.loads(baseline_path.read_text())
+    observed, metrics = compare_snapshots(
+        bundle["layers"]["predicted_route_impact"]["features"],
+        baseline_traffic["features"],
+        later_traffic["features"],
+    )
+    indicator = summarize_control_indicator(bundle["control_plan"], observed)
+    bundle["status"] = "PRE_ONSET_PLACEBO"
+    bundle["placebo_snapshot"] = later_receipt
+    bundle["placebo_metrics"] = {
+        "scored_segments": metrics["scored_segments"],
+        "overlap_with_background_change": metrics["hit"],
+        "nearby_background_change_without_overlap": metrics["miss"],
+        "overlap_without_large_change": metrics["false_alarm"],
+        "unscored": metrics["unscored"],
+        "timing": timing,
+    }
+    bundle["control_indicator"] = indicator
+    bundle["layers"]["observed_change"] = _collection(observed)
+    bundle["comparison_note"] = (
+        "Both official VIZ feeds precede the announced incremental onset. "
+        "Any spatial coincidence here is background variation, not a predicted event hit. "
+        "Do not compute event precision or recall from this placebo pair."
+    )
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(bundle, ensure_ascii=False, separators=(",", ":")) + "\n")
+    return {"output": str(output), "status": bundle["status"], "placebo_metrics": bundle["placebo_metrics"]}
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     sub = parser.add_subparsers(dest="command", required=True)
@@ -595,8 +673,17 @@ def main() -> None:
     build_parser.add_argument("snapshot_name")
     build_parser.add_argument("--event-name")
     build_parser.add_argument("--output", type=Path, default=LOCAL_BUNDLE)
+    placebo_parser = sub.add_parser("placebo")
+    placebo_parser.add_argument("snapshot_name")
+    placebo_parser.add_argument("later_name")
+    placebo_parser.add_argument("--output", type=Path, default=RAW / "berlin-placebo-local.json")
     args = parser.parse_args()
-    result = capture(args.name) if args.command == "capture" else build(args.snapshot_name, args.output, args.event_name)
+    if args.command == "capture":
+        result = capture(args.name)
+    elif args.command == "placebo":
+        result = build_placebo(args.snapshot_name, args.later_name, args.output)
+    else:
+        result = build(args.snapshot_name, args.output, args.event_name)
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 

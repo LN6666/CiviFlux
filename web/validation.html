@@ -21,15 +21,15 @@
         <label><input type="checkbox" data-layer="predicted" checked>深橙 / 浅橙 · 插件预测路段有 / 无赛前 VIZ 空间覆盖</label>
         <label><input type="checkbox" data-layer="traffic" checked>实时交通 · VIZ 路段状态</label>
         <label><input type="checkbox" data-layer="controls" checked>深蓝虚线 · 仅据赛前信息匹配的对照路段</label>
-        <label><input type="checkbox" data-layer="changes" checked>逐段判定 · 命中 / 漏报 / 误报</label>
-        <div class="verdict-legend" aria-label="Road comparison verdict legend"><span><i class="hit"></i>绿色 命中</span><span><i class="miss"></i>红色 漏报</span><span><i class="false-alarm"></i>紫色 误报</span></div>
+        <label><input type="checkbox" data-layer="changes" checked><span id="changes-label">逐段判定 · 命中 / 漏报 / 误报</span></label>
+        <div class="verdict-legend" aria-label="Road comparison verdict legend"><span><i class="hit"></i><span id="hit-label">绿色 命中</span></span><span><i class="miss"></i><span id="miss-label">红色 漏报</span></span><span><i class="false-alarm"></i><span id="false-label">紫色 误报</span></span></div>
         <label><input type="checkbox" data-layer="closures" checked>紫色 · 输入的封路候选</label>
         <label><input type="checkbox" data-layer="reports" checked>蓝色 · 官方封路通报</label>
         <label><input type="checkbox" data-layer="context" checked>灰色 · 城市道路背景</label>
       </fieldset>
       <button id="fit">定位预测范围</button>
       <section id="details" aria-label="Selected road details">点击地图路段查看 ID、时间、来源和数值。</section>
-      <p class="source">深橙与浅橙都是冻结的插件路由结果；浅橙没有赛前 VIZ 几何匹配，不能计入逐段命中或误报。紫色虚线是情景输入。深蓝虚线按赛前道路类别、方向与速度选出，避开输入封路和预测路段至少 200 米；它仍可能受赛事波及。赛时快照接入后，绿色表示预测与两次 VIZ 状态变化重合、红色表示 VIZ 变化未被预测、紫色实线表示预测处未测得变化。无赛前数据或缺速的路段不评分；对照后的额外降速仅是间接描述，不证明赛事因果影响。</p>
+      <p class="source" id="interpretation">深橙与浅橙都是冻结的插件路由结果；浅橙没有赛前 VIZ 几何匹配，不能计入逐段命中或误报。紫色虚线是情景输入。深蓝虚线按赛前道路类别、方向与速度选出，避开输入封路和预测路段至少 200 米；它仍可能受赛事波及。赛时快照接入后，绿色表示预测与两次 VIZ 状态变化重合、红色表示 VIZ 变化未被预测、紫色实线表示预测处未测得变化。无赛前数据或缺速的路段不评分；对照后的额外降速仅是间接描述，不证明赛事因果影响。</p>
       <p class="source">数据：© OpenStreetMap contributors（ODbL）；柏林 VIZ 交通图层由柏林交通部门展示，底层 VMZ Berlin / HERE；本地快照不随开源仓库分发。</p>
     </section>
     <section class="map-wrap" aria-label="Berlin GIS comparison map"><div id="map"></div></section>

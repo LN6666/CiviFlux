@@ -5,7 +5,9 @@ import pytest
 from scripts.berlin_validation_map import (
     _check_frozen_baseline,
     _comparison_timing,
+    _placebo_timing,
     _receipt_feed_time,
+    _validate_snapshot_name,
     _validate_traffic_binding,
     compare_snapshots,
     select_matched_controls,
@@ -129,6 +131,24 @@ def test_capture_and_feed_both_must_straddle_announced_onset() -> None:
     baseline["traffic"]["feed_time_stamp"] = "2026-09-26T05:00:10Z"
     with pytest.raises(ValueError, match="feed timestamps"):
         _comparison_timing(baseline, event)
+
+
+def test_placebo_pair_must_stay_before_onset_and_snapshot_names_are_bounded() -> None:
+    baseline = {
+        "captured_at_utc": "2026-09-25T18:45:10+00:00",
+        "traffic": {"feed_time_stamp": "2026-09-25T18:45:05Z"},
+    }
+    later = {
+        "captured_at_utc": "2026-09-25T21:03:41+00:00",
+        "traffic": {"feed_time_stamp": "2026-09-25T21:03:35Z"},
+    }
+    assert _placebo_timing(baseline, later)["later_feed_age_s"] == 6
+    later["captured_at_utc"] = "2026-09-26T05:01:00+00:00"
+    later["traffic"]["feed_time_stamp"] = "2026-09-26T05:00:55Z"
+    with pytest.raises(ValueError, match="both precede"):
+        _placebo_timing(baseline, later)
+    with pytest.raises(ValueError, match="short ASCII"):
+        _validate_snapshot_name("../outside")
 
 
 def test_baseline_only_controls_avoid_restricted_roads_and_adjust_common_speed_change() -> None:

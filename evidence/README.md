@@ -12,6 +12,7 @@
 - `wp6/`：冻结场景、独立标签/oracle、消融、内核 benchmark、外部开源系统 smoke；`policy_permutation_control.json` 是冻结真实免费策略的离线置换负对照，`historical_backtest_preflight.json` 仅盘点列名输入的历史证据缺口；`final_gate.json` 绑定代码与产物哈希。
 - `wp7/`：最终检查、仓库卫生、干净检出和已安装 wheel 检查；`sbom/` 保存 CycloneDX 1.6、许可证清单、未决项与内容寻址 NOTICE 文本。`container_ci_initial_fail.json`、`container_ci_linker_fail.json`、`container_ci_atomic_fail.json` 保存三轮 Linux 容器失败；`container_ci_pass.json` 为随后 [PR #2 Linux CI](https://github.com/LN6666/CiviFlux/actions/runs/35898788800) 取得的真实 PASS 报告，限于无网络只读容器、合成需求和本地 API/SUMO。离线缓存缺失的首次结果与后续安装验证分别保留。
 - `wp7/ci_run_36188723802.json`：PR #7 当前 Berlin 赛前基线锁定代码的受控 CI 回执，含测试数、确切 Git 树匹配、浏览器与容器产物哈希。它不含赛时观测或历史命中率。
+- `events/berlin-2026-pre-onset-placebo.json`：两份真实官方 VIZ feed 的赛前增量安慰剂聚合统计、时间和原始字节哈希。道路级数据与 GIS 包仅存本机 ignored 路径；空间重合不是赛事命中。
 
 ## 原始工程包参考证据
 

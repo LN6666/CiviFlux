@@ -54,3 +54,23 @@ test('GIS map shows all three measured road comparison outcomes',async({page})=>
   await expect(page.getByLabel('Road comparison verdict legend')).toContainText('紫色 误报');
   await expect(page.locator('canvas.maplibregl-canvas')).toBeVisible();
 });
+
+test('pre-onset placebo map labels background changes without event hit rate',async({page})=>{
+  const bundle={
+    schema_version:'civiflux-validation-map-v1',event_id:'berlin-marathon-2026',status:'PRE_ONSET_PLACEBO',prediction_frozen_at_utc:'2026-09-25T18:20:40Z',
+    observation_snapshot:{captured_at_utc:'2026-09-25T18:45:10Z',traffic:{feed_time_stamp:'2026-09-25T18:45:05Z',sha256:'before'}},
+    event_snapshot:null,comparison_metrics:null,placebo_snapshot:{traffic:{feed_time_stamp:'2026-09-25T21:03:35Z'}},
+    placebo_metrics:{scored_segments:3,overlap_with_background_change:1,nearby_background_change_without_overlap:1,overlap_without_large_change:1,unscored:0},
+    counts:{context_roads:0,predicted_route_impact_edges:1,restriction_input_edges:0,traffic_segments:3,marathon_reports:0},
+    layers:{context_roads:collection(),predicted_route_impact:collection([road('p1','predicted_route_impact')]),restriction_inputs:collection(),viz_traffic:collection(),viz_controls:collection(),viz_marathon_reports:collection(),observed_change:collection()},
+    comparison_note:'two feeds before onset',
+  };
+  await page.route('**/validation/berlin-placebo-local.json',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(bundle)}));
+  await page.goto('/validation.html?bundle=placebo');
+  await expect(page.getByRole('status')).toContainText('赛前快照的安慰剂地图');
+  await expect(page.locator('#summary')).toContainText('背景变化与预测重合 1');
+  await expect(page.locator('#summary')).not.toContainText('精确率');
+  await expect(page.getByLabel('Road comparison verdict legend')).toContainText('赛前变化与预测重合');
+  await expect(page.getByLabel('Road comparison verdict legend')).not.toContainText('绿色 命中');
+  await expect(page.locator('#interpretation')).toContainText('这些颜色不是赛事命中');
+});

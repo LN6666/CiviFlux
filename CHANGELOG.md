@@ -25,6 +25,7 @@ The repository has progressed from a specification/reference-test pack to a prod
 - Protected `main` now requires both passing `core` and `container` checks before ordinary PR merges.
 - Added an OSM-source-bound pedestrian-area overlap and nearest-gap proxy to the Baku active-mode sensitivity map; its zero-overlap result is retained as a negative geometric finding, without asserting event closure or routability.
 - Locked Berlin event spatial coverage to baseline VIZ geometry and required an immutable pre-onset control-map checkpoint with source-byte/feed-time binding before two-snapshot metrics can be built.
+- Added a separate, source-hashed Berlin pre-incremental-onset placebo map from two real VIZ feeds. It displays background spatial coincidence and matched-control speed changes without presenting a race-day hit rate or publishing licensed road-level feed data.
 
 ## Source pack — 2026-09-23, handoff-3-operational-ontology
 

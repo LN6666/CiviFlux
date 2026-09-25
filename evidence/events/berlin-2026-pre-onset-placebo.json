@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "status": "PRE_ONSET_INCREMENTAL_PLACEBO",
+  "event_id": "berlin-marathon-2026",
+  "comparison_scope": "Two real official VIZ live feeds collected before the announced 2026-09-26 05:00 UTC incremental restriction onset; other marathon preparations and restrictions were already active.",
+  "prediction_frozen_at_utc": "2026-09-25T18:20:40.771407+00:00",
+  "prediction_sha256": "f89fc30b2139bf26b724c88801947466082e5e4561404160b41025522729be0b",
+  "citypack_sha256": "5781a8627f6b7680f70a81892b55dee33049554cb1b38946b86b1f818c1e67a0",
+  "baseline_traffic": {
+    "captured_at_utc": "2026-09-25T18:45:10.063375+00:00",
+    "feed_time_stamp": "2026-09-25T18:45:05.722Z",
+    "sha256": "50cce2b3e0d1a8a699b0e9fa70ec98f7629fb1a2ecd1955887308d160ad0884b",
+    "feature_count": 1991
+  },
+  "later_traffic": {
+    "captured_at_utc": "2026-09-25T21:03:41.014920+00:00",
+    "feed_time_stamp": "2026-09-25T21:03:35.578Z",
+    "sha256": "3865a9547ddf023632d20354ae4071191380024e428a7a525f15ae082573daad",
+    "feature_count": 1991
+  },
+  "timing": {
+    "announced_onset_utc": "2026-09-26T05:00:00+00:00",
+    "baseline_feed_utc": "2026-09-25T18:45:05.722000+00:00",
+    "later_feed_utc": "2026-09-25T21:03:35.578000+00:00",
+    "baseline_feed_age_s": 4,
+    "later_feed_age_s": 5,
+    "maximum_allowed_feed_age_s": 900
+  },
+  "spatial_coverage": {
+    "predicted_edges_with_viz_match": 25,
+    "predicted_edges_without_viz_match": 26,
+    "matched_viz_segments": 12,
+    "scored_matched_viz_segments": 11,
+    "interpretation": "Spatial observation coverage only, frozen from the baseline feed; unmatched prediction edges cannot be scored as hits or false alarms."
+  },
+  "background_change_counts": {
+    "scored_segments": 375,
+    "overlap_with_background_change": 1,
+    "nearby_background_change_without_overlap": 13,
+    "overlap_without_large_change": 10,
+    "unscored": 45
+  },
+  "change_class_counts": {
+    "newly_reported_closed": 1,
+    "no_large_speed_drop": 361,
+    "speed_drop_30pct": 13,
+    "unscored_preexisting_closure": 45
+  },
+  "control_selection_sha256": "d8f80c7b525ba9d0f9bbc6bf51cf4ba65c427ecbc5b9fa846ebaca2db5bfc09f",
+  "control_indicator": {
+    "status": "DESCRIPTIVE_CONTROL_ONLY",
+    "valid_treated_control_groups": 11,
+    "selected_treated_segments": 11,
+    "selected_control_segments": 22,
+    "median_treated_speed_drop_fraction": -0.06643700787401581,
+    "median_control_speed_drop_fraction": -0.19264515808311783,
+    "median_pair_adjusted_speed_drop_fraction": 0.0,
+    "newly_reported_closed_treated": 0,
+    "newly_reported_closed_controls": 0
+  },
+  "private_gis_bundle": "web/public/validation/berlin-placebo-local.json (gitignored; requires local VIZ source data)",
+  "claim_ceiling": "This is an observed pre-incremental-onset placebo, not an event-hour performance measure. A spatial coincidence before the new restriction demonstrates that naive overlap can occur in the background. The pair spans different evening hours and includes already active event preparation; it cannot estimate a calibrated false-positive rate, isolate event causation, or validate a hit rate."
+}
