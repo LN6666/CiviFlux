@@ -43,6 +43,20 @@ def _collection(features: list[dict]) -> dict:
     return {"type": "FeatureCollection", "features": features}
 
 
+def _marathon_line_reports(features: list[dict]) -> list[dict]:
+    """Expose only line components of VIZ's point-plus-line report geometry."""
+    lines = []
+    for feature in features:
+        if "marathon" not in str(feature.get("properties", {}).get("content", "")).lower():
+            continue
+        geometry = feature.get("geometry", {})
+        parts = geometry.get("geometries", []) if geometry.get("type") == "GeometryCollection" else [geometry]
+        for part in parts:
+            if part.get("type") == "LineString":
+                lines.append({"type": "Feature", "geometry": part, "properties": feature["properties"]})
+    return lines
+
+
 def _metric_line(coordinates: list[list[float]]) -> LineString:
     # Local Berlin equirectangular projection, used only for short segment
     # matching. Scores retain the original WGS84 geometries for map display.
@@ -545,10 +559,7 @@ def build(snapshot_name: str, output: Path = LOCAL_BUNDLE, event_name: str | Non
     for index, feature in enumerate(predicted):
         feature["properties"]["viz_baseline_coverage"] = index in covered_indices
     report_source = json.loads(reports_path.read_text())
-    reports = [
-        feature for feature in report_source["features"]
-        if "marathon" in str(feature.get("properties", {}).get("content", "")).lower()
-    ]
+    reports = _marathon_line_reports(report_source["features"])
     event_receipt = None
     observed_change: list[dict] = []
     comparison_metrics = None

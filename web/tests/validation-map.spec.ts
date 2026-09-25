@@ -74,3 +74,29 @@ test('pre-onset placebo map labels background changes without event hit rate',as
   await expect(page.getByLabel('Road comparison verdict legend')).not.toContainText('绿色 命中');
   await expect(page.locator('#interpretation')).toContainText('这些颜色不是赛事命中');
 });
+
+test('notice geometry audit colors candidate roads without claiming observed impacts',async({page})=>{
+  const inputs=[
+    {...road('supported','restriction_input'),properties:{id:'supported',layer:'restriction_input',name:'Straße des 17. Juni',viz_mapping_status:'SPATIAL_SUPPORT_DIRECTION_UNRESOLVED',viz_nearest_gap_m:4,viz_maximum_overlap_m:40,viz_required_overlap_m:25}},
+    {...road('unsupported','restriction_input'),properties:{id:'unsupported',layer:'restriction_input',name:'Straße des 17. Juni',viz_mapping_status:'NO_SUFFICIENT_SPATIAL_OVERLAP',viz_nearest_gap_m:140,viz_maximum_overlap_m:0,viz_required_overlap_m:25}},
+    {...road('no-report','restriction_input'),properties:{id:'no-report',layer:'restriction_input',name:'Unter den Linden',viz_mapping_status:'NO_NAMED_REPORT_IN_SNAPSHOT',viz_nearest_gap_m:null,viz_maximum_overlap_m:0,viz_required_overlap_m:25}},
+  ];
+  const bundle={
+    schema_version:'civiflux-validation-map-v1',event_id:'berlin-marathon-2026',status:'PRE_EVENT_BASELINE_ONLY',prediction_frozen_at_utc:'2026-09-25T18:20:40Z',
+    observation_snapshot:{captured_at_utc:'2026-09-25T18:45:10Z',traffic:{feed_time_stamp:'2026-09-25T18:45:05Z',sha256:'traffic'},reports:{sha256:'reports'}},
+    event_snapshot:null,comparison_metrics:null,
+    mapping_audit:{status:'CANDIDATE_SPATIAL_AUDIT_ONLY',viz_reports_sha256:'reports',cases:[{case_id:'active',candidate_directed_edges:2,sufficient_overlap:1,without_sufficient_overlap:1,same_street_viz_reports:2,direction_verified:0},{case_id:'upcoming',candidate_directed_edges:1,sufficient_overlap:0,without_sufficient_overlap:1,same_street_viz_reports:0,direction_verified:0}]},
+    counts:{context_roads:0,predicted_route_impact_edges:0,restriction_input_edges:3,traffic_segments:0,marathon_reports:2},
+    layers:{context_roads:collection(),predicted_route_impact:collection(),restriction_inputs:collection(inputs),viz_traffic:collection(),viz_controls:collection(),viz_marathon_reports:collection(),observed_change:collection()},
+    comparison_note:'notice geometry only',
+  };
+  await page.route('**/validation/berlin-mapping-review-local.json',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(bundle)}));
+  await page.goto('/validation.html?bundle=mapping');
+  await expect(page.getByRole('status')).toContainText('不是现场封路或扰动验证');
+  await expect(page.locator('#summary')).toContainText('空间重合支持 1/2 条候选有向边');
+  await expect(page.locator('#summary')).toContainText('同名 VIZ 通报 0 条；空间重合支持 0/1');
+  await expect(page.locator('#restriction-label')).toContainText('红色 重合不足 / 灰色 无同名通报');
+  await expect(page.getByLabel('Road comparison verdict legend')).toBeHidden();
+  await expect(page.locator('#interpretation')).toContainText('方向与现场执行均未核验');
+  await expect(page.locator('canvas.maplibregl-canvas')).toBeVisible();
+});

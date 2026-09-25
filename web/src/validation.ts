@@ -11,7 +11,9 @@ type Coverage={predicted_edges_with_viz_match:number;predicted_edges_without_viz
 type ControlPlan={treated_segments:number;treated_segments_with_controls:number;control_segments:number;selection_sha256:string};
 type ControlIndicator={valid_treated_control_groups:number;median_pair_adjusted_speed_drop_fraction:number|null;newly_reported_closed_treated:number;newly_reported_closed_controls:number};
 type PlaceboMetrics={scored_segments:number;overlap_with_background_change:number;nearby_background_change_without_overlap:number;overlap_without_large_change:number;unscored:number};
-type Bundle={schema_version:string;event_id:string;status:string;prediction_frozen_at_utc:string;observation_snapshot:{captured_at_utc:string;traffic:{feed_time_stamp:string;sha256:string}};event_snapshot:{traffic:{feed_time_stamp:string}}|null;placebo_snapshot?:{traffic:{feed_time_stamp:string}};comparison_metrics:Metrics|null;placebo_metrics?:PlaceboMetrics;pre_event_coverage?:Coverage;control_plan?:ControlPlan;control_indicator?:ControlIndicator|null;counts:Record<string,number>;layers:Record<LayerName,FeatureCollection>;comparison_note:string};
+type MappingCase={case_id:string;candidate_directed_edges:number;sufficient_overlap:number;without_sufficient_overlap:number;same_street_viz_reports:number;direction_verified:number};
+type MappingAudit={status:string;viz_reports_sha256:string;cases:MappingCase[]};
+type Bundle={schema_version:string;event_id:string;status:string;prediction_frozen_at_utc:string;observation_snapshot:{captured_at_utc:string;traffic:{feed_time_stamp:string;sha256:string};reports?:{sha256:string}};event_snapshot:{traffic:{feed_time_stamp:string}}|null;placebo_snapshot?:{traffic:{feed_time_stamp:string}};comparison_metrics:Metrics|null;placebo_metrics?:PlaceboMetrics;mapping_audit?:MappingAudit;pre_event_coverage?:Coverage;control_plan?:ControlPlan;control_indicator?:ControlIndicator|null;counts:Record<string,number>;layers:Record<LayerName,FeatureCollection>;comparison_note:string};
 
 const empty:FeatureCollection={type:'FeatureCollection',features:[]};
 const $=<T extends HTMLElement>(selector:string)=>{const element=document.querySelector<T>(selector);if(!element)throw Error(`Missing ${selector}`);return element;};
@@ -21,7 +23,8 @@ const details=$<HTMLElement>('#details');
 const interpretation=$<HTMLParagraphElement>('#interpretation');
 const eventInterpretation=interpretation.textContent;
 let bundle:Bundle|null=null;
-const bundlePath=new URLSearchParams(window.location.search).get('bundle')==='placebo'?'/validation/berlin-placebo-local.json':'/validation/berlin-local.json';
+const bundleChoice=new URLSearchParams(window.location.search).get('bundle');
+const bundlePath=bundleChoice==='placebo'?'/validation/berlin-placebo-local.json':bundleChoice==='mapping'?'/validation/berlin-mapping-review-local.json':'/validation/berlin-local.json';
 const map=new maplibregl.Map({container:'map',center:[13.381,52.518],zoom:12,attributionControl:false,style:{version:8,sources:{},layers:[{id:'background',type:'background',paint:{'background-color':'#edf2ee'}}]}});
 map.addControl(new maplibregl.NavigationControl(),'bottom-right');
 map.addControl(new maplibregl.AttributionControl({compact:false,customAttribution:'© OpenStreetMap contributors · Berlin VIZ / VMZ Berlin / HERE'}),'bottom-left');
@@ -33,7 +36,7 @@ const specs:[string,LayerName,maplibregl.LayerSpecification][]=[
   ['changes','observed_change',{id:'changes',type:'line',source:'changes',filter:['in',['get','verdict'],['literal',['hit','miss','false_alarm']]],paint:{'line-color':['match',['get','verdict'],'hit','#16855a','miss','#c6353e','false_alarm','#9a4ab4','#65776c'],'line-width':6,'line-opacity':.9}}],
   ['reports','viz_marathon_reports',{id:'reports',type:'line',source:'reports',filter:['==',['geometry-type'],'LineString'],paint:{'line-color':'#3474ad','line-width':5,'line-offset':-3,'line-dasharray':[2,2]}}],
   ['predicted','predicted_route_impact',{id:'predicted',type:'line',source:'predicted',paint:{'line-color':['case',['==',['get','viz_baseline_coverage'],false],'#e9aa81','#e56a24'],'line-width':5,'line-offset':4}}],
-  ['closures','restriction_inputs',{id:'closures',type:'line',source:'closures',paint:{'line-color':'#8b55aa','line-width':4,'line-offset':-4,'line-dasharray':[2,2]}}],
+  ['closures','restriction_inputs',{id:'closures',type:'line',source:'closures',paint:{'line-color':['match',['get','viz_mapping_status'],'SPATIAL_SUPPORT_DIRECTION_UNRESOLVED','#8b55aa','NO_SUFFICIENT_SPATIAL_OVERLAP','#cc3737','NO_NAMED_REPORT_IN_SNAPSHOT','#68737a','#8b55aa'],'line-width':4,'line-offset':-4,'line-dasharray':[2,2]}}],
 ];
 
 function validate(value:unknown):Bundle{
@@ -44,6 +47,14 @@ function validate(value:unknown):Bundle{
   if(candidate.status==='PRE_ONSET_PLACEBO'&&(!candidate.placebo_snapshot||!candidate.placebo_metrics||candidate.event_snapshot||candidate.comparison_metrics))throw Error('赛前安慰剂包不能混入赛时比较');
   if(candidate.layers&&!candidate.layers.viz_controls)candidate.layers.viz_controls=empty;
   for(const [,key] of specs){const layer=candidate.layers?.[key];if(layer?.type!=='FeatureCollection'||!Array.isArray(layer.features))throw Error(`缺少 ${key} GeoJSON 图层`);}
+  if(candidate.mapping_audit){
+    const audit=candidate.mapping_audit;
+    if(candidate.status!=='PRE_EVENT_BASELINE_ONLY'||candidate.event_snapshot||candidate.placebo_snapshot||candidate.comparison_metrics||candidate.placebo_metrics||audit.status!=='CANDIDATE_SPATIAL_AUDIT_ONLY'||audit.viz_reports_sha256!==candidate.observation_snapshot?.reports?.sha256||!Array.isArray(audit.cases))throw Error('公告映射审计与赛前快照不一致');
+    const total=audit.cases.reduce((sum,item)=>sum+item.candidate_directed_edges,0);
+    if(total!==candidate.layers!.restriction_inputs.features.length||total!==candidate.counts?.restriction_input_edges||audit.cases.some(item=>item.direction_verified!==0||item.sufficient_overlap+item.without_sufficient_overlap!==item.candidate_directed_edges))throw Error('公告映射审计计数不一致');
+    const valid=new Set(['SPATIAL_SUPPORT_DIRECTION_UNRESOLVED','NO_SUFFICIENT_SPATIAL_OVERLAP','NO_NAMED_REPORT_IN_SNAPSHOT']);
+    if(candidate.layers!.restriction_inputs.features.some(feature=>!valid.has(String(feature.properties?.viz_mapping_status))))throw Error('公告映射审计缺少逐段状态');
+  }
   return candidate as Bundle;
 }
 
@@ -58,13 +69,17 @@ function setBundle(next:Bundle){
   summary.textContent=`预测冻结：${next.prediction_frozen_at_utc}\n赛前交通：${next.observation_snapshot.traffic.feed_time_stamp}${next.event_snapshot?`\n赛时交通：${next.event_snapshot.traffic.feed_time_stamp}`:''}${next.placebo_snapshot?`\n第二份赛前交通：${next.placebo_snapshot.traffic.feed_time_stamp}`:''}\n插件影响道路：${c.predicted_route_impact_edges} 条\n输入封路候选：${c.restriction_input_edges} 条\nVIZ 交通路段：${c.traffic_segments} 条\n赛事封路通报：${c.marathon_reports} 条${coverage?`\n\n赛前可测覆盖：${coverage.predicted_edges_with_viz_match}/${c.predicted_route_impact_edges} 条插件路段；${coverage.predicted_edges_without_viz_match} 条没有匹配 VIZ 路段\n匹配的 VIZ 路段：${coverage.matched_viz_segments}，其中可评分 ${coverage.scored_matched_viz_segments}`:''}${m?`\n\n赛时空间对照 · ${m.scored_segments} 个可评分 VIZ 路段\n预测路段 VIZ 匹配：${m.predicted_edges_with_viz_match}/${m.predicted_edge_count}（其余无 VIZ 覆盖）\n命中 ${m.hit} · 漏报 ${m.miss} · 误报 ${m.false_alarm} · 缺测 ${m.unscored}\n精确率 ${m.precision===null?'无分母':(100*m.precision).toFixed(1)+'%'} · 召回率 ${m.recall===null?'无分母':(100*m.recall).toFixed(1)+'%'}`:''}${p?`\n\n赛前安慰剂 · ${p.scored_segments} 个可评分 VIZ 路段\n背景变化与预测重合 ${p.overlap_with_background_change} · 邻近背景变化未重合 ${p.nearby_background_change_without_overlap} · 预测重合处未见大变化 ${p.overlap_without_large_change} · 不可评分 ${p.unscored}\n两份交通快照均早于新增限制；这些不是赛事命中、漏报或误报。`:''}`;
   if(next.control_plan)summary.textContent+=`\n\n赛前选定对照：${next.control_plan.treated_segments_with_controls}/${next.control_plan.treated_segments} 个预测重合 VIZ 路段找到对照；${next.control_plan.control_segments} 条独立对照路段`;
   if(next.control_indicator)summary.textContent+=`\n两时刻对照有效组：${next.control_indicator.valid_treated_control_groups}；${p?'相对对照的背景降速差中位数':'额外降速中位数'}：${next.control_indicator.median_pair_adjusted_speed_drop_fraction===null?'无法计算':(100*next.control_indicator.median_pair_adjusted_speed_drop_fraction).toFixed(1)+' 个百分点'}（描述性间接指标）\n新增封闭字段：预测重合路段 ${next.control_indicator.newly_reported_closed_treated} · 对照路段 ${next.control_indicator.newly_reported_closed_controls}`;
+  if(next.mapping_audit)for(const item of next.mapping_audit.cases)summary.textContent+=`\n\n公告几何间接核查 · ${item.case_id}\n同名 VIZ 通报 ${item.same_street_viz_reports} 条；空间重合支持 ${item.sufficient_overlap}/${item.candidate_directed_edges} 条候选有向边；未获支持 ${item.without_sufficient_overlap} 条；方向核验 ${item.direction_verified} 条。`;
   summary.style.whiteSpace='pre-wrap';
-  status.textContent=next.status==='PRE_EVENT_BASELINE_ONLY'?'已载入赛前地图；赛时观测和差异评分待采集。':p?'已载入两份赛前快照的安慰剂地图；没有赛事效果或命中率。':'已载入两次交通快照的空间对照。';
+  status.textContent=next.mapping_audit?'已载入 VIZ 公告几何与 OSM 候选映射审阅图；不是现场封路或扰动验证。':next.status==='PRE_EVENT_BASELINE_ONLY'?'已载入赛前地图；赛时观测和差异评分待采集。':p?'已载入两份赛前快照的安慰剂地图；没有赛事效果或命中率。':'已载入两次交通快照的空间对照。';
+  $<HTMLSpanElement>('#restriction-label').textContent=next.mapping_audit?'输入候选：紫色 重合支持 / 红色 重合不足 / 灰色 无同名通报':'紫色 · 输入的封路候选';
+  $<HTMLLabelElement>('#changes-toggle').style.display=next.mapping_audit?'none':'';
+  $<HTMLDivElement>('#verdict-legend').style.display=next.mapping_audit?'none':'';
   $<HTMLSpanElement>('#changes-label').textContent=p?'赛前背景变化 · 重合 / 未重合 / 无大变化':'逐段判定 · 命中 / 漏报 / 误报';
   $<HTMLSpanElement>('#hit-label').textContent=p?'绿色 赛前变化与预测重合':'绿色 命中';
   $<HTMLSpanElement>('#miss-label').textContent=p?'红色 邻近赛前变化未重合':'红色 漏报';
   $<HTMLSpanElement>('#false-label').textContent=p?'紫色 预测重合处无大变化':'紫色 误报';
-  interpretation.textContent=p?'两份官方交通快照均早于本次新增限制起点；绿色仅表示赛前变化与冻结路线重合，红色表示附近赛前变化未重合，紫色表示预测重合处未见大变化。其他马拉松准备可能已在进行，间隔时段也不同；这些颜色不是赛事命中、漏报、误报或因果效果。原始 VIZ/HERE 路段只留在本机。':eventInterpretation;
+  interpretation.textContent=next.mapping_audit?'紫色虚线仅表示公告线与 OSM 候选边有足够空间重合；红色表示同街名通报存在但重合不足；灰色表示当前快照没有同街名通报。VIZ 通报是计划几何，既不能证明现场执行，也不能核验有向边方向。所有候选仍待人工审阅。这些颜色不是插件扰动的命中、漏报或误报；原始 VIZ/HERE 路段只留在本机。':p?'两份官方交通快照均早于本次新增限制起点；绿色仅表示赛前变化与冻结路线重合，红色表示附近赛前变化未重合，紫色表示预测重合处未见大变化。其他马拉松准备可能已在进行，间隔时段也不同；这些颜色不是赛事命中、漏报、误报或因果效果。原始 VIZ/HERE 路段只留在本机。':eventInterpretation;
   status.dataset.error='false';
   fitPrediction();
 }
@@ -72,7 +87,7 @@ function setBundle(next:Bundle){
 function fitPrediction(){
   if(!bundle)return;
   const bounds=new maplibregl.LngLatBounds();
-  for(const key of ['predicted_route_impact','viz_controls'] as const)
+  for(const key of (bundle.mapping_audit?['restriction_inputs','predicted_route_impact']:['predicted_route_impact','viz_controls']) as LayerName[])
     for(const feature of bundle.layers[key].features)
       if(feature.geometry.type==='LineString')for(const point of feature.geometry.coordinates)bounds.extend(point as [number,number]);
   if(!bounds.isEmpty())map.fitBounds(bounds,{padding:65,maxZoom:14,duration:0});
@@ -82,7 +97,7 @@ function lineDetails(feature:Feature):string{
   const p=feature.properties??{};
   const layer=String(p.layer??'VIZ');
   if(layer==='predicted_route_impact')return `插件预测影响路段\n${p.name||p.id}\nID: ${p.id}\n赛前 VIZ 空间覆盖: ${p.viz_baseline_coverage===true?'有':p.viz_baseline_coverage===false?'无':'未检查'}\n影响的冻结 OD: ${(p.route_labels??[]).join(', ')}`;
-  if(layer==='restriction_input')return `情景输入的封路候选（不是预测）\n${p.name||p.id}\nID: ${p.id}`;
+  if(layer==='restriction_input')return `情景输入的封路候选（不是预测）\n${p.name||p.id}\nID: ${p.id}${p.viz_mapping_status?`\n公告几何核查: ${p.viz_mapping_status}\n最近距离: ${p.viz_nearest_gap_m===null?'无同名通报':p.viz_nearest_gap_m+' m'}\n最大重合: ${p.viz_maximum_overlap_m} m；要求: ${p.viz_required_overlap_m} m\n方向与现场执行均未核验`:''}`;
   if(layer==='viz_control')return `赛前匹配的非预测对照路段\nVIZ ID: ${p.unique_id}\n赛前车速: ${p.baseline_speed_kph} km/h\n自由流车速: ${p.freeflow_speed_kph} km/h\n对照不是赛事未影响的保证。`;
   if(p.change_class)return `VIZ 两快照变化路段${bundle?.status==='PRE_ONSET_PLACEBO'?'（均早于新增限制）':''}\nID: ${p.unique_id}\n类别: ${p.change_class}\n预测几何重合: ${p.predicted_overlap===null?'无法判定':p.predicted_overlap?'是':'否'}\n前次 / 后次车速: ${p.baseline_speed_kph??'缺失'} / ${p.event_speed_kph??'缺失'} km/h\n前次 / 后次封闭字段: ${p.baseline_closed??'缺失'} / ${p.event_closed??'缺失'}\n空间判定: ${bundle?.status==='PRE_ONSET_PLACEBO'?'赛前背景 '+p.verdict:p.verdict}`;
   if(p.unique_id)return `VIZ 实时交通路段\nID: ${p.unique_id}\n车速: ${p.closed===1?'封闭字段为 1，零车速不视作测量':`${p.speedavg??'缺失'} km/h`}\n自由流车速: ${p.freeflowspeed??'缺失'} km/h\nLOS: ${p.los??'缺失'}\n快照: ${bundle?.observation_snapshot.traffic.feed_time_stamp??''}`;

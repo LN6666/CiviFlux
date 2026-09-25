@@ -21,9 +21,9 @@
         <label><input type="checkbox" data-layer="predicted" checked>深橙 / 浅橙 · 插件预测路段有 / 无赛前 VIZ 空间覆盖</label>
         <label><input type="checkbox" data-layer="traffic" checked>实时交通 · VIZ 路段状态</label>
         <label><input type="checkbox" data-layer="controls" checked>深蓝虚线 · 仅据赛前信息匹配的对照路段</label>
-        <label><input type="checkbox" data-layer="changes" checked><span id="changes-label">逐段判定 · 命中 / 漏报 / 误报</span></label>
-        <div class="verdict-legend" aria-label="Road comparison verdict legend"><span><i class="hit"></i><span id="hit-label">绿色 命中</span></span><span><i class="miss"></i><span id="miss-label">红色 漏报</span></span><span><i class="false-alarm"></i><span id="false-label">紫色 误报</span></span></div>
-        <label><input type="checkbox" data-layer="closures" checked>紫色 · 输入的封路候选</label>
+        <label id="changes-toggle"><input type="checkbox" data-layer="changes" checked><span id="changes-label">逐段判定 · 命中 / 漏报 / 误报</span></label>
+        <div id="verdict-legend" class="verdict-legend" aria-label="Road comparison verdict legend"><span><i class="hit"></i><span id="hit-label">绿色 命中</span></span><span><i class="miss"></i><span id="miss-label">红色 漏报</span></span><span><i class="false-alarm"></i><span id="false-label">紫色 误报</span></span></div>
+        <label><input type="checkbox" data-layer="closures" checked><span id="restriction-label">紫色 · 输入的封路候选</span></label>
         <label><input type="checkbox" data-layer="reports" checked>蓝色 · 官方封路通报</label>
         <label><input type="checkbox" data-layer="context" checked>灰色 · 城市道路背景</label>
       </fieldset>
