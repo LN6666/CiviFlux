@@ -10,7 +10,7 @@
 
 **最新受控检查点，26 Sep 2026 JST：**PR #7 的 `4cc4f62` 代码树已由 [Linux CI 36186049667](https://github.com/LN6666/CiviFlux/actions/runs/36186049667) 核验，`core` 与 `container` 都通过；[CI 摘要](../evidence/wp7/ci_run_36186049667.json)记录临时合并树匹配、测试数与产物哈希。Berlin 有[多方式 KG 审计](../evidence/events/berlin-2026-multimodal-kg-audit.json)和[赛前 VIZ 覆盖／对照预检](../evidence/events/berlin-2026-viz-pre-event-coverage.json)：51 条冻结预测路段中 25 条有方向一致的 VIZ 几何匹配，26 条没有；11 条可评分的重合 VIZ 路段各选出 2 条只用赛前字段匹配的对照，最小排除距离 211.2 m。GIS 图层和事件时成对额外降速算法已就绪，但仍无赛时结果。这些数值不是预测命中率或因果效应。Baku 的[步骑间接地图](BAKU_2026_INDIRECT_GIS_COMPARISON.md)含独立的 0.2 m / 15 m **假设走廊**暴露和固定合成 OD 可达性探针，可重放 Action，明确速度假设。大型原始城市包仍需按数据说明重建；步行面未纳入可路由 KG，实际步骑限制与赛时观测仍缺失。严格 release manifest 保留 2 个 `DEFERRED_USER`、1 个 `BLOCKED_EXTERNAL`，`engineering_complete=false`。
 
-**待 CI 复核的后续增量：**Baku 步骑探针新增步行区域面几何交集及最近距离指标；固定 18 Sep OSM ROI 扫描 60 处，15 m 假设走廊交集为 0 处/0 m²，最近 205.48 m。保留该负结果，面仍不参与路由或 PPR。后续代码提交及 CI 状态见 PR #7；未通过前不能沿用上一检查点的绿色结论。
+**后续受控检查点：**PR #7 的 `d2a5db0` 代码树经 [Linux CI 36187455079](https://github.com/LN6666/CiviFlux/actions/runs/36187455079) `core`、`container` 双检查通过；[回执](../evidence/wp7/ci_run_36187455079.json)核对了临时合并树、15 项浏览器测试及容器 smoke。Baku 步骑探针新增步行区域面几何交集及最近距离指标；固定 18 Sep OSM ROI 扫描 60 处，15 m 假设走廊交集为 0 处/0 m²，最近 205.48 m。保留该负结果，面仍不参与路由或 PPR。严格 release manifest 仍有 2 个 `DEFERRED_USER`、1 个 `BLOCKED_EXTERNAL`，`engineering_complete=false`。
 
 ## 新账户的第一步
 
