@@ -8,8 +8,9 @@ test('GIS validation map separates frozen plugin output from scenario inputs and
     schema_version:'civiflux-validation-map-v1',event_id:'berlin-marathon-2026',status:'PRE_EVENT_BASELINE_ONLY',prediction_frozen_at_utc:'2026-09-25T18:20:40Z',
     observation_snapshot:{captured_at_utc:'2026-09-25T18:45:10Z',traffic:{feed_time_stamp:'2026-09-25T18:45:05Z',sha256:'test'}},
     event_snapshot:null,comparison_metrics:null,
+    control_plan:{treated_segments:1,treated_segments_with_controls:1,control_segments:1,selection_sha256:'fixed-baseline-test'},
     counts:{context_roads:1,predicted_route_impact_edges:1,restriction_input_edges:1,traffic_segments:1,marathon_reports:0},
-    layers:{context_roads:collection([road('context','context')]),predicted_route_impact:collection([road('prediction','predicted_route_impact')]),restriction_inputs:collection([road('input','restriction_input')]),viz_traffic:collection([{type:'Feature',geometry:{type:'LineString',coordinates:[[13.38,52.517],[13.39,52.517]]},properties:{unique_id:'viz-1',los:2,speedavg:32,closed:0}}]),viz_marathon_reports:collection(),observed_change:collection()},
+    layers:{context_roads:collection([road('context','context')]),predicted_route_impact:collection([road('prediction','predicted_route_impact')]),restriction_inputs:collection([road('input','restriction_input')]),viz_traffic:collection([{type:'Feature',geometry:{type:'LineString',coordinates:[[13.38,52.517],[13.39,52.517]]},properties:{unique_id:'viz-1',los:2,speedavg:32,closed:0}}]),viz_controls:collection([{type:'Feature',geometry:{type:'LineString',coordinates:[[13.4,52.519],[13.41,52.519]]},properties:{unique_id:'control-1',layer:'viz_control',baseline_speed_kph:32,freeflow_speed_kph:45}}]),viz_marathon_reports:collection(),observed_change:collection()},
     comparison_note:'test fixture',
   };
   await page.route('**/validation/berlin-local.json',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(bundle)}));
@@ -17,8 +18,11 @@ test('GIS validation map separates frozen plugin output from scenario inputs and
   await expect(page.getByRole('status')).toContainText('已载入赛前地图');
   await expect(page.locator('#summary')).toContainText('插件影响道路：1 条');
   await expect(page.locator('#summary')).toContainText('输入封路候选：1 条');
+  await expect(page.locator('#summary')).toContainText('赛前选定对照：1/1 个预测重合 VIZ 路段找到对照；1 条独立对照路段');
   await expect(page.locator('input[data-layer="predicted"]')).toBeChecked();
   await expect(page.locator('fieldset')).toContainText('深橙 / 浅橙 · 插件预测路段有 / 无赛前 VIZ 空间覆盖');
+  await page.getByLabel('深蓝虚线 · 仅据赛前信息匹配的对照路段').uncheck();
+  await expect(page.getByLabel('深蓝虚线 · 仅据赛前信息匹配的对照路段')).not.toBeChecked();
   await page.getByLabel('紫色 · 输入的封路候选').uncheck();
   await expect(page.getByLabel('紫色 · 输入的封路候选')).not.toBeChecked();
   await expect(page.locator('canvas.maplibregl-canvas')).toBeVisible();
@@ -32,6 +36,8 @@ test('GIS map shows all three measured road comparison outcomes',async({page})=>
     observation_snapshot:{captured_at_utc:'2026-09-26T04:45:00Z',traffic:{feed_time_stamp:'2026-09-26T04:45:00Z',sha256:'before'}},
     event_snapshot:{traffic:{feed_time_stamp:'2026-09-26T06:30:00Z'}},
     pre_event_coverage:{predicted_edges_with_viz_match:1,predicted_edges_without_viz_match:1,matched_viz_segments:1,scored_matched_viz_segments:1},
+    control_plan:{treated_segments:1,treated_segments_with_controls:1,control_segments:2,selection_sha256:'before-only'},
+    control_indicator:{valid_treated_control_groups:1,median_pair_adjusted_speed_drop_fraction:.4,newly_reported_closed_treated:0,newly_reported_closed_controls:0},
     comparison_metrics:{hit:1,miss:1,false_alarm:1,unscored:0,scored_segments:3,predicted_edge_count:2,predicted_edges_with_viz_match:2,matched_viz_segments:2,scored_matched_viz_segments:2,precision:.5,recall:.5},
     counts:{context_roads:0,predicted_route_impact_edges:2,restriction_input_edges:0,traffic_segments:3,marathon_reports:0},
     layers:{context_roads:collection(),predicted_route_impact:collection([road('p1','predicted_route_impact'),road('p2','predicted_route_impact')]),restriction_inputs:collection(),viz_traffic:collection(),viz_marathon_reports:collection(),observed_change:collection(compared)},
@@ -42,6 +48,7 @@ test('GIS map shows all three measured road comparison outcomes',async({page})=>
   await expect(page.getByRole('status')).toContainText('两次交通快照');
   await expect(page.locator('#summary')).toContainText('命中 1 · 漏报 1 · 误报 1');
   await expect(page.locator('#summary')).toContainText('赛前可测覆盖：1/2 条插件路段；1 条没有匹配 VIZ 路段');
+  await expect(page.locator('#summary')).toContainText('额外降速中位数：40.0 个百分点（描述性间接指标）');
   await expect(page.getByLabel('Road comparison verdict legend')).toContainText('绿色 命中');
   await expect(page.getByLabel('Road comparison verdict legend')).toContainText('红色 漏报');
   await expect(page.getByLabel('Road comparison verdict legend')).toContainText('紫色 误报');

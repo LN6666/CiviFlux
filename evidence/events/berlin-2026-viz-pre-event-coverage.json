@@ -19,5 +19,13 @@
   "preexisting_closed_or_other_unscored_viz_segments": 45,
   "no_change_control_hits": 0,
   "no_change_control_misses": 0,
-  "claim_ceiling": "Measurement coverage and no-change pipeline control only. Unmatched prediction edges have unknown real outcomes; no event-hour observations, road-level hit rate, or traffic attribution are present."
+  "baseline_only_control_method": "baseline-only nearest VIZ class/direction/freeflow/speed-ratio matching; maximum 2 unique controls per treated segment, within 1 km of prediction and >=200 m from prediction and restriction inputs",
+  "control_treated_viz_segments": 11,
+  "control_treated_segments_with_match": 11,
+  "selected_control_viz_segments": 22,
+  "minimum_control_exclusion_distance_m": 211.2,
+  "control_selection_sha256": "d8f80c7b525ba9d0f9bbc6bf51cf4ba65c427ecbc5b9fa846ebaca2db5bfc09f",
+  "no_change_control_valid_groups": 11,
+  "no_change_control_adjusted_speed_drop_fraction": 0.0,
+  "claim_ceiling": "Measurement coverage and baseline-only control-selection feasibility, with no-change pipeline control. Selected controls can be affected by spillover and do not establish an event counterfactual. Unmatched prediction edges have unknown real outcomes; no event-hour observations, road-level hit rate, or traffic attribution are present."
 }

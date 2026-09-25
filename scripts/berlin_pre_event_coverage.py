@@ -11,6 +11,8 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+from shapely.ops import unary_union
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / "core"), str(ROOT)]
 
@@ -19,9 +21,11 @@ from urbanimpact.citypack.fetch import sha256_file
 from scripts.berlin_validation_map import (
     PROBE,
     RAW,
+    _metric_line,
     _receipt_feed_time,
     build,
     compare_snapshots,
+    summarize_control_indicator,
 )
 
 SNAPSHOT = "sep25-pre-event-evening"
@@ -38,12 +42,27 @@ def main() -> None:
     runtime_bundle = ROOT / ".runtime/berlin-pre-event-coverage-bundle.json"
     build(SNAPSHOT, output=runtime_bundle)
     bundle = json.loads(runtime_bundle.read_text())
+    control_plan = bundle["control_plan"]
     traffic = json.loads((ROOT / receipt["traffic"]["local_path"]).read_text())["features"]
     observed, metrics = compare_snapshots(
         bundle["layers"]["predicted_route_impact"]["features"], traffic, traffic
     )
     if metrics["hit"] or metrics["miss"]:
         raise ValueError("same-snapshot negative control reported a traffic change")
+    control_indicator = summarize_control_indicator(control_plan, observed)
+    if control_indicator["median_pair_adjusted_speed_drop_fraction"] != 0:
+        raise ValueError("same-snapshot matched controls reported a speed change")
+    excluded = unary_union([
+        _metric_line(feature["geometry"]["coordinates"])
+        for layer in ("predicted_route_impact", "restriction_inputs")
+        for feature in bundle["layers"][layer]["features"]
+    ])
+    control_distances = [
+        _metric_line(feature["geometry"]["coordinates"]).distance(excluded)
+        for feature in bundle["layers"]["viz_controls"]["features"]
+    ]
+    if control_distances and min(control_distances) < 200:
+        raise ValueError("selected control overlaps the 200 m exclusion zone")
     report = {
         "schema_version": "1.0",
         "status": "PRE_EVENT_COVERAGE_ONLY_NOT_EVENT_VALIDATION",
@@ -65,7 +84,15 @@ def main() -> None:
         "preexisting_closed_or_other_unscored_viz_segments": metrics["unscored"],
         "no_change_control_hits": metrics["hit"],
         "no_change_control_misses": metrics["miss"],
-        "claim_ceiling": "Measurement coverage and no-change pipeline control only. Unmatched prediction edges have unknown real outcomes; no event-hour observations, road-level hit rate, or traffic attribution are present.",
+        "baseline_only_control_method": control_plan["method"],
+        "control_treated_viz_segments": control_plan["treated_segments"],
+        "control_treated_segments_with_match": control_plan["treated_segments_with_controls"],
+        "selected_control_viz_segments": control_plan["control_segments"],
+        "minimum_control_exclusion_distance_m": round(min(control_distances), 1) if control_distances else None,
+        "control_selection_sha256": control_plan["selection_sha256"],
+        "no_change_control_valid_groups": control_indicator["valid_treated_control_groups"],
+        "no_change_control_adjusted_speed_drop_fraction": control_indicator["median_pair_adjusted_speed_drop_fraction"],
+        "claim_ceiling": "Measurement coverage and baseline-only control-selection feasibility, with no-change pipeline control. Selected controls can be affected by spillover and do not establish an event counterfactual. Unmatched prediction edges have unknown real outcomes; no event-hour observations, road-level hit rate, or traffic attribution are present.",
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n")

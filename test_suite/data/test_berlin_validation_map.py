@@ -2,14 +2,20 @@ from __future__ import annotations
 
 import pytest
 
-from scripts.berlin_validation_map import _comparison_timing, _receipt_feed_time, compare_snapshots
+from scripts.berlin_validation_map import (
+    _comparison_timing,
+    _receipt_feed_time,
+    compare_snapshots,
+    select_matched_controls,
+    summarize_control_indicator,
+)
 
 
 def road(key: str, x: float, speed: float, closed: int = 0) -> dict:
     return {
         "type": "Feature",
         "geometry": {"type": "LineString", "coordinates": [[x, 52.52], [x + 0.001, 52.52]]},
-        "properties": {"unique_id": key, "speedavg": speed, "closed": closed},
+        "properties": {"unique_id": key, "speedavg": speed, "freeflowspeed": 50, "strkat_1": "I", "closed": closed},
     }
 
 
@@ -104,3 +110,49 @@ def test_capture_and_feed_both_must_straddle_announced_onset() -> None:
     baseline["traffic"]["feed_time_stamp"] = "2026-09-26T05:00:10Z"
     with pytest.raises(ValueError, match="feed timestamps"):
         _comparison_timing(baseline, event)
+
+
+def test_baseline_only_controls_avoid_restricted_roads_and_adjust_common_speed_change() -> None:
+    predicted = [road("prediction", 13.380, 30)]
+    restricted = [road("input", 13.383, 30)]
+    baseline = [
+        road("treated", 13.380, 40),
+        road("near_input", 13.383, 40),
+        road("control_a", 13.389, 40),
+        road("control_b", 13.390, 40),
+        road("wrong_class", 13.391, 40),
+    ]
+    baseline[-1]["properties"]["strkat_1"] = "II"
+    baseline_observed, _ = compare_snapshots(predicted, baseline, baseline)
+    plan, features = select_matched_controls(predicted, restricted, baseline, baseline_observed)
+    assert plan["treated_segments"] == 1
+    assert plan["control_segments"] == 2
+    assert {feature["properties"]["unique_id"] for feature in features} == {"control_a", "control_b"}
+    assert all(group["control_ids"] != ["near_input"] for group in plan["groups"])
+
+    event = [
+        road("treated", 13.380, 20),
+        road("near_input", 13.383, 40),
+        road("control_a", 13.389, 36),
+        road("control_b", 13.390, 36),
+        road("wrong_class", 13.391, 40),
+    ]
+    observed, _ = compare_snapshots(predicted, baseline, event)
+    indicator = summarize_control_indicator(plan, observed)
+    assert indicator["status"] == "DESCRIPTIVE_CONTROL_ONLY"
+    assert indicator["valid_treated_control_groups"] == 1
+    assert indicator["median_pair_adjusted_speed_drop_fraction"] == pytest.approx(0.4)
+
+
+def test_control_indicator_excludes_new_closures_from_speed_math() -> None:
+    plan = {"groups": [{"treated_id": "treated", "control_ids": ["control"]}]}
+    observed, _ = compare_snapshots(
+        [road("prediction", 13.380, 30)],
+        [road("treated", 13.380, 40), road("control", 13.389, 40)],
+        [road("treated", 13.380, 0, 1), road("control", 13.389, 0, 1)],
+    )
+    indicator = summarize_control_indicator(plan, observed)
+    assert indicator["status"] == "INSUFFICIENT_VALID_PAIRS"
+    assert indicator["median_pair_adjusted_speed_drop_fraction"] is None
+    assert indicator["newly_reported_closed_treated"] == 1
+    assert indicator["newly_reported_closed_controls"] == 1

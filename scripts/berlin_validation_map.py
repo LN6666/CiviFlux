@@ -10,6 +10,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
+import statistics
 import sys
 import urllib.parse
 import urllib.request
@@ -213,6 +215,120 @@ def compare_snapshots(predicted: list[dict], before: list[dict], after: list[dic
     return observed, metrics
 
 
+def select_matched_controls(
+    predicted: list[dict], restricted: list[dict], baseline: list[dict], baseline_comparison: list[dict]
+) -> tuple[dict, list[dict]]:
+    """Freeze nearby, untreated VIZ controls using only baseline data.
+
+    Controls are descriptive time-of-day comparators. Distance from both the
+    predicted paths and announcement-derived restrictions reduces direct
+    overlap; it cannot guarantee that an event has no spillover there.
+    """
+    indexed = _unique_features(baseline, "control baseline")
+    prediction_lines = [_metric_line(f["geometry"]["coordinates"]) for f in predicted]
+    excluded_lines = prediction_lines + [_metric_line(f["geometry"]["coordinates"]) for f in restricted]
+    exclusion = unary_union(excluded_lines)
+    evaluation_area = unary_union(prediction_lines).buffer(1000)
+    treated_ids = sorted(
+        f["properties"]["unique_id"] for f in baseline_comparison
+        if f["properties"]["predicted_overlap"] is True and f["properties"]["verdict"] != "unscored"
+    )
+    candidates = []
+    for feature in baseline:
+        props = feature["properties"]
+        speed, freeflow = props.get("speedavg"), props.get("freeflowspeed")
+        if props.get("closed") == 1 or not isinstance(speed, (int, float)) or not isinstance(freeflow, (int, float)) or speed <= 0 or freeflow <= 0:
+            continue
+        geometry = _metric_line(feature["geometry"]["coordinates"])
+        if geometry.length < 25 or not geometry.intersects(evaluation_area) or geometry.distance(exclusion) < 200:
+            continue
+        candidates.append((props["unique_id"], geometry, props))
+    used: set[str] = set()
+    groups = []
+    for treated_id in treated_ids:
+        treated = indexed[treated_id]
+        props = treated["properties"]
+        treated_speed, treated_freeflow = props.get("speedavg"), props.get("freeflowspeed")
+        if not isinstance(treated_speed, (int, float)) or not isinstance(treated_freeflow, (int, float)) or treated_speed <= 0 or treated_freeflow <= 0:
+            groups.append({"treated_id": treated_id, "control_ids": []})
+            continue
+        geometry = _metric_line(treated["geometry"]["coordinates"])
+        ranked = []
+        for control_id, control_geometry, control in candidates:
+            if control_id in used or control.get("strkat_1") != props.get("strkat_1") or not _same_direction(geometry, control_geometry):
+                continue
+            freeflow_ratio = control["freeflowspeed"] / treated_freeflow
+            length_ratio = control_geometry.length / geometry.length
+            normalized_speed_gap = abs(control["speedavg"] / control["freeflowspeed"] - treated_speed / treated_freeflow)
+            if not 0.5 <= freeflow_ratio <= 2 or not 0.25 <= length_ratio <= 4 or normalized_speed_gap > 0.3:
+                continue
+            cost = abs(math.log(freeflow_ratio)) + normalized_speed_gap + 0.15 * abs(math.log(length_ratio))
+            ranked.append((cost, control_id))
+        chosen = [control_id for _, control_id in sorted(ranked)[:2]]
+        used.update(chosen)
+        groups.append({"treated_id": treated_id, "control_ids": chosen})
+    selected = [
+        {
+            "type": "Feature",
+            "geometry": indexed[control_id]["geometry"],
+            "properties": {
+                "unique_id": control_id,
+                "layer": "viz_control",
+                "baseline_speed_kph": indexed[control_id]["properties"]["speedavg"],
+                "freeflow_speed_kph": indexed[control_id]["properties"]["freeflowspeed"],
+            },
+        }
+        for control_id in sorted(used)
+    ]
+    plan = {
+        "method": "baseline-only nearest VIZ class/direction/freeflow/speed-ratio matching; maximum 2 unique controls per treated segment, within 1 km of prediction and >=200 m from prediction and restriction inputs",
+        "treated_segments": len(treated_ids),
+        "treated_segments_with_controls": sum(bool(group["control_ids"]) for group in groups),
+        "control_segments": len(used),
+        "groups": groups,
+    }
+    return plan, selected
+
+
+def summarize_control_indicator(plan: dict, observed: list[dict]) -> dict:
+    """Describe treated-versus-control speed changes without causal claims."""
+    by_id = {feature["properties"]["unique_id"]: feature["properties"] for feature in observed}
+
+    def slowdown(key: str) -> float | None:
+        props = by_id.get(key)
+        if not props or props["verdict"] == "unscored" or props["baseline_closed"] == 1 or props["event_closed"] == 1:
+            return None
+        old, new = props["baseline_speed_kph"], props["event_speed_kph"]
+        if not isinstance(old, (int, float)) or not isinstance(new, (int, float)) or old <= 0 or new <= 0:
+            return None
+        return (old - new) / old
+
+    treated_drops, control_drops, adjusted_drops = [], [], []
+    matched_control_ids = {control_id for group in plan["groups"] for control_id in group["control_ids"]}
+    for group in plan["groups"]:
+        treated_drop = slowdown(group["treated_id"])
+        controls = [drop for key in group["control_ids"] if (drop := slowdown(key)) is not None]
+        if treated_drop is None or not controls:
+            continue
+        control_drop = statistics.median(controls)
+        treated_drops.append(treated_drop)
+        control_drops.append(control_drop)
+        adjusted_drops.append(treated_drop - control_drop)
+    treated_ids = {group["treated_id"] for group in plan["groups"]}
+    return {
+        "status": "DESCRIPTIVE_CONTROL_ONLY" if adjusted_drops else "INSUFFICIENT_VALID_PAIRS",
+        "valid_treated_control_groups": len(adjusted_drops),
+        "selected_treated_segments": len(treated_ids),
+        "selected_control_segments": len(matched_control_ids),
+        "median_treated_speed_drop_fraction": statistics.median(treated_drops) if treated_drops else None,
+        "median_control_speed_drop_fraction": statistics.median(control_drops) if control_drops else None,
+        "median_pair_adjusted_speed_drop_fraction": statistics.median(adjusted_drops) if adjusted_drops else None,
+        "newly_reported_closed_treated": sum(by_id.get(key, {}).get("change_class") == "newly_reported_closed" for key in treated_ids),
+        "newly_reported_closed_controls": sum(by_id.get(key, {}).get("change_class") == "newly_reported_closed" for key in matched_control_ids),
+        "interpretation": "Baseline-selected controls can absorb some common time-of-day speed changes, but event spillover, other works, weather and demand differences remain. This is a descriptive indirect indicator, not a causal event effect, measured travel-time prediction, or classifier accuracy.",
+    }
+
+
 def _within(geometry: list[list[float]], bbox: tuple[float, ...] = BBOX) -> bool:
     xmin, ymin, xmax, ymax = bbox
     return any(xmin <= point[0] <= xmax and ymin <= point[1] <= ymax for point in geometry)
@@ -329,9 +445,18 @@ def build(snapshot_name: str, output: Path = LOCAL_BUNDLE, event_name: str | Non
     ]
     traffic = json.loads(traffic_path.read_text())
     predicted = [road_feature(eid, "predicted_route_impact") for eid in sorted(affected_ids)]
-    _, pre_event_coverage = compare_snapshots(predicted, traffic["features"], traffic["features"])
+    restricted = [road_feature(eid, "restriction_input") for eid in sorted(candidate_ids)]
+    baseline_comparison, pre_event_coverage = compare_snapshots(predicted, traffic["features"], traffic["features"])
     if pre_event_coverage["hit"] or pre_event_coverage["miss"]:
         raise ValueError("same-snapshot spatial control reported a traffic change")
+    control_plan, control_features = select_matched_controls(
+        predicted, restricted, traffic["features"], baseline_comparison
+    )
+    control_plan["baseline_traffic_sha256"] = receipt["traffic"]["sha256"]
+    control_plan["baseline_feed_utc"] = receipt["traffic"]["feed_time_stamp"]
+    control_plan["selection_sha256"] = hashlib.sha256(
+        json.dumps(control_plan["groups"], sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
     covered_indices = set(pre_event_coverage["matched_prediction_indices"])
     for index, feature in enumerate(predicted):
         feature["properties"]["viz_baseline_coverage"] = index in covered_indices
@@ -343,6 +468,7 @@ def build(snapshot_name: str, output: Path = LOCAL_BUNDLE, event_name: str | Non
     event_receipt = None
     observed_change: list[dict] = []
     comparison_metrics = None
+    control_indicator = None
     if event_name:
         event_receipt = json.loads((RAW / f"{event_name}-receipt.json").read_text())
         event_traffic_path = ROOT / event_receipt["traffic"]["local_path"]
@@ -356,6 +482,7 @@ def build(snapshot_name: str, output: Path = LOCAL_BUNDLE, event_name: str | Non
             event_traffic["features"],
         )
         comparison_metrics["timing"] = timing
+        control_indicator = summarize_control_indicator(control_plan, observed_change)
     bundle = {
         "schema_version": "civiflux-validation-map-v1",
         "event_id": "berlin-marathon-2026",
@@ -366,6 +493,8 @@ def build(snapshot_name: str, output: Path = LOCAL_BUNDLE, event_name: str | Non
         "event_snapshot": event_receipt,
         "status": "TWO_SNAPSHOT_SPATIAL_COMPARISON" if event_receipt else "PRE_EVENT_BASELINE_ONLY",
         "comparison_metrics": comparison_metrics,
+        "control_plan": control_plan,
+        "control_indicator": control_indicator,
         "pre_event_coverage": {
             "predicted_edges_with_viz_match": pre_event_coverage["predicted_edges_with_viz_match"],
             "predicted_edges_without_viz_match": pre_event_coverage["predicted_edges_without_viz_match"],
@@ -383,12 +512,13 @@ def build(snapshot_name: str, output: Path = LOCAL_BUNDLE, event_name: str | Non
         "layers": {
             "context_roads": _collection(context),
             "predicted_route_impact": _collection(predicted),
-            "restriction_inputs": _collection([road_feature(eid, "restriction_input") for eid in sorted(candidate_ids)]),
+            "restriction_inputs": _collection(restricted),
             "viz_traffic": _collection(traffic["features"]),
+            "viz_controls": _collection(control_features),
             "viz_marathon_reports": _collection(reports),
             "observed_change": _collection(observed_change),
         },
-        "comparison_note": "The orange paths are frozen plugin routing outputs for two declared OD pairs, not closure inputs. Purple paths are announcement-derived restriction inputs. The VIZ speed/LOS layer is a pre-onset baseline here. Two-snapshot spatial scores are descriptive and cannot isolate event causation from time-of-day or other changes.",
+        "comparison_note": "The orange paths are frozen plugin routing outputs for two declared OD pairs, not closure inputs. Purple paths are announcement-derived restriction inputs. Blue control segments are selected using baseline VIZ class/direction/speed only, away from predicted and input roads. Two-snapshot spatial scores and any pair-adjusted speed indicator are descriptive; controls cannot establish event causation.",
     }
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(bundle, ensure_ascii=False, separators=(",", ":")) + "\n")
