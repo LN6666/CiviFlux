@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "status": "SPATIAL_SUPPORT_SUBSET_SENSITIVITY_ONLY",
+  "event_id": "berlin-marathon-2026",
+  "frozen_probe_sha256": "f89fc30b2139bf26b724c88801947466082e5e4561404160b41025522729be0b",
+  "citypack_sha256": "5781a8627f6b7680f70a81892b55dee33049554cb1b38946b86b1f818c1e67a0",
+  "closure_candidates_sha256": "d8135b957a50e8a112d1e3c143950f7d9d1ff75a16c2a6174ffbdb12f0b5bc13",
+  "mapping_detail_sha256": "b000784f5389f755f4cc981bad1cffe93a0969bb2163b4ad8da26f3b923f0ca4",
+  "viz_snapshot": "sep25-pre-event-evening",
+  "viz_captured_at_utc": "2026-09-25T18:45:10.063375+00:00",
+  "viz_reports_sha256": "d29358f373080937b8c8838aa437b4e7ed1e964d6e25c26d3f2682a5ff5c2ce1",
+  "active_candidate_count": 37,
+  "active_geometry_supported_count": 29,
+  "active_without_sufficient_geometry_count": 8,
+  "upcoming_candidate_count_unchanged": 35,
+  "outcomes": [
+    {
+      "label": "west_to_east",
+      "baseline_status": "available",
+      "incremental_status": "unreachable",
+      "baseline_same_as_frozen": true,
+      "incremental_same_as_frozen": true,
+      "baseline_freeflow_s": 70.69469262602877,
+      "incremental_freeflow_s": null
+    },
+    {
+      "label": "east_to_west",
+      "baseline_status": "available",
+      "incremental_status": "unreachable",
+      "baseline_same_as_frozen": true,
+      "incremental_same_as_frozen": true,
+      "baseline_freeflow_s": 60.950559638682144,
+      "incremental_freeflow_s": null
+    },
+    {
+      "label": "north_south_control",
+      "baseline_status": "available",
+      "incremental_status": "available",
+      "baseline_same_as_frozen": true,
+      "incremental_same_as_frozen": true,
+      "baseline_freeflow_s": 74.97201904519906,
+      "incremental_freeflow_s": 74.97201904519906
+    }
+  ],
+  "all_fixed_od_results_identical": true,
+  "claim_ceiling": "Post-freeze sensitivity of three declared synthetic OD pairs only. Filtering eight active candidate edges by pre-onset VIZ announcement geometry does not establish the true operated closure set, direction, citywide robustness or observed event impact. The frozen prospective probe is unchanged."
+}

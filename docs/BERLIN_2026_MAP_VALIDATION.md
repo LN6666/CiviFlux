@@ -23,6 +23,14 @@ npm --prefix web run dev
 
 浏览器打开 `http://127.0.0.1:5173/validation.html?bundle=mapping`。VIZ 通报是事先发布的计划几何，不能核验有向道路权限、现场执行或交通扰动。
 
+针对这 **8** 条重合不足的已开始限制候选，另做一项**冻结后输入敏感性复跑**：只在已开始的 Straße des 17. Juni 情景中保留 29 条公告线几何支持边；尚未开始的 35 条 Unter den Linden 候选、同一 OSM CityPack、乘用车类别和原冻结的三组 OD/端点保持不变。[结果及输入哈希](../evidence/events/berlin-2026-mapping-sensitivity.json)显示三组 OD 的基线/增量路由对象均与[原冻结探针](../evidence/events/berlin-2026-incremental-pre-onset-probe.json)逐项一致：两个东西向 OD 在增量情景下仍不可达，北南对照仍可达。在 25 Sep 21:03 UTC 第二份赛前通报快照上按相同方法复算，也得到 29/8 与三组结果相同。复跑从原始通报和 CityPack 重新计算几何审计，不信任手填的中间审阅文件：
+
+```bash
+uv run --frozen python scripts/berlin_mapping_sensitivity.py sep25-pre-event-evening
+```
+
+这是固定 **3 组合成 OD** 对已开始限制候选子集的敏感性；不能证明 29 条就是实际封路，也未测试尚无同名 VIZ 通报的 35 条新增限制候选的方向或边界，更不能当作城市扰动实测。
+
 用上述**同一份赛前快照同时充当比较器两侧**进行空变化负对照：51 条冻结插件路段中，按 18 m 缓冲、方向与重合长度规则，**25 条**至少匹配一个 VIZ 路段，**26 条无 VIZ 空间覆盖**；与插件路段匹配的 VIZ 有向 ID 为 **12 条**，其中 **11 条**的赛前状态可评分。固定预测周围 1 km 范围共 420 条 VIZ 路段，375 条可评分，45 条已封闭或字段缺失。空变化控制没有产生状态变化命中或漏报。此审计只说明赛时对照可能覆盖的观测范围，不评价插件准确率；无 VIZ 覆盖的 26 条不能被记为误报。[可复核摘要](../evidence/events/berlin-2026-viz-pre-event-coverage.json)只公开哈希与统计，原始 VIZ/HERE 几何仍留本机 ignored。重新生成：`uv run --frozen python scripts/berlin_pre_event_coverage.py`。
 
 同一 25 Sep 赛前快照也用来**预检对照选取是否可行**：在 11 条有可评分赛前状态的预测重合 VIZ 路段中，11 条各找到 2 条未重复的对照，共 22 条。选择只使用赛前 VIZ 道路类别、方向、自由流车速、当前车速比和几何长度；对照位于冻结预测 1 km 范围内，距预测路线及输入封路候选至少 200 m，本次最小实测几何间距 211.2 m。选择清单的 SHA-256 与输入快照哈希写进同一[审计摘要](../evidence/events/berlin-2026-viz-pre-event-coverage.json)，具体 VIZ 路段几何/ID 留在 ignored 本机包。**这只是方法可行性预检**：实际 26 Sep 赛前快照会重新固定对照，可能出现不同数量；远离路线也不保证未受赛事溢出影响。
