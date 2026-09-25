@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0",
+  "status": "SCOPED_CI_PASS",
+  "captured_at": "2026-09-25T20:32:09.715602+00:00",
+  "source": "GitHub Actions job metadata/log plus downloaded browser/container artifacts",
+  "repository": "LN6666/CiviFlux",
+  "pull_request": 7,
+  "run_id": 36186049667,
+  "run_url": "https://github.com/LN6666/CiviFlux/actions/runs/36186049667",
+  "head_commit": "4cc4f627fe91056f42910c44465cb3d819ea9856",
+  "head_tree": "ad13f2493452a8f5682c59eaa1de23eeabf27180",
+  "checkout_merge_commit": "688cbff4a6e26adb4b06731b2dc97280cf6be1d5",
+  "checkout_merge_tree": "ad13f2493452a8f5682c59eaa1de23eeabf27180",
+  "exact_tree_match": true,
+  "tested_code_commit": "4cc4f627fe91056f42910c44465cb3d819ea9856",
+  "jobs": {
+    "core": {
+      "job_id": 108239529083,
+      "conclusion": "success",
+      "completed_at": "2026-09-25T20:31:26Z",
+      "url": "https://github.com/LN6666/CiviFlux/actions/runs/36186049667/job/108239529083"
+    },
+    "container": {
+      "job_id": 108239529304,
+      "conclusion": "success",
+      "completed_at": "2026-09-25T20:30:04Z",
+      "url": "https://github.com/LN6666/CiviFlux/actions/runs/36186049667/job/108239529304"
+    }
+  },
+  "test_result_lines": [
+    "7 passed in 1.09s",
+    "211 passed, 1 warning in 10.27s",
+    "65 passed, 1 skipped, 1 warning in 2.37s",
+    "7 passed in 0.71s",
+    "11 passed in 14.28s",
+    "20 passed in 0.77s",
+    "15 passed (31.1s)"
+  ],
+  "ci_log_sha256": "a3483878a642f4bb5c41225c7bb377cadd5341da8d6e6ec59b732fe4885d0a50",
+  "artifacts": {
+    "linux-sbom-evidence": {
+      "id": 10886159065,
+      "digest": "sha256:f269b5b0c29fed4935869f23e0d70a17ecfa06e246f31b9da3ec408b975c7fb7",
+      "size_in_bytes": 455931
+    },
+    "browser-evidence": {
+      "id": 10886029251,
+      "digest": "sha256:45f134d817a57056b0fd13acd2f8c517ec90689177cd847557cec30b49913e2e",
+      "size_in_bytes": 521822
+    },
+    "container-reproduction": {
+      "id": 10884999703,
+      "digest": "sha256:cc363157df7d92be3b0138d510b6461eeb6d177fc5a45e41e6405f47d2050b41",
+      "size_in_bytes": 6797
+    }
+  },
+  "browser": {
+    "results_json_sha256": "a411a9b878e60f9a788bfd373478aaf29b8f8afb43b47bc15484a25b32e3c877",
+    "stats": {
+      "startTime": "2026-09-25T20:30:48.038Z",
+      "duration": 31053.612,
+      "expected": 15,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "container": {
+    "reproduction_json_sha256": "df8462dd543cf3f1354a2fd71fa41fb7795091febd5f0bfda9461c675f43cde3",
+    "status": "PASS",
+    "stages": [
+      {
+        "stage": "git_commit",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_daemon",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_buildx",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_build",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "image_inspect",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "container_smoke",
+        "status": "PASS",
+        "exit_code": 0
+      }
+    ],
+    "image_id": "sha256:464f7b996a24ba6e4cbb29364bdf565847af029d2ad95496b0cd17394a47c2be"
+  },
+  "claim_ceiling": "Identical-tree CI verifies code, synthetic API/SUMO and 15 browser tests; one ignored Helsinki CityPack test skipped. Berlin 25/51 frozen prediction edges have baseline VIZ directional spatial coverage, while 26 do not; a pre-event feasibility run selected 22 controls for 11 scorable VIZ segments, with no event-hour outcome or hit rate yet. Baku indirect probes remain hypothetical, not observed race-day impacts. No paid SimpleJev or full release claim."
+}
