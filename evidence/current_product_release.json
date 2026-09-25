@@ -4,30 +4,30 @@
   "gates": {
     "GATE-CONTRACTS": {
       "status": "PASS",
-      "producer": "github_actions_36191842277",
-      "commit": "867d19b59da5866270fbbb6656794488583436ff",
+      "producer": "github_actions_36192737662",
+      "commit": "8c0229593cd1db7b0ce5044ec87ff1df38db667b",
       "commands": [
         {
-          "command": "GitHub Actions run 36191842277 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
+          "command": "GitHub Actions run 36192737662 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
           "exit_code": 0
         }
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/ci_run_36191842277.json",
-          "sha256": "cffc6f5412922d389678091610a6d7d0cf9d885bc0526aa1804939883194c375"
+          "path": "evidence/wp7/ci_run_36192737662.json",
+          "sha256": "4fed4b4982f369de6aefdaaabadb4198db07da8cdaa5f53305e3b24be8aca1b5"
         }
       ],
-      "executed_at": "2026-09-25T21:31:47Z",
+      "executed_at": "2026-09-25T21:41:37Z",
       "scope": "Current ontology/Scenario/Action/Projection/Result contracts, generated bindings and unsupported-version rejection tested in CI."
     },
     "GATE-NETWORK": {
       "status": "PASS",
-      "producer": "github_actions_36191842277_and_local",
-      "commit": "867d19b59da5866270fbbb6656794488583436ff",
+      "producer": "github_actions_36192737662_and_local",
+      "commit": "8c0229593cd1db7b0ce5044ec87ff1df38db667b",
       "commands": [
         {
-          "command": "GitHub Actions run 36191842277 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
+          "command": "GitHub Actions run 36192737662 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
           "exit_code": 0
         },
         {
@@ -37,8 +37,8 @@
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/ci_run_36191842277.json",
-          "sha256": "cffc6f5412922d389678091610a6d7d0cf9d885bc0526aa1804939883194c375"
+          "path": "evidence/wp7/ci_run_36192737662.json",
+          "sha256": "4fed4b4982f369de6aefdaaabadb4198db07da8cdaa5f53305e3b24be8aca1b5"
         },
         {
           "path": "evidence/wp7/current_data_test_620.json",
@@ -79,18 +79,22 @@
         {
           "path": "evidence/events/berlin-2026-viz-mapping-audit.json",
           "sha256": "53c45e3ebe14c9b3a298ac99a817f79b790b37978f5490e93ea16e674b9705e5"
+        },
+        {
+          "path": "evidence/events/berlin-2026-mapping-sensitivity.json",
+          "sha256": "c961b11ddabf624eb8c43ecfaae731641300bfa889a58c0311622bae21628c70"
         }
       ],
-      "executed_at": "2026-09-25T21:31:47Z",
-      "scope": "Current-tree directed turn/vehicle/time routing and independent synthetic oracle; local frozen Helsinki current-snapshot CityPack tests and scoped outer browser/API run. Berlin pre-onset official VIZ traffic was captured locally but event-hour road change and human-accepted road mapping are not yet available. Berlin/Baku dated-source road-only CityPacks and immutable audits are candidate topology; event restrictions and physical outcomes remain unverified. Separate Baku multimodal candidate pack has 95,904 directed linear segments (15,990 without motor permission); walk/cycle access and race-day effects remain unreviewed. Berlin multimodal candidate KG has 436,764 directed linear segments. Baku active-mode router now uses explicit assumed 1.4/4.0 m/s speeds; 0.2/15 m hypothetical corridor exposure and fixed synthetic OD reachability have replayed Action evidence, not race-day observed impacts. Berlin frozen 51 directed route-impact edges have 25 directional VIZ baseline spatial matches and 26 unmatched edges; 12 distinct VIZ directed segments match, 11 scorable. This is coverage only, not event validation. A baseline-only Berlin VIZ control feasibility run matched 11 scorable predicted-overlap segments to 22 distinct same-class/direction/roughly-speed-matched controls at least 200 m from predictions and restriction inputs; minimum observed clearance 211.2 m. The no-change control returned zero adjusted speed change. No event-hour impact or causal claim. Baku pedestrian-area proxy scanned 60 source-bound OSM polygons; neither 0.2 m nor 15 m hypothetical Pushkin corridor overlaps an area (nearest gaps 220.28/205.48 m). This is a negative geometry result and leaves observed active-mode effects unresolved. A source-hashed VIZ line geometry cross-check supports 29/37 already-started Straße des 17. Juni input candidates spatially; 8 lack sufficient overlap. The 35 upcoming Unter den Linden candidates have no same-street VIZ report in this pre-onset snapshot. All remain unreviewed; this is not observed traffic impact or direction verification."
+      "executed_at": "2026-09-25T21:41:37Z",
+      "scope": "Current-tree directed turn/vehicle/time routing and independent synthetic oracle; local frozen Helsinki current-snapshot CityPack tests and scoped outer browser/API run. Berlin pre-onset official VIZ traffic was captured locally but event-hour road change and human-accepted road mapping are not yet available. Berlin/Baku dated-source road-only CityPacks and immutable audits are candidate topology; event restrictions and physical outcomes remain unverified. Separate Baku multimodal candidate pack has 95,904 directed linear segments (15,990 without motor permission); walk/cycle access and race-day effects remain unreviewed. Berlin multimodal candidate KG has 436,764 directed linear segments. Baku active-mode router now uses explicit assumed 1.4/4.0 m/s speeds; 0.2/15 m hypothetical corridor exposure and fixed synthetic OD reachability have replayed Action evidence, not race-day observed impacts. Berlin frozen 51 directed route-impact edges have 25 directional VIZ baseline spatial matches and 26 unmatched edges; 12 distinct VIZ directed segments match, 11 scorable. This is coverage only, not event validation. A baseline-only Berlin VIZ control feasibility run matched 11 scorable predicted-overlap segments to 22 distinct same-class/direction/roughly-speed-matched controls at least 200 m from predictions and restriction inputs; minimum observed clearance 211.2 m. The no-change control returned zero adjusted speed change. No event-hour impact or causal claim. Baku pedestrian-area proxy scanned 60 source-bound OSM polygons; neither 0.2 m nor 15 m hypothetical Pushkin corridor overlaps an area (nearest gaps 220.28/205.48 m). This is a negative geometry result and leaves observed active-mode effects unresolved. A source-hashed VIZ line geometry cross-check supports 29/37 already-started Straße des 17. Juni input candidates spatially; 8 lack sufficient overlap. The 35 upcoming Unter den Linden candidates have no same-street VIZ report in this pre-onset snapshot. All remain unreviewed; this is not observed traffic impact or direction verification. Pre-onset VIZ notice geometry supports 29/37 active candidate directed edges; dropping 8 unsupported edges leaves three frozen synthetic OD results unchanged. This does not verify actual closures or event-hour impacts."
     },
     "GATE-GRAPH": {
       "status": "PASS",
-      "producer": "github_actions_36191842277_and_local",
-      "commit": "867d19b59da5866270fbbb6656794488583436ff",
+      "producer": "github_actions_36192737662_and_local",
+      "commit": "8c0229593cd1db7b0ce5044ec87ff1df38db667b",
       "commands": [
         {
-          "command": "GitHub Actions run 36191842277 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
+          "command": "GitHub Actions run 36192737662 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
           "exit_code": 0
         },
         {
@@ -100,8 +104,8 @@
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/ci_run_36191842277.json",
-          "sha256": "cffc6f5412922d389678091610a6d7d0cf9d885bc0526aa1804939883194c375"
+          "path": "evidence/wp7/ci_run_36192737662.json",
+          "sha256": "4fed4b4982f369de6aefdaaabadb4198db07da8cdaa5f53305e3b24be8aca1b5"
         },
         {
           "path": "evidence/wp7/current_data_test_620.json",
@@ -140,30 +144,30 @@
           "sha256": "7ced4e3fa3f7d94c91ccf8345756940593df69e12c1123541958cbbefa4195aa"
         }
       ],
-      "executed_at": "2026-09-25T21:31:47Z",
+      "executed_at": "2026-09-25T21:41:37Z",
       "scope": "Typed operational/dependency projection, evidence/temporal binding, immutable Action replay and PPR context tests; A4 fixed-vector offline direct-ranking control covers 23 frozen facility candidates with unchanged physical facts. It is not a real classifier ablation or historical-city KG validation. Berlin/Baku ontology-typed current road/facility KG exports have candidate, provenance-bearing links; they are not actual event operational graphs. Separate Baku multimodal ontology/KG audit has 96,710 typed objects and mode-filterable turn candidates; pedestrian polygons are map geometry only, not typed KG objects or scored impacts. Berlin multimodal KG has 437,400 typed candidate objects. Baku active-mode corridor restriction overlays are typed and replayable, but not sourced event closures or measured graph change."
     },
     "GATE-PPR": {
       "status": "PASS",
-      "producer": "github_actions_36191842277",
-      "commit": "867d19b59da5866270fbbb6656794488583436ff",
+      "producer": "github_actions_36192737662",
+      "commit": "8c0229593cd1db7b0ce5044ec87ff1df38db667b",
       "commands": [
         {
-          "command": "GitHub Actions run 36191842277 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
+          "command": "GitHub Actions run 36192737662 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
           "exit_code": 0
         }
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/ci_run_36191842277.json",
-          "sha256": "cffc6f5412922d389678091610a6d7d0cf9d885bc0526aa1804939883194c375"
+          "path": "evidence/wp7/ci_run_36192737662.json",
+          "sha256": "4fed4b4982f369de6aefdaaabadb4198db07da8cdaa5f53305e3b24be8aca1b5"
         },
         {
           "path": "evidence/wp6/a4_direct_control_offline.json",
           "sha256": "b0bde2112035475cb9d0ea3fcee027f1098b7a0bf8af3375501692f6112e3996"
         }
       ],
-      "executed_at": "2026-09-25T21:31:47Z",
+      "executed_at": "2026-09-25T21:41:37Z",
       "scope": "Sparse relation-mixture PPR versus dense/NetworkX independent oracles, paired-context invariants and residual checks; A3 policy epsilon binding and A4 no-PPR direct control tested with offline fixed policy only. Attention is relevance, not risk."
     },
     "GATE-QWEN-SYSTEM-ONE": {
@@ -195,45 +199,45 @@
     },
     "GATE-SUMO": {
       "status": "PASS",
-      "producer": "github_actions_36191842277",
-      "commit": "867d19b59da5866270fbbb6656794488583436ff",
+      "producer": "github_actions_36192737662",
+      "commit": "8c0229593cd1db7b0ce5044ec87ff1df38db667b",
       "commands": [
         {
-          "command": "GitHub Actions run 36191842277 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
+          "command": "GitHub Actions run 36192737662 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
           "exit_code": 0
         },
         {
-          "command": "GitHub Actions run 36191842277 container: python3 deploy/container_repro.py --out .runtime/container-ci/reproduction.json",
+          "command": "GitHub Actions run 36192737662 container: python3 deploy/container_repro.py --out .runtime/container-ci/reproduction.json",
           "exit_code": 0
         }
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/ci_run_36191842277.json",
-          "sha256": "cffc6f5412922d389678091610a6d7d0cf9d885bc0526aa1804939883194c375"
+          "path": "evidence/wp7/ci_run_36192737662.json",
+          "sha256": "4fed4b4982f369de6aefdaaabadb4198db07da8cdaa5f53305e3b24be8aca1b5"
         }
       ],
-      "executed_at": "2026-09-25T21:31:47Z",
+      "executed_at": "2026-09-25T21:41:37Z",
       "scope": "Pinned real SUMO baseline/event pair, cancellation/failure/vehicle restrictions, native artifact export and Linux installed-image SUMO smoke; synthetic demand only."
     },
     "GATE-WEB": {
       "status": "PASS",
-      "producer": "github_actions_36191842277_and_local",
-      "commit": "867d19b59da5866270fbbb6656794488583436ff",
+      "producer": "github_actions_36192737662_and_local",
+      "commit": "8c0229593cd1db7b0ce5044ec87ff1df38db667b",
       "commands": [
         {
-          "command": "GitHub Actions run 36191842277 core: make build-web",
+          "command": "GitHub Actions run 36192737662 core: make build-web",
           "exit_code": 0
         },
         {
-          "command": "GitHub Actions run 36191842277 core: make test-browser",
+          "command": "GitHub Actions run 36192737662 core: make test-browser",
           "exit_code": 0
         }
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/ci_run_36191842277.json",
-          "sha256": "cffc6f5412922d389678091610a6d7d0cf9d885bc0526aa1804939883194c375"
+          "path": "evidence/wp7/ci_run_36192737662.json",
+          "sha256": "4fed4b4982f369de6aefdaaabadb4198db07da8cdaa5f53305e3b24be8aca1b5"
         },
         {
           "path": "evidence/wp5/helsinki_outer_browser_smoke.json",
@@ -246,10 +250,14 @@
         {
           "path": "evidence/events/berlin-2026-viz-mapping-audit.json",
           "sha256": "53c45e3ebe14c9b3a298ac99a817f79b790b37978f5490e93ea16e674b9705e5"
+        },
+        {
+          "path": "evidence/events/berlin-2026-mapping-sensitivity.json",
+          "sha256": "c961b11ddabf624eb8c43ecfaae731641300bfa889a58c0311622bae21628c70"
         }
       ],
-      "executed_at": "2026-09-25T21:31:47Z",
-      "scope": "Current-tree Web build and 17 CI browser tests. Berlin GIS map separates frozen plugin roads, restriction inputs, baseline VIZ coverage, 22 baseline-only matched control road segments, and later two-snapshot verdicts. A pre-event feasibility run found directional VIZ coverage for 25/51 prediction edges; 11 scorable matched VIZ segments each found two controls, with a 211.2 m minimum distance from predicted/restriction roads. The event-hour pair-adjusted median speed-drop indicator is descriptive only; there is no event-hour outcome or measured accuracy yet. Baku AYNA street-name overlap 23/32 (71.9%) and hypothetical active-mode exposure/connectivity are proxy/sensitivity results, not measured hit rate. No cross-device SLA. The Berlin event comparator now locks VIZ spatial overlap and control selection to a persisted pre-onset baseline and checks raw feed timestamp/count binding; event-hour results remain pending. A separate gitignored Berlin GIS bundle uses two real pre-incremental-onset VIZ feeds and labels spatial coincidence as background placebo rather than an event hit rate; only source hashes and aggregate counts are published. The local mapping-review GIS view colors notice-to-OSM input candidates by geometric support and shows 6 normalized VIZ report lines; CI verifies UI claim limits. Raw VIZ/HERE geometry remains ignored and unpublished."
+      "executed_at": "2026-09-25T21:41:37Z",
+      "scope": "Current-tree Web build and 17 CI browser tests. Berlin GIS map separates frozen plugin roads, restriction inputs, baseline VIZ coverage, 22 baseline-only matched control road segments, and later two-snapshot verdicts. A pre-event feasibility run found directional VIZ coverage for 25/51 prediction edges; 11 scorable matched VIZ segments each found two controls, with a 211.2 m minimum distance from predicted/restriction roads. The event-hour pair-adjusted median speed-drop indicator is descriptive only; there is no event-hour outcome or measured accuracy yet. Baku AYNA street-name overlap 23/32 (71.9%) and hypothetical active-mode exposure/connectivity are proxy/sensitivity results, not measured hit rate. No cross-device SLA. The Berlin event comparator now locks VIZ spatial overlap and control selection to a persisted pre-onset baseline and checks raw feed timestamp/count binding; event-hour results remain pending. A separate gitignored Berlin GIS bundle uses two real pre-incremental-onset VIZ feeds and labels spatial coincidence as background placebo rather than an event hit rate; only source hashes and aggregate counts are published. The local mapping-review GIS view colors notice-to-OSM input candidates by geometric support and shows 6 normalized VIZ report lines; CI verifies UI claim limits. Raw VIZ/HERE geometry remains ignored and unpublished. Pre-onset VIZ notice geometry supports 29/37 active candidate directed edges; dropping 8 unsupported edges leaves three frozen synthetic OD results unchanged. This does not verify actual closures or event-hour impacts."
     },
     "GATE-REAL-CITY": {
       "status": "BLOCKED_EXTERNAL",
@@ -307,44 +315,44 @@
     },
     "GATE-SECURITY": {
       "status": "PASS",
-      "producer": "github_actions_36191842277",
-      "commit": "867d19b59da5866270fbbb6656794488583436ff",
+      "producer": "github_actions_36192737662",
+      "commit": "8c0229593cd1db7b0ce5044ec87ff1df38db667b",
       "commands": [
         {
-          "command": "GitHub Actions run 36191842277 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
+          "command": "GitHub Actions run 36192737662 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
           "exit_code": 0
         }
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/ci_run_36191842277.json",
-          "sha256": "cffc6f5412922d389678091610a6d7d0cf9d885bc0526aa1804939883194c375"
+          "path": "evidence/wp7/ci_run_36192737662.json",
+          "sha256": "4fed4b4982f369de6aefdaaabadb4198db07da8cdaa5f53305e3b24be8aca1b5"
         }
       ],
-      "executed_at": "2026-09-25T21:31:47Z",
+      "executed_at": "2026-09-25T21:41:37Z",
       "scope": "Automated API/input/egress/cache/export controls, repository secret heuristic, locked dependency/SBOM integrity, 20 security tests and high-severity npm audit; not a penetration test or legal license adjudication."
     },
     "GATE-REPRODUCE": {
       "status": "PASS",
-      "producer": "github_actions_36191842277",
-      "commit": "867d19b59da5866270fbbb6656794488583436ff",
+      "producer": "github_actions_36192737662",
+      "commit": "8c0229593cd1db7b0ce5044ec87ff1df38db667b",
       "commands": [
         {
-          "command": "GitHub Actions run 36191842277 container: python3 deploy/container_repro.py --out .runtime/container-ci/reproduction.json",
+          "command": "GitHub Actions run 36192737662 container: python3 deploy/container_repro.py --out .runtime/container-ci/reproduction.json",
           "exit_code": 0
         }
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/ci_run_36191842277.json",
-          "sha256": "cffc6f5412922d389678091610a6d7d0cf9d885bc0526aa1804939883194c375"
+          "path": "evidence/wp7/ci_run_36192737662.json",
+          "sha256": "4fed4b4982f369de6aefdaaabadb4198db07da8cdaa5f53305e3b24be8aca1b5"
         },
         {
           "path": "evidence/wp7/clean_checkout_620_offline.json",
           "sha256": "c8085818d2bd8ac4bebe236f8be4e46fbeaa73f5a3bfb75afbe13dc604f16d09"
         }
       ],
-      "executed_at": "2026-09-25T21:31:47Z",
+      "executed_at": "2026-09-25T21:41:37Z",
       "scope": "Current identical code tree: Linux amd64 pinned-image build, network-disabled read-only installed-image API/export and real SUMO synthetic smoke PASS in CI. Earlier native macOS offline checkout on 620bc30 stopped at dependency sync because pinned sumo-data wheel was absent from local UV cache; no native retry on current b7bf9e7 tree. No published registry digest, paid classifier, measured-city validation or production deployment claim."
     }
   },

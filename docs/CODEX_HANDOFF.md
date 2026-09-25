@@ -20,6 +20,8 @@
 
 **输入误差复核：**[柏林敏感性证据](../evidence/events/berlin-2026-mapping-sensitivity.json)从原始 VIZ 线重新计算支持子集，移除 8 条重合不足的已开始限制候选后，原冻结的三组合成 OD 在基线和增量两臂的路由对象均不变；第二份赛前通报快照在本机得到同样结果。这是对局部输入映射不确定性的复跑，不是 35 条未来候选的核验，也不是交通实测。冻结探针保持原样。重建命令见[地图验证说明](BERLIN_2026_MAP_VALIDATION.md)；新环境先按数据说明重建 ignored Berlin CityPack 和原始 VIZ 快照。
 
+**最新受控检查点：**上述敏感性脚本的代码提交 `8c02295` 经 [Linux CI 36192737662](https://github.com/LN6666/CiviFlux/actions/runs/36192737662) `core`、`container` 双检查通过；[回执](../evidence/wp7/ci_run_36192737662.json)核对临时合并树与开发提交树一致、契约 7、fast 211、data 73 PASS/1 SKIP、outcomes 7、SUMO 11、安全 20、浏览器 17 PASS。当前 [release manifest](../evidence/current_product_release.json)绑定此受控代码树，仍有两个付费相关 `DEFERRED_USER` 和一个真实城市 `BLOCKED_EXTERNAL`，`engineering_complete=false`。Berlin 26 Sep 赛时路段命中率仍未获得；25 Sep 的 29/37 是公告输入映射几何支持比例，Baku 的 23/32 是公告街名代理重合比例，两者都不是现场扰动命中率。
+
 ## 新账户的第一步
 
 1. 在自己的机器执行 `git clone https://github.com/LN6666/CiviFlux.git`，在 Codex 中把克隆出的 `CiviFlux` 目录作为项目打开。公开仓库可匿名克隆；提交 PR 时才需要自己的 GitHub 身份或 fork。接手正在审查的改动时也查看[开放的 PR](https://github.com/LN6666/CiviFlux/pulls)，不要以为未合并分支已经在 `main`。
