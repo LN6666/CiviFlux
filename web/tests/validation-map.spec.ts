@@ -97,6 +97,6 @@ test('notice geometry audit colors candidate roads without claiming observed imp
   await expect(page.locator('#summary')).toContainText('同名 VIZ 通报 0 条；空间重合支持 0/1');
   await expect(page.locator('#restriction-label')).toContainText('红色 重合不足 / 灰色 无同名通报');
   await expect(page.getByLabel('Road comparison verdict legend')).toBeHidden();
-  await expect(page.locator('#interpretation')).toContainText('方向与现场执行均未核验');
+  await expect(page.locator('#interpretation')).toContainText('既不能证明现场执行，也不能核验有向边方向');
   await expect(page.locator('canvas.maplibregl-canvas')).toBeVisible();
 });
