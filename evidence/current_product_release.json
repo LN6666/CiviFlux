@@ -4,30 +4,30 @@
   "gates": {
     "GATE-CONTRACTS": {
       "status": "PASS",
-      "producer": "github_actions_36180444113",
-      "commit": "c976f25fe89e153cf7fae1082ddbe55a0e156cc4",
+      "producer": "github_actions_36182672141",
+      "commit": "f3fbd13fbb20fcaef8f77ac906c288e3ff846c3a",
       "commands": [
         {
-          "command": "GitHub Actions run 36180444113 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
+          "command": "GitHub Actions run 36182672141 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
           "exit_code": 0
         }
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/ci_run_36180444113.json",
-          "sha256": "2ed72f7a869eaa0d776c368f4e1d2c0f1ef6b8ace0a597eb45dc133752f832a7"
+          "path": "evidence/wp7/ci_run_36182672141.json",
+          "sha256": "958f17bd3cf2f055bff71c96aebec32b07fda0a96c25861b864f1d7e774906ca"
         }
       ],
-      "executed_at": "2026-09-25T19:35:49Z",
+      "executed_at": "2026-09-25T19:57:57Z",
       "scope": "Current ontology/Scenario/Action/Projection/Result contracts, generated bindings and unsupported-version rejection tested in CI."
     },
     "GATE-NETWORK": {
       "status": "PASS",
-      "producer": "github_actions_36180444113_and_local",
-      "commit": "c976f25fe89e153cf7fae1082ddbe55a0e156cc4",
+      "producer": "github_actions_36182672141_and_local",
+      "commit": "f3fbd13fbb20fcaef8f77ac906c288e3ff846c3a",
       "commands": [
         {
-          "command": "GitHub Actions run 36180444113 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
+          "command": "GitHub Actions run 36182672141 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
           "exit_code": 0
         },
         {
@@ -37,8 +37,8 @@
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/ci_run_36180444113.json",
-          "sha256": "2ed72f7a869eaa0d776c368f4e1d2c0f1ef6b8ace0a597eb45dc133752f832a7"
+          "path": "evidence/wp7/ci_run_36182672141.json",
+          "sha256": "958f17bd3cf2f055bff71c96aebec32b07fda0a96c25861b864f1d7e774906ca"
         },
         {
           "path": "evidence/wp7/current_data_test_620.json",
@@ -63,18 +63,26 @@
         {
           "path": "evidence/events/baku-2026-multimodal-kg-audit.json",
           "sha256": "4dff0ec87fb94fd33590653b24e2b6670c422a099dc80a32c13ae9369eda9982"
+        },
+        {
+          "path": "evidence/events/berlin-2026-multimodal-kg-audit.json",
+          "sha256": "c18692ba7b9429d3622e5953dc2d235a2f11e255e6115defd78f137b4502da51"
+        },
+        {
+          "path": "evidence/events/baku-2026-active-indirect-probe.json",
+          "sha256": "e5e00312cf7c52a691dcee188160a56bd3e4789c5894b8eb7d9c424f6b0ce48a"
         }
       ],
-      "executed_at": "2026-09-25T19:35:49Z",
-      "scope": "Current-tree directed turn/vehicle/time routing and independent synthetic oracle; local frozen Helsinki current-snapshot CityPack tests and scoped outer browser/API run. Berlin pre-onset official VIZ traffic was captured locally but event-hour road change and human-accepted road mapping are not yet available. Berlin/Baku dated-source road-only CityPacks and immutable audits are candidate topology; event restrictions and physical outcomes remain unverified. Separate Baku multimodal candidate pack has 95,904 directed linear segments (15,990 without motor permission); walk/cycle access and race-day effects remain unreviewed."
+      "executed_at": "2026-09-25T19:57:57Z",
+      "scope": "Current-tree directed turn/vehicle/time routing and independent synthetic oracle; local frozen Helsinki current-snapshot CityPack tests and scoped outer browser/API run. Berlin pre-onset official VIZ traffic was captured locally but event-hour road change and human-accepted road mapping are not yet available. Berlin/Baku dated-source road-only CityPacks and immutable audits are candidate topology; event restrictions and physical outcomes remain unverified. Separate Baku multimodal candidate pack has 95,904 directed linear segments (15,990 without motor permission); walk/cycle access and race-day effects remain unreviewed. Berlin multimodal candidate KG has 436,764 directed linear segments. Baku active-mode router now uses explicit assumed 1.4/4.0 m/s speeds; 0.2/15 m hypothetical corridor exposure and fixed synthetic OD reachability have replayed Action evidence, not race-day observed impacts."
     },
     "GATE-GRAPH": {
       "status": "PASS",
-      "producer": "github_actions_36180444113_and_local",
-      "commit": "c976f25fe89e153cf7fae1082ddbe55a0e156cc4",
+      "producer": "github_actions_36182672141_and_local",
+      "commit": "f3fbd13fbb20fcaef8f77ac906c288e3ff846c3a",
       "commands": [
         {
-          "command": "GitHub Actions run 36180444113 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
+          "command": "GitHub Actions run 36182672141 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
           "exit_code": 0
         },
         {
@@ -84,8 +92,8 @@
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/ci_run_36180444113.json",
-          "sha256": "2ed72f7a869eaa0d776c368f4e1d2c0f1ef6b8ace0a597eb45dc133752f832a7"
+          "path": "evidence/wp7/ci_run_36182672141.json",
+          "sha256": "958f17bd3cf2f055bff71c96aebec32b07fda0a96c25861b864f1d7e774906ca"
         },
         {
           "path": "evidence/wp7/current_data_test_620.json",
@@ -114,32 +122,40 @@
         {
           "path": "evidence/events/baku-2026-multimodal-kg-audit.json",
           "sha256": "4dff0ec87fb94fd33590653b24e2b6670c422a099dc80a32c13ae9369eda9982"
+        },
+        {
+          "path": "evidence/events/berlin-2026-multimodal-kg-audit.json",
+          "sha256": "c18692ba7b9429d3622e5953dc2d235a2f11e255e6115defd78f137b4502da51"
+        },
+        {
+          "path": "evidence/events/baku-2026-active-indirect-probe.json",
+          "sha256": "e5e00312cf7c52a691dcee188160a56bd3e4789c5894b8eb7d9c424f6b0ce48a"
         }
       ],
-      "executed_at": "2026-09-25T19:35:49Z",
-      "scope": "Typed operational/dependency projection, evidence/temporal binding, immutable Action replay and PPR context tests; A4 fixed-vector offline direct-ranking control covers 23 frozen facility candidates with unchanged physical facts. It is not a real classifier ablation or historical-city KG validation. Berlin/Baku ontology-typed current road/facility KG exports have candidate, provenance-bearing links; they are not actual event operational graphs. Separate Baku multimodal ontology/KG audit has 96,710 typed objects and mode-filterable turn candidates; pedestrian polygons are map geometry only, not typed KG objects or scored impacts."
+      "executed_at": "2026-09-25T19:57:57Z",
+      "scope": "Typed operational/dependency projection, evidence/temporal binding, immutable Action replay and PPR context tests; A4 fixed-vector offline direct-ranking control covers 23 frozen facility candidates with unchanged physical facts. It is not a real classifier ablation or historical-city KG validation. Berlin/Baku ontology-typed current road/facility KG exports have candidate, provenance-bearing links; they are not actual event operational graphs. Separate Baku multimodal ontology/KG audit has 96,710 typed objects and mode-filterable turn candidates; pedestrian polygons are map geometry only, not typed KG objects or scored impacts. Berlin multimodal KG has 437,400 typed candidate objects. Baku active-mode corridor restriction overlays are typed and replayable, but not sourced event closures or measured graph change."
     },
     "GATE-PPR": {
       "status": "PASS",
-      "producer": "github_actions_36180444113",
-      "commit": "c976f25fe89e153cf7fae1082ddbe55a0e156cc4",
+      "producer": "github_actions_36182672141",
+      "commit": "f3fbd13fbb20fcaef8f77ac906c288e3ff846c3a",
       "commands": [
         {
-          "command": "GitHub Actions run 36180444113 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
+          "command": "GitHub Actions run 36182672141 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
           "exit_code": 0
         }
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/ci_run_36180444113.json",
-          "sha256": "2ed72f7a869eaa0d776c368f4e1d2c0f1ef6b8ace0a597eb45dc133752f832a7"
+          "path": "evidence/wp7/ci_run_36182672141.json",
+          "sha256": "958f17bd3cf2f055bff71c96aebec32b07fda0a96c25861b864f1d7e774906ca"
         },
         {
           "path": "evidence/wp6/a4_direct_control_offline.json",
           "sha256": "b0bde2112035475cb9d0ea3fcee027f1098b7a0bf8af3375501692f6112e3996"
         }
       ],
-      "executed_at": "2026-09-25T19:35:49Z",
+      "executed_at": "2026-09-25T19:57:57Z",
       "scope": "Sparse relation-mixture PPR versus dense/NetworkX independent oracles, paired-context invariants and residual checks; A3 policy epsilon binding and A4 no-PPR direct control tested with offline fixed policy only. Attention is relevance, not risk."
     },
     "GATE-QWEN-SYSTEM-ONE": {
@@ -171,53 +187,53 @@
     },
     "GATE-SUMO": {
       "status": "PASS",
-      "producer": "github_actions_36180444113",
-      "commit": "c976f25fe89e153cf7fae1082ddbe55a0e156cc4",
+      "producer": "github_actions_36182672141",
+      "commit": "f3fbd13fbb20fcaef8f77ac906c288e3ff846c3a",
       "commands": [
         {
-          "command": "GitHub Actions run 36180444113 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
+          "command": "GitHub Actions run 36182672141 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
           "exit_code": 0
         },
         {
-          "command": "GitHub Actions run 36180444113 container: python3 deploy/container_repro.py --out .runtime/container-ci/reproduction.json",
+          "command": "GitHub Actions run 36182672141 container: python3 deploy/container_repro.py --out .runtime/container-ci/reproduction.json",
           "exit_code": 0
         }
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/ci_run_36180444113.json",
-          "sha256": "2ed72f7a869eaa0d776c368f4e1d2c0f1ef6b8ace0a597eb45dc133752f832a7"
+          "path": "evidence/wp7/ci_run_36182672141.json",
+          "sha256": "958f17bd3cf2f055bff71c96aebec32b07fda0a96c25861b864f1d7e774906ca"
         }
       ],
-      "executed_at": "2026-09-25T19:35:49Z",
+      "executed_at": "2026-09-25T19:57:57Z",
       "scope": "Pinned real SUMO baseline/event pair, cancellation/failure/vehicle restrictions, native artifact export and Linux installed-image SUMO smoke; synthetic demand only."
     },
     "GATE-WEB": {
       "status": "PASS",
-      "producer": "github_actions_36180444113_and_local",
-      "commit": "c976f25fe89e153cf7fae1082ddbe55a0e156cc4",
+      "producer": "github_actions_36182672141_and_local",
+      "commit": "f3fbd13fbb20fcaef8f77ac906c288e3ff846c3a",
       "commands": [
         {
-          "command": "GitHub Actions run 36180444113 core: make build-web",
+          "command": "GitHub Actions run 36182672141 core: make build-web",
           "exit_code": 0
         },
         {
-          "command": "GitHub Actions run 36180444113 core: make test-browser",
+          "command": "GitHub Actions run 36182672141 core: make test-browser",
           "exit_code": 0
         }
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/ci_run_36180444113.json",
-          "sha256": "2ed72f7a869eaa0d776c368f4e1d2c0f1ef6b8ace0a597eb45dc133752f832a7"
+          "path": "evidence/wp7/ci_run_36182672141.json",
+          "sha256": "958f17bd3cf2f055bff71c96aebec32b07fda0a96c25861b864f1d7e774906ca"
         },
         {
           "path": "evidence/wp5/helsinki_outer_browser_smoke.json",
           "sha256": "c699d7fa0754b454952578a135159bd778643a6e47fb1ebdd29ddea98a9c3b31"
         }
       ],
-      "executed_at": "2026-09-25T19:35:49Z",
-      "scope": "Current-tree Web build and 15 CI browser tests, including Baku indirect GIS map. Baku synthetic bus detours share AYNA named streets on 23/32 directed edges (71.9% retrospective proxy, not measured hit rate). Separate active-mode candidate overlay shows walk/cycle ways and pedestrian areas, without event restrictions or impacts. Berlin map remains a pre-onset comparison; no measured city accuracy or cross-device SLA."
+      "executed_at": "2026-09-25T19:57:57Z",
+      "scope": "Current-tree Web build and 15 CI browser tests, including Baku indirect GIS map with separate 15 m hypothetical walking/cycling exposure layers and synthetic baseline paths. Baku bus AYNA 23/32 (71.9%) remains a retrospective street-name proxy, not measured hit rate. Active-mode exposure/connectivity is assumption-sensitive and not observed event impact. Berlin map remains pre-onset; no measured city accuracy or cross-device SLA."
     },
     "GATE-REAL-CITY": {
       "status": "BLOCKED_EXTERNAL",
@@ -275,45 +291,45 @@
     },
     "GATE-SECURITY": {
       "status": "PASS",
-      "producer": "github_actions_36180444113",
-      "commit": "c976f25fe89e153cf7fae1082ddbe55a0e156cc4",
+      "producer": "github_actions_36182672141",
+      "commit": "f3fbd13fbb20fcaef8f77ac906c288e3ff846c3a",
       "commands": [
         {
-          "command": "GitHub Actions run 36180444113 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
+          "command": "GitHub Actions run 36182672141 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
           "exit_code": 0
         }
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/ci_run_36180444113.json",
-          "sha256": "2ed72f7a869eaa0d776c368f4e1d2c0f1ef6b8ace0a597eb45dc133752f832a7"
+          "path": "evidence/wp7/ci_run_36182672141.json",
+          "sha256": "958f17bd3cf2f055bff71c96aebec32b07fda0a96c25861b864f1d7e774906ca"
         }
       ],
-      "executed_at": "2026-09-25T19:35:49Z",
+      "executed_at": "2026-09-25T19:57:57Z",
       "scope": "Automated API/input/egress/cache/export controls, repository secret heuristic, locked dependency/SBOM integrity, 20 security tests and high-severity npm audit; not a penetration test or legal license adjudication."
     },
     "GATE-REPRODUCE": {
       "status": "PASS",
-      "producer": "github_actions_36180444113",
-      "commit": "c976f25fe89e153cf7fae1082ddbe55a0e156cc4",
+      "producer": "github_actions_36182672141",
+      "commit": "f3fbd13fbb20fcaef8f77ac906c288e3ff846c3a",
       "commands": [
         {
-          "command": "GitHub Actions run 36180444113 container: python3 deploy/container_repro.py --out .runtime/container-ci/reproduction.json",
+          "command": "GitHub Actions run 36182672141 container: python3 deploy/container_repro.py --out .runtime/container-ci/reproduction.json",
           "exit_code": 0
         }
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/ci_run_36180444113.json",
-          "sha256": "2ed72f7a869eaa0d776c368f4e1d2c0f1ef6b8ace0a597eb45dc133752f832a7"
+          "path": "evidence/wp7/ci_run_36182672141.json",
+          "sha256": "958f17bd3cf2f055bff71c96aebec32b07fda0a96c25861b864f1d7e774906ca"
         },
         {
           "path": "evidence/wp7/clean_checkout_620_offline.json",
           "sha256": "c8085818d2bd8ac4bebe236f8be4e46fbeaa73f5a3bfb75afbe13dc604f16d09"
         }
       ],
-      "executed_at": "2026-09-25T19:34:32Z",
-      "scope": "Current identical code tree: Linux amd64 pinned-image build, network-disabled read-only installed-image API/export and real SUMO synthetic smoke PASS in CI. Earlier native macOS offline checkout on 620bc30 stopped at dependency sync because pinned sumo-data wheel was absent from local UV cache; no native retry on current c976f25 tree. No published registry digest, paid classifier, measured-city validation or production deployment claim."
+      "executed_at": "2026-09-25T19:56:41Z",
+      "scope": "Current identical code tree: Linux amd64 pinned-image build, network-disabled read-only installed-image API/export and real SUMO synthetic smoke PASS in CI. Earlier native macOS offline checkout on 620bc30 stopped at dependency sync because pinned sumo-data wheel was absent from local UV cache; no native retry on current f3fbd13f tree. No published registry digest, paid classifier, measured-city validation or production deployment claim."
     }
   },
   "claims": {

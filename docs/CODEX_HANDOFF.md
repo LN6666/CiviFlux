@@ -8,6 +8,8 @@
 
 **最新工作线，25 Sep 2026 UTC：**用户现要求优先按大型活动时间建设城市 ontology/KG，并核查 Berlin Marathon 与 Baku F1 的验证可行性。[Berlin 城市图审计](../evidence/events/berlin-2026-city-kg-audit.json)和[Baku 城市图审计](../evidence/events/baku-2026-city-kg-audit.json)记录固定 OSM 来源、范围、有向道路/转向/typed links 数量与结果哈希；原始数据和大型 CityPack/KG **gitignored，不会随 Git clone 自动到达**，按 [data/README](../data/README.md)重建。Berlin 的[官方封路候选](../data/event_cases/berlin-marathon-2026-closure-candidates.json)未经人工核验；[事前冻结的条件探针](../evidence/events/berlin-2026-incremental-pre-onset-probe.json)只给出未验证候选下的自由流路径敏感性。Baku 的[2026 来源事实卡](../data/event_cases/baku-f1-2026-source-facts.json)与[可行性审计](BAKU_2026_F1_DATA_FEASIBILITY.md)显示公告充分、赛前 OSM 可得，但封路起点已过、实际运营和独立道路数值观测未核验。**不能把公告、PPR 或这些探针写成交通预测验证。** 当前本地检查结果和下一步缺口见[STATE](../execution/STATE.md)；新代码须以最新 CI 重新核验。
 
+**最新受控检查点，26 Sep 2026 JST：**PR #7 的 `f3fbd13` 代码树已由 [Linux CI 36182672141](https://github.com/LN6666/CiviFlux/actions/runs/36182672141) 核验，`core` 与 `container` 都通过；[CI 摘要](../evidence/wp7/ci_run_36182672141.json)记录临时合并树匹配、测试数与产物哈希。Berlin 另有[多方式 KG 审计](../evidence/events/berlin-2026-multimodal-kg-audit.json)；Baku 的[步骑间接地图](BAKU_2026_INDIRECT_GIS_COMPARISON.md)新增了独立的 0.2 m / 15 m **假设走廊**暴露和固定合成 OD 可达性探针，可重放 Action，明确速度假设。不能将受影响候选通道、图上不可达或公交公告街名重合比例称为真实赛时影响或命中率。大型原始城市包仍需按数据说明重建；步行面未纳入可路由 KG，实际步骑限制与赛时观测仍缺失。严格 release manifest 保留 2 个 `DEFERRED_USER`、1 个 `BLOCKED_EXTERNAL`，`engineering_complete=false`。
+
 ## 新账户的第一步
 
 1. 在自己的机器执行 `git clone https://github.com/LN6666/CiviFlux.git`，在 Codex 中把克隆出的 `CiviFlux` 目录作为项目打开。公开仓库可匿名克隆；提交 PR 时才需要自己的 GitHub 身份或 fork。接手正在审查的改动时也查看[开放的 PR](https://github.com/LN6666/CiviFlux/pulls)，不要以为未合并分支已经在 `main`。
