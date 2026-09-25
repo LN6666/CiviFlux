@@ -1,0 +1,421 @@
+{
+  "schema_version": "civiflux-active-indirect-v2",
+  "status": "HYPOTHETICAL_INDIRECT_STRESS_TEST",
+  "case_id": "baku-f1-2026-active-corridor-sensitivity",
+  "source_osm_sha256": "5134c55378dda62dfe4257b6aa7eec06fe9c67594f7e578bcd6186fbaac5c363",
+  "motor_citypack_sha256": "8adba2949ca4d6637b0250ef8eb72fd6833456abcad3674dcfeb3fcfe1577c89",
+  "multimodal_citypack_sha256": "c6679caad099a40b1f88bc2c32ff9956afb6e8dbecb9d523c3c89080bc0acf9a",
+  "multimodal_osm_roi_sha256": "ed9ff1c56ddf60e941d28085e770cecfbab97ac5b7790f0bf409ef5a186f86c7",
+  "bcc_notice_sha256": "3aeb95b9dc259127ebf17360e8a9dd96a5f6dc90baa3342d3287b139bd03629b",
+  "active_case_sha256": "6e63b8e97689a07168d01b1cecf47c62c3ca0fec455ab1a455608862c05b0183",
+  "bus_case_sha256": "4c782e44cfdad5129a92a5b31b1182c66bf99ee8396b805f7ba4984dc7a3c673",
+  "source_motor_candidate_edges": 12,
+  "condition": "Only for sensitivity analysis, block each mode-permitted linear edge whose geometry intersects the buffered, unreviewed BCC Pushkin motor-road candidate geometry. The road notice does not attest a walking or cycling closure.",
+  "origin_target_policy": "Reuse the two post-event synthetic coordinates in the bus case; snap separately to each permitted mode network without selecting by result",
+  "speed_assumptions_mps": {
+    "pedestrian": 1.4,
+    "bicycle": 4.0
+  },
+  "pedestrian_area_routing": "NOT_MODELLED",
+  "buffer_results": [
+    {
+      "buffer_m": 0.2,
+      "modes": {
+        "pedestrian": {
+          "exposed_directed_edges": 11,
+          "exposed_dedicated_nonmotor_edges": 0,
+          "sum_directed_length_m": 313.2,
+          "baseline_reachable_od": 1,
+          "conditional_reachable_od": 0,
+          "od": [
+            {
+              "id": "pushkin_to_neftchilar",
+              "synthetic": true,
+              "origin_node": "osm:node:7384081390:5afb40ae",
+              "target_node": "osm:node:2558449292:f60b0ada",
+              "origin_snap_gap_m": 0.0,
+              "target_snap_gap_m": 0.0,
+              "baseline_status": "available",
+              "conditional_status": "unreachable",
+              "baseline_distance_m": 212.76,
+              "conditional_distance_m": null,
+              "baseline_assumed_freeflow_s": 151.9714285714286,
+              "conditional_assumed_freeflow_s": null,
+              "delta_distance_m": null,
+              "delta_assumed_freeflow_s": null,
+              "baseline_uses_exposed_edges": 7
+            },
+            {
+              "id": "pushkin_to_east_port",
+              "synthetic": true,
+              "origin_node": "osm:node:12282027663:a2f9e5a7",
+              "target_node": "osm:node:4396634688:d928d1f0",
+              "origin_snap_gap_m": 0.0,
+              "target_snap_gap_m": 0.0,
+              "baseline_status": "unreachable",
+              "conditional_status": "unreachable",
+              "baseline_distance_m": null,
+              "conditional_distance_m": null,
+              "baseline_assumed_freeflow_s": null,
+              "conditional_assumed_freeflow_s": null,
+              "delta_distance_m": null,
+              "delta_assumed_freeflow_s": null,
+              "baseline_uses_exposed_edges": 0
+            }
+          ],
+          "scenario_overlay_hash": "4d8845944a28f0ff9d1c99a5f1f8485ee7d3e20f58c116ab97b15fc17ec288a6",
+          "action_records": [
+            {
+              "ontology_version": "1.0.0",
+              "action_id": "baku-active-pedestrian-colocated-create",
+              "action_type": "CreateScenario",
+              "timestamp": "2026-09-25T12:00:00+04:00",
+              "parameters_hash": "446eb25b6414e82a0e0a2650225d6f4d815907b840e9106c93beb8db2b6847e4",
+              "actor_context": "reproducible-user-requested-sensitivity",
+              "input_object_refs": [
+                "baku-active-pedestrian-colocated"
+              ],
+              "precondition_results": [
+                {
+                  "name": "typed_validation",
+                  "passed": true
+                }
+              ],
+              "output_object_refs": [
+                "baku-active-pedestrian-colocated"
+              ],
+              "status": "committed",
+              "error": null,
+              "provenance_hash": "2aa0d4cac4c1e6461e19d89afac46b6dfe7f7c48f4e39d7f423da34bf3c26e61"
+            },
+            {
+              "ontology_version": "1.0.0",
+              "action_id": "baku-active-pedestrian-colocated-restriction",
+              "action_type": "AddRoadRestriction",
+              "timestamp": "2026-09-25T12:00:00+04:00",
+              "parameters_hash": "5f1b95251b3dfee6eb6c1693d15f5227b9c61b3c97dcfd33dc088dd50013c2e5",
+              "actor_context": "reproducible-user-requested-sensitivity",
+              "input_object_refs": [
+                "baku-active-pedestrian-colocated"
+              ],
+              "precondition_results": [
+                {
+                  "name": "typed_validation",
+                  "passed": true
+                }
+              ],
+              "output_object_refs": [
+                "baku-active-pedestrian-colocated"
+              ],
+              "status": "committed",
+              "error": null,
+              "provenance_hash": "1e0784462591279bab91c1fc599548d4962b4d205c2b091fc51bed46e129a21f"
+            }
+          ],
+          "action_replay_verified": true
+        },
+        "bicycle": {
+          "exposed_directed_edges": 11,
+          "exposed_dedicated_nonmotor_edges": 0,
+          "sum_directed_length_m": 313.2,
+          "baseline_reachable_od": 1,
+          "conditional_reachable_od": 0,
+          "od": [
+            {
+              "id": "pushkin_to_neftchilar",
+              "synthetic": true,
+              "origin_node": "osm:node:7384081390:5afb40ae",
+              "target_node": "osm:node:9811381254:3b49157d",
+              "origin_snap_gap_m": 0.0,
+              "target_snap_gap_m": 29.9,
+              "baseline_status": "available",
+              "conditional_status": "unreachable",
+              "baseline_distance_m": 225.16,
+              "conditional_distance_m": null,
+              "baseline_assumed_freeflow_s": 56.290000000000006,
+              "conditional_assumed_freeflow_s": null,
+              "delta_distance_m": null,
+              "delta_assumed_freeflow_s": null,
+              "baseline_uses_exposed_edges": 6
+            },
+            {
+              "id": "pushkin_to_east_port",
+              "synthetic": true,
+              "origin_node": "osm:node:12282027663:a2f9e5a7",
+              "target_node": "osm:node:4396634688:d928d1f0",
+              "origin_snap_gap_m": 0.0,
+              "target_snap_gap_m": 0.0,
+              "baseline_status": "unreachable",
+              "conditional_status": "unreachable",
+              "baseline_distance_m": null,
+              "conditional_distance_m": null,
+              "baseline_assumed_freeflow_s": null,
+              "conditional_assumed_freeflow_s": null,
+              "delta_distance_m": null,
+              "delta_assumed_freeflow_s": null,
+              "baseline_uses_exposed_edges": 0
+            }
+          ],
+          "scenario_overlay_hash": "b2cdfed183b83b60c6d3be1cece661fa7c90010a62536dc697a5fd1e17fb0502",
+          "action_records": [
+            {
+              "ontology_version": "1.0.0",
+              "action_id": "baku-active-bicycle-colocated-create",
+              "action_type": "CreateScenario",
+              "timestamp": "2026-09-25T12:00:00+04:00",
+              "parameters_hash": "79597dd904a819e62ddfda8eecedd3188f67124630d0f225d0ec40900a771fd2",
+              "actor_context": "reproducible-user-requested-sensitivity",
+              "input_object_refs": [
+                "baku-active-bicycle-colocated"
+              ],
+              "precondition_results": [
+                {
+                  "name": "typed_validation",
+                  "passed": true
+                }
+              ],
+              "output_object_refs": [
+                "baku-active-bicycle-colocated"
+              ],
+              "status": "committed",
+              "error": null,
+              "provenance_hash": "1b064f4d27a967ee0abe15a6beee8ab4a8933f689d5b4de4604165d36da5e420"
+            },
+            {
+              "ontology_version": "1.0.0",
+              "action_id": "baku-active-bicycle-colocated-restriction",
+              "action_type": "AddRoadRestriction",
+              "timestamp": "2026-09-25T12:00:00+04:00",
+              "parameters_hash": "b136612628628fec49b67471ac93c99d4255e22e892408a8c04001783ccd6a71",
+              "actor_context": "reproducible-user-requested-sensitivity",
+              "input_object_refs": [
+                "baku-active-bicycle-colocated"
+              ],
+              "precondition_results": [
+                {
+                  "name": "typed_validation",
+                  "passed": true
+                }
+              ],
+              "output_object_refs": [
+                "baku-active-bicycle-colocated"
+              ],
+              "status": "committed",
+              "error": null,
+              "provenance_hash": "cd0d7a67feff02e50b0a0a6c5910bd1adefef8ba98819775d2c3b5ee7748d2a4"
+            }
+          ],
+          "action_replay_verified": true
+        }
+      },
+      "pedestrian_area_geometry": {
+        "candidate_polygons_scanned": 60,
+        "invalid_polygons_skipped": 0,
+        "overlapping_polygons": 0,
+        "unique_overlap_area_m2": 0.0,
+        "nearest_polygon_gap_m": 220.28,
+        "interpretation": "OSM pedestrian-area polygon intersection with a hypothetical road buffer; no passage, event closure or impact status inferred"
+      }
+    },
+    {
+      "buffer_m": 15.0,
+      "modes": {
+        "pedestrian": {
+          "exposed_directed_edges": 60,
+          "exposed_dedicated_nonmotor_edges": 37,
+          "sum_directed_length_m": 1281.8,
+          "baseline_reachable_od": 1,
+          "conditional_reachable_od": 0,
+          "od": [
+            {
+              "id": "pushkin_to_neftchilar",
+              "synthetic": true,
+              "origin_node": "osm:node:7384081390:5afb40ae",
+              "target_node": "osm:node:2558449292:f60b0ada",
+              "origin_snap_gap_m": 0.0,
+              "target_snap_gap_m": 0.0,
+              "baseline_status": "available",
+              "conditional_status": "unreachable",
+              "baseline_distance_m": 212.76,
+              "conditional_distance_m": null,
+              "baseline_assumed_freeflow_s": 151.9714285714286,
+              "conditional_assumed_freeflow_s": null,
+              "delta_distance_m": null,
+              "delta_assumed_freeflow_s": null,
+              "baseline_uses_exposed_edges": 9
+            },
+            {
+              "id": "pushkin_to_east_port",
+              "synthetic": true,
+              "origin_node": "osm:node:12282027663:a2f9e5a7",
+              "target_node": "osm:node:4396634688:d928d1f0",
+              "origin_snap_gap_m": 0.0,
+              "target_snap_gap_m": 0.0,
+              "baseline_status": "unreachable",
+              "conditional_status": "unreachable",
+              "baseline_distance_m": null,
+              "conditional_distance_m": null,
+              "baseline_assumed_freeflow_s": null,
+              "conditional_assumed_freeflow_s": null,
+              "delta_distance_m": null,
+              "delta_assumed_freeflow_s": null,
+              "baseline_uses_exposed_edges": 0
+            }
+          ],
+          "scenario_overlay_hash": "7310ae551c64916fbb482d278f6dbd623a24554012961e25515ed65cf9a6dcee",
+          "action_records": [
+            {
+              "ontology_version": "1.0.0",
+              "action_id": "baku-active-pedestrian-15m-create",
+              "action_type": "CreateScenario",
+              "timestamp": "2026-09-25T12:00:00+04:00",
+              "parameters_hash": "1802aef256a4046a3561806cec5cffad295d3d8614be1ef32764f78e2f6b00ec",
+              "actor_context": "reproducible-user-requested-sensitivity",
+              "input_object_refs": [
+                "baku-active-pedestrian-15m"
+              ],
+              "precondition_results": [
+                {
+                  "name": "typed_validation",
+                  "passed": true
+                }
+              ],
+              "output_object_refs": [
+                "baku-active-pedestrian-15m"
+              ],
+              "status": "committed",
+              "error": null,
+              "provenance_hash": "a2be730b03567546221f2b26618fe9fd2cd0ab1ea7f8cb5e5cbb384acc080737"
+            },
+            {
+              "ontology_version": "1.0.0",
+              "action_id": "baku-active-pedestrian-15m-restriction",
+              "action_type": "AddRoadRestriction",
+              "timestamp": "2026-09-25T12:00:00+04:00",
+              "parameters_hash": "2c5c4f11b691b7d046e11d0f34cf99ee1e13632f0256623d6805e3bcc3ef33e5",
+              "actor_context": "reproducible-user-requested-sensitivity",
+              "input_object_refs": [
+                "baku-active-pedestrian-15m"
+              ],
+              "precondition_results": [
+                {
+                  "name": "typed_validation",
+                  "passed": true
+                }
+              ],
+              "output_object_refs": [
+                "baku-active-pedestrian-15m"
+              ],
+              "status": "committed",
+              "error": null,
+              "provenance_hash": "5ba951f716aa315fe69e24531e07f957a4692ec4d886bcd6c031bac9f8ae465f"
+            }
+          ],
+          "action_replay_verified": true
+        },
+        "bicycle": {
+          "exposed_directed_edges": 28,
+          "exposed_dedicated_nonmotor_edges": 5,
+          "sum_directed_length_m": 1183.5,
+          "baseline_reachable_od": 1,
+          "conditional_reachable_od": 0,
+          "od": [
+            {
+              "id": "pushkin_to_neftchilar",
+              "synthetic": true,
+              "origin_node": "osm:node:7384081390:5afb40ae",
+              "target_node": "osm:node:9811381254:3b49157d",
+              "origin_snap_gap_m": 0.0,
+              "target_snap_gap_m": 29.9,
+              "baseline_status": "available",
+              "conditional_status": "unreachable",
+              "baseline_distance_m": 225.16,
+              "conditional_distance_m": null,
+              "baseline_assumed_freeflow_s": 56.290000000000006,
+              "conditional_assumed_freeflow_s": null,
+              "delta_distance_m": null,
+              "delta_assumed_freeflow_s": null,
+              "baseline_uses_exposed_edges": 9
+            },
+            {
+              "id": "pushkin_to_east_port",
+              "synthetic": true,
+              "origin_node": "osm:node:12282027663:a2f9e5a7",
+              "target_node": "osm:node:4396634688:d928d1f0",
+              "origin_snap_gap_m": 0.0,
+              "target_snap_gap_m": 0.0,
+              "baseline_status": "unreachable",
+              "conditional_status": "unreachable",
+              "baseline_distance_m": null,
+              "conditional_distance_m": null,
+              "baseline_assumed_freeflow_s": null,
+              "conditional_assumed_freeflow_s": null,
+              "delta_distance_m": null,
+              "delta_assumed_freeflow_s": null,
+              "baseline_uses_exposed_edges": 0
+            }
+          ],
+          "scenario_overlay_hash": "67a8ad5b3c25f91beb21358ce3b0c0271fca795969857db49137d3f4a5a45bcd",
+          "action_records": [
+            {
+              "ontology_version": "1.0.0",
+              "action_id": "baku-active-bicycle-15m-create",
+              "action_type": "CreateScenario",
+              "timestamp": "2026-09-25T12:00:00+04:00",
+              "parameters_hash": "e52085751a1cbbd806525386cb574af0ee8e6b214b5c2a251e1d1bea90856eaa",
+              "actor_context": "reproducible-user-requested-sensitivity",
+              "input_object_refs": [
+                "baku-active-bicycle-15m"
+              ],
+              "precondition_results": [
+                {
+                  "name": "typed_validation",
+                  "passed": true
+                }
+              ],
+              "output_object_refs": [
+                "baku-active-bicycle-15m"
+              ],
+              "status": "committed",
+              "error": null,
+              "provenance_hash": "995d1e258d4476d2ef858d73dbf05d6cc3f66447078f82b2590b44fec43983d7"
+            },
+            {
+              "ontology_version": "1.0.0",
+              "action_id": "baku-active-bicycle-15m-restriction",
+              "action_type": "AddRoadRestriction",
+              "timestamp": "2026-09-25T12:00:00+04:00",
+              "parameters_hash": "540c429ebf02963f5d743e36701a2b2c86aa16ea3ab938dd31448109c1947ef8",
+              "actor_context": "reproducible-user-requested-sensitivity",
+              "input_object_refs": [
+                "baku-active-bicycle-15m"
+              ],
+              "precondition_results": [
+                {
+                  "name": "typed_validation",
+                  "passed": true
+                }
+              ],
+              "output_object_refs": [
+                "baku-active-bicycle-15m"
+              ],
+              "status": "committed",
+              "error": null,
+              "provenance_hash": "d06c76634fbe84206f2fbce1e17bb89914b60921c47f44f71f12f9d21259b595"
+            }
+          ],
+          "action_replay_verified": true
+        }
+      },
+      "pedestrian_area_geometry": {
+        "candidate_polygons_scanned": 60,
+        "invalid_polygons_skipped": 0,
+        "overlapping_polygons": 0,
+        "unique_overlap_area_m2": 0.0,
+        "nearest_polygon_gap_m": 205.48,
+        "interpretation": "OSM pedestrian-area polygon intersection with a hypothetical road buffer; no passage, event closure or impact status inferred"
+      }
+    }
+  ],
+  "claim_ceiling": "Exploratory conditional topology and fixed-speed route sensitivity on current OSM; not race-day nonmotor access, actual detour, observed travel time or prediction accuracy"
+}

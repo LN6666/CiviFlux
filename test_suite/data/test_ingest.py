@@ -132,6 +132,69 @@ def test_osm_import_preserves_oneway_and_no_right_turn(tmp_path):
     assert roads["South"]["geometry"][0][1] < roads["South"]["geometry"][-1][1]
 
 
+def test_osm_multimodal_variant_retains_dedicated_foot_and_cycle_paths(tmp_path):
+    from adapters.osm.network import convert_network, extract_roi
+
+    root = Path(__file__).resolve().parents[2]
+    source = tmp_path / "modes.osm"
+    source.write_text("""<osm version="0.6" generator="unit-test">
+    <node id="1" lat="60.000" lon="24.000"/><node id="2" lat="60.001" lon="24.000"/>
+    <node id="3" lat="60.001" lon="24.001"/><node id="4" lat="60.002" lon="24.001"/>
+    <way id="10"><nd ref="1"/><nd ref="2"/><tag k="highway" v="residential"/><tag k="name" v="Motor"/></way>
+    <way id="20"><nd ref="2"/><nd ref="3"/><tag k="highway" v="footway"/><tag k="name" v="Walk"/></way>
+    <way id="30"><nd ref="3"/><nd ref="4"/><tag k="highway" v="cycleway"/><tag k="name" v="Cycle"/></way>
+    </osm>""")
+    selected = extract_roi(source, tmp_path / "roi.osm", [23.99, 59.99, 24.01, 60.01])
+    default = convert_network(
+        tmp_path / "roi.osm",
+        tmp_path / "motor.net.xml",
+        root / ".venv/bin/netconvert",
+        tmp_path / "motor.log",
+        selected,
+    )
+    all_modes = convert_network(
+        tmp_path / "roi.osm",
+        tmp_path / "multi.net.xml",
+        root / ".venv/bin/netconvert",
+        tmp_path / "multi.log",
+        selected,
+        keep_vehicle_classes=(
+            "passenger",
+            "bus",
+            "emergency",
+            "delivery",
+            "truck",
+            "taxi",
+            "motorcycle",
+            "bicycle",
+            "pedestrian",
+        ),
+    )
+    motor_names = {edge["name"] for edge in default["edges"]}
+    active_edges = {edge["name"]: edge for edge in all_modes["edges"]}
+    assert "Motor" in motor_names and "Walk" not in motor_names and "Cycle" not in motor_names
+    assert "pedestrian" in active_edges["Walk"]["allowed_vehicle_classes"]
+    assert "bicycle" in active_edges["Cycle"]["allowed_vehicle_classes"]
+    assert "retained_vehicle_classes" not in default["conversion"]
+    assert "pedestrian" in all_modes["conversion"]["retained_vehicle_classes"]
+
+
+def test_pedestrian_area_overlay_requires_explicit_area_tag(tmp_path):
+    from adapters.osm.active_mobility import pedestrian_area_features
+
+    source = tmp_path / "areas.osm"
+    source.write_text("""<osm version="0.6" generator="unit-test">
+    <node id="1" lat="40.000" lon="49.000"/><node id="2" lat="40.000" lon="49.001"/>
+    <node id="3" lat="40.001" lon="49.001"/><node id="4" lat="40.001" lon="49.000"/>
+    <way id="10"><nd ref="1"/><nd ref="2"/><nd ref="3"/><nd ref="4"/><nd ref="1"/><tag k="highway" v="pedestrian"/><tag k="area" v="yes"/></way>
+    <way id="20"><nd ref="1"/><nd ref="2"/><nd ref="3"/><nd ref="4"/><nd ref="1"/><tag k="highway" v="pedestrian"/></way>
+    </osm>""")
+    features = pedestrian_area_features(source, (48.99, 39.99, 49.01, 40.01), "test-osm")
+    assert len(features) == 1
+    assert features[0]["properties"]["id"] == "osm:pedestrian-area:10"
+    assert features[0]["geometry"]["type"] == "Polygon"
+
+
 def test_extended_gtfs_bus_type_is_candidate():
     from urbanimpact.citypack.build import shape_candidates
 

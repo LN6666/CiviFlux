@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0",
+  "status": "SCOPED_CI_PASS",
+  "captured_at": "2026-09-25T21:10:58.647913+00:00",
+  "source": "GitHub Actions metadata/log plus downloaded browser/container artifacts",
+  "repository": "LN6666/CiviFlux",
+  "pull_request": 7,
+  "run_id": 36189858812,
+  "run_url": "https://github.com/LN6666/CiviFlux/actions/runs/36189858812",
+  "head_commit": "b7bf9e7f095934cf299866cf2f6cecfad2df323d",
+  "head_tree": "d1fdbe35047e77ac523dfec64f5df638495eb13f",
+  "checkout_merge_commit": "028a95683043dcf29f7e083ef893cd61bd89853c",
+  "checkout_merge_tree": "d1fdbe35047e77ac523dfec64f5df638495eb13f",
+  "exact_tree_match": true,
+  "tested_code_commit": "b7bf9e7f095934cf299866cf2f6cecfad2df323d",
+  "jobs": {
+    "core": {
+      "job_id": 108252106676,
+      "conclusion": "success",
+      "completed_at": "2026-09-25T21:10:23Z",
+      "url": "https://github.com/LN6666/CiviFlux/actions/runs/36189858812/job/108252106676"
+    },
+    "container": {
+      "job_id": 108252107032,
+      "conclusion": "success",
+      "completed_at": "2026-09-25T21:09:03Z",
+      "url": "https://github.com/LN6666/CiviFlux/actions/runs/36189858812/job/108252107032"
+    }
+  },
+  "test_result_lines": [
+    "7 passed in 1.35s",
+    "211 passed, 1 warning in 10.13s",
+    "70 passed, 1 skipped, 1 warning in 2.46s",
+    "7 passed in 0.70s",
+    "11 passed in 13.82s",
+    "20 passed in 0.81s",
+    "16 passed (31.2s)"
+  ],
+  "ci_log_sha256": "5a560e990e4ec4550f61ef430f58a3518262394fb8c2629e9c2588d1333d157a",
+  "artifacts": {
+    "linux-sbom-evidence": {
+      "id": 10888135512,
+      "digest": "sha256:3c451fe7eaac9717ba65b59f7116b8611f64f30c880848a12ea80425fa4b0e8b",
+      "size_in_bytes": 455931
+    },
+    "container-reproduction": {
+      "id": 10888020639,
+      "digest": "sha256:6685063d043a523310f61c9d1cb1809a3ca947f56b29f6d0bc2e75b5c07245df",
+      "size_in_bytes": 6949
+    },
+    "browser-evidence": {
+      "id": 10887856211,
+      "digest": "sha256:9e44f4f90ba5685cab81e378d55572c553e75a5562fa64e26f68e1ade8dadc2f",
+      "size_in_bytes": 521333
+    }
+  },
+  "browser": {
+    "results_json_sha256": "e87f1fe1e327944bb663fc98d59d7c17c818a596490bc9a68649df279dbe7cd9",
+    "stats": {
+      "startTime": "2026-09-25T21:09:46.535Z",
+      "duration": 31216.221999999998,
+      "expected": 16,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "container": {
+    "reproduction_json_sha256": "a6e8d007ece95795c84029e31e886d125de319184d9374e9b24e7ab3c78cc4d9",
+    "status": "PASS",
+    "stages": [
+      {
+        "stage": "git_commit",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_daemon",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_buildx",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_build",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "image_inspect",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "container_smoke",
+        "status": "PASS",
+        "exit_code": 0
+      }
+    ],
+    "image_id": "sha256:0b17e833a95dea5f5c625e9f4c8bb9ebc9025140e6ebad310fc5da99fb1cb13f"
+  },
+  "claim_ceiling": "Identical-tree CI verifies pre-onset placebo code and UI guard, synthetic API/SUMO, and 16 browser tests; one ignored Helsinki CityPack data test skipped. The local VIZ placebo uses two real feeds before the incremental onset and is source-bound by hashes, but full road-level data is gitignored and not replayed by CI. It is not an event-hour outcome or a hit rate. Paid SimpleJev and full release remain unvalidated."
+}

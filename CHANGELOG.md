@@ -19,9 +19,16 @@ The repository has progressed from a specification/reference-test pack to a prod
 - Exhaustively permuted six frozen SimpleJev relation scores (720 orderings) in an offline graph control; the result tests implementation sensitivity, not model quality.
 - Compared three nested Helsinki crops, then replayed the scoped 48-target outer-ring Road/Fire cases through typed Action, routing, KG projection and fixed PPR. Missing and resnapped entrances remain unresolved.
 - Added a source-tiered historical backtest protocol and a read-only evidence preflight. No event-matched observed traffic outcomes are available for numeric validation.
+- Added pinned Berlin and pre-closure Baku OSM imports, bounded road-only CityPacks and provenance-bearing ontology KG exports; froze an unreviewed Berlin incremental routing probe before a planned closure and documented Baku 2026 F1 source/validation limits. Neither constitutes observed event-impact accuracy.
 - Pinned container build inputs and added an offline Linux CI smoke. Three initial runs exposed missing SUMO native libraries; adding `libxrender1`, `libatomic1` and concise ELF linker diagnostics led to a passing Linux `core`/`container` run. The container report is scoped to a synthetic city and disabled model egress.
 - After PR #1 was squash-merged, moved subsequent work to a fresh branch/PR path. PR branch pushes now run a single pull-request workflow to avoid duplicate failure notifications.
 - Protected `main` now requires both passing `core` and `container` checks before ordinary PR merges.
+- Added an OSM-source-bound pedestrian-area overlap and nearest-gap proxy to the Baku active-mode sensitivity map; its zero-overlap result is retained as a negative geometric finding, without asserting event closure or routability.
+- Locked Berlin event spatial coverage to baseline VIZ geometry and required an immutable pre-onset control-map checkpoint with source-byte/feed-time binding before two-snapshot metrics can be built.
+- Added a separate, source-hashed Berlin pre-incremental-onset placebo map from two real VIZ feeds. It displays background spatial coincidence and matched-control speed changes without presenting a race-day hit rate or publishing licensed road-level feed data.
+- Added a Berlin notice-geometry audit that cross-checks 72 announcement-to-OSM restriction candidates against source-hashed VIZ report lines. A local GIS review view colors spatial support, insufficient overlap and absent same-street reports while keeping road direction and observed impacts unverified.
+- Added a source-recomputed Berlin input-mapping sensitivity: removing eight active restriction candidates without sufficient VIZ notice-line overlap leaves all three frozen synthetic OD baseline/incremental route results unchanged. The upcoming restriction candidates and frozen prediction remain untouched.
+- Added a source-hashed Berlin walking/cycling counter coverage audit using public September Telraam and EcoCounter snapshots. It reports observation distance and freshness relative to the frozen motor-route corridor, retaining missing direct coverage and counter quality warnings rather than claiming an active-mode hit rate.
 
 ## Source pack — 2026-09-23, handoff-3-operational-ontology
 

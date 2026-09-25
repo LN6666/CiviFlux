@@ -4,111 +4,175 @@
   "gates": {
     "GATE-CONTRACTS": {
       "status": "PASS",
-      "producer": "actual_product_validation",
-      "commit": "7d217b8dec9280a4a44d3774f16a0cfe88ed3a6c",
+      "producer": "github_actions_36193534591",
+      "commit": "d3a355cc96020c7b591e9309ef15b160966216f2",
       "commands": [
         {
-          "command": "PYTHONPATH=core:. uv run --frozen pytest -q test_suite tests --ignore=test_suite/live --junitxml=evidence/wp7/final_python_junit.xml",
+          "command": "GitHub Actions run 36193534591 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
           "exit_code": 0
         }
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/final_python_junit.xml",
-          "sha256": "0673c4ac4e2a5b42584ce0c9945c4f1e3409f2eff2d24b47e9b106ff05e5bf61"
-        },
-        {
-          "path": "evidence/wp7/final_python.log",
-          "sha256": "b134143e14c0f0b6a5e8d3142a436e631ae62f1a74accda97260cc0830560c8c"
-        },
-        {
-          "path": "evidence/wp7/contracts_check.log",
-          "sha256": "b3f556e0a72aa25710be8cb3d2b060520dfbd89f32b6b3933918bebe4c823a50"
+          "path": "evidence/wp7/ci_run_36193534591.json",
+          "sha256": "46ac7121da63c56352b8d65049c2a8f1593617502ded25970dbeac24383eeff8"
         }
       ],
-      "executed_at": "2026-09-23T15:24:11.273911+00:00",
-      "scope": "Canonical ontology/Scenario/Actions/Projection/Result generation and validation; unsupported versions rejected"
+      "executed_at": "2026-09-25T21:50:48Z",
+      "scope": "Current ontology/Scenario/Action/Projection/Result contracts, generated bindings and unsupported-version rejection tested in CI."
     },
     "GATE-NETWORK": {
       "status": "PASS",
-      "producer": "actual_product_validation",
-      "commit": "7d217b8dec9280a4a44d3774f16a0cfe88ed3a6c",
+      "producer": "github_actions_36193534591_and_local",
+      "commit": "d3a355cc96020c7b591e9309ef15b160966216f2",
       "commands": [
         {
-          "command": "PYTHONPATH=core:. uv run --frozen pytest -q test_suite tests --ignore=test_suite/live --junitxml=evidence/wp7/final_python_junit.xml",
+          "command": "GitHub Actions run 36193534591 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
+          "exit_code": 0
+        },
+        {
+          "command": "Local macOS on commit 620bc30: make test-data with ignored Helsinki sources temporarily linked, then removed",
           "exit_code": 0
         }
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/final_python_junit.xml",
-          "sha256": "0673c4ac4e2a5b42584ce0c9945c4f1e3409f2eff2d24b47e9b106ff05e5bf61"
+          "path": "evidence/wp7/ci_run_36193534591.json",
+          "sha256": "46ac7121da63c56352b8d65049c2a8f1593617502ded25970dbeac24383eeff8"
         },
         {
-          "path": "evidence/wp7/final_python.log",
-          "sha256": "b134143e14c0f0b6a5e8d3142a436e631ae62f1a74accda97260cc0830560c8c"
+          "path": "evidence/wp7/current_data_test_620.json",
+          "sha256": "a92242417e75b057d9ef9ebaf4fbae5f89f2986a13ada5929c4e256d77d32bb6"
         },
         {
-          "path": "evidence/wp6/ablation_report.json",
-          "sha256": "410b9581038bc91b31d3f7701d395482639b148f3c9920d96644aeaa78d4dc42"
+          "path": "evidence/wp7/current_data_test_620.log",
+          "sha256": "9bceb20b0655adeb375edcd73a7d66663d61f145cf772301c30ff2a629b3745e"
+        },
+        {
+          "path": "evidence/wp5/helsinki_outer_browser_smoke.json",
+          "sha256": "c699d7fa0754b454952578a135159bd778643a6e47fb1ebdd29ddea98a9c3b31"
+        },
+        {
+          "path": "evidence/events/berlin-2026-city-kg-audit.json",
+          "sha256": "37ed757658cb898cec37d161bab14362cee6b0ced502b8144c6780fd43d3c690"
+        },
+        {
+          "path": "evidence/events/baku-2026-city-kg-audit.json",
+          "sha256": "88aa5a17d15f887909674071bb4da92d6208ad1a200d4d85f71aba9c5da0ff9b"
+        },
+        {
+          "path": "evidence/events/baku-2026-multimodal-kg-audit.json",
+          "sha256": "4dff0ec87fb94fd33590653b24e2b6670c422a099dc80a32c13ae9369eda9982"
+        },
+        {
+          "path": "evidence/events/berlin-2026-multimodal-kg-audit.json",
+          "sha256": "c18692ba7b9429d3622e5953dc2d235a2f11e255e6115defd78f137b4502da51"
+        },
+        {
+          "path": "evidence/events/baku-2026-active-indirect-probe.json",
+          "sha256": "7ced4e3fa3f7d94c91ccf8345756940593df69e12c1123541958cbbefa4195aa"
+        },
+        {
+          "path": "evidence/events/berlin-2026-viz-pre-event-coverage.json",
+          "sha256": "cb99e5aae1f97ce3a8bd0ae4428e2d58f359037910054ece76d58f0868a9145f"
+        },
+        {
+          "path": "evidence/events/berlin-2026-viz-mapping-audit.json",
+          "sha256": "53c45e3ebe14c9b3a298ac99a817f79b790b37978f5490e93ea16e674b9705e5"
+        },
+        {
+          "path": "evidence/events/berlin-2026-mapping-sensitivity.json",
+          "sha256": "c961b11ddabf624eb8c43ecfaae731641300bfa889a58c0311622bae21628c70"
+        },
+        {
+          "path": "evidence/events/berlin-2026-active-observation-coverage.json",
+          "sha256": "e0c42a4c8d125bb50acb8ebf3175dc367810843a98778c1cddc7d7d4b9f7128a"
         }
       ],
-      "executed_at": "2026-09-23T15:24:11.273911+00:00",
-      "scope": "Directed turn/vehicle/time routing tests plus independent exhaustive synthetic oracle; not observed traffic validation"
+      "executed_at": "2026-09-25T21:50:48Z",
+      "scope": "Current-tree directed turn/vehicle/time routing and independent synthetic oracle; local frozen Helsinki current-snapshot CityPack tests and scoped outer browser/API run. Berlin pre-onset official VIZ traffic was captured locally but event-hour road change and human-accepted road mapping are not yet available. Berlin/Baku dated-source road-only CityPacks and immutable audits are candidate topology; event restrictions and physical outcomes remain unverified. Separate Baku multimodal candidate pack has 95,904 directed linear segments (15,990 without motor permission); walk/cycle access and race-day effects remain unreviewed. Berlin multimodal candidate KG has 436,764 directed linear segments. Baku active-mode router now uses explicit assumed 1.4/4.0 m/s speeds; 0.2/15 m hypothetical corridor exposure and fixed synthetic OD reachability have replayed Action evidence, not race-day observed impacts. Berlin frozen 51 directed route-impact edges have 25 directional VIZ baseline spatial matches and 26 unmatched edges; 12 distinct VIZ directed segments match, 11 scorable. This is coverage only, not event validation. A baseline-only Berlin VIZ control feasibility run matched 11 scorable predicted-overlap segments to 22 distinct same-class/direction/roughly-speed-matched controls at least 200 m from predictions and restriction inputs; minimum observed clearance 211.2 m. The no-change control returned zero adjusted speed change. No event-hour impact or causal claim. Baku pedestrian-area proxy scanned 60 source-bound OSM polygons; neither 0.2 m nor 15 m hypothetical Pushkin corridor overlaps an area (nearest gaps 220.28/205.48 m). This is a negative geometry result and leaves observed active-mode effects unresolved. A source-hashed VIZ line geometry cross-check supports 29/37 already-started Straße des 17. Juni input candidates spatially; 8 lack sufficient overlap. The 35 upcoming Unter den Linden candidates have no same-street VIZ report in this pre-onset snapshot. All remain unreviewed; this is not observed traffic impact or direction verification. Pre-onset VIZ notice geometry supports 29/37 active candidate directed edges; dropping 8 unsupported edges leaves three frozen synthetic OD results unchanged. This does not verify actual closures or event-hour impacts. Source-bound September Telraam/EcoCounter coverage audit finds no counter directly on the frozen motor-route impact geometry; it does not validate active-mode impacts."
     },
     "GATE-GRAPH": {
       "status": "PASS",
-      "producer": "actual_product_validation",
-      "commit": "7d217b8dec9280a4a44d3774f16a0cfe88ed3a6c",
+      "producer": "github_actions_36193534591_and_local",
+      "commit": "d3a355cc96020c7b591e9309ef15b160966216f2",
       "commands": [
         {
-          "command": "PYTHONPATH=core:. uv run --frozen pytest -q test_suite tests --ignore=test_suite/live --junitxml=evidence/wp7/final_python_junit.xml",
+          "command": "GitHub Actions run 36193534591 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
+          "exit_code": 0
+        },
+        {
+          "command": "Local macOS on commit 620bc30: make test-data with ignored Helsinki sources temporarily linked, then removed",
           "exit_code": 0
         }
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/final_python_junit.xml",
-          "sha256": "0673c4ac4e2a5b42584ce0c9945c4f1e3409f2eff2d24b47e9b106ff05e5bf61"
+          "path": "evidence/wp7/ci_run_36193534591.json",
+          "sha256": "46ac7121da63c56352b8d65049c2a8f1593617502ded25970dbeac24383eeff8"
         },
         {
-          "path": "evidence/wp7/final_python.log",
-          "sha256": "b134143e14c0f0b6a5e8d3142a436e631ae62f1a74accda97260cc0830560c8c"
+          "path": "evidence/wp7/current_data_test_620.json",
+          "sha256": "a92242417e75b057d9ef9ebaf4fbae5f89f2986a13ada5929c4e256d77d32bb6"
         },
         {
-          "path": "evidence/wp0/ontology_review.md",
-          "sha256": "eccff6ea4bac5b56a0cabe155627a92f25aeec09334555b7ae6460f7a716c3ba"
+          "path": "evidence/wp7/current_data_test_620.log",
+          "sha256": "9bceb20b0655adeb375edcd73a7d66663d61f145cf772301c30ff2a629b3745e"
+        },
+        {
+          "path": "evidence/wp6/a4_direct_control_offline.json",
+          "sha256": "b0bde2112035475cb9d0ea3fcee027f1098b7a0bf8af3375501692f6112e3996"
+        },
+        {
+          "path": "evidence/wp5/helsinki_outer_browser_smoke.json",
+          "sha256": "c699d7fa0754b454952578a135159bd778643a6e47fb1ebdd29ddea98a9c3b31"
+        },
+        {
+          "path": "evidence/events/berlin-2026-city-kg-audit.json",
+          "sha256": "37ed757658cb898cec37d161bab14362cee6b0ced502b8144c6780fd43d3c690"
+        },
+        {
+          "path": "evidence/events/baku-2026-city-kg-audit.json",
+          "sha256": "88aa5a17d15f887909674071bb4da92d6208ad1a200d4d85f71aba9c5da0ff9b"
+        },
+        {
+          "path": "evidence/events/baku-2026-multimodal-kg-audit.json",
+          "sha256": "4dff0ec87fb94fd33590653b24e2b6670c422a099dc80a32c13ae9369eda9982"
+        },
+        {
+          "path": "evidence/events/berlin-2026-multimodal-kg-audit.json",
+          "sha256": "c18692ba7b9429d3622e5953dc2d235a2f11e255e6115defd78f137b4502da51"
+        },
+        {
+          "path": "evidence/events/baku-2026-active-indirect-probe.json",
+          "sha256": "7ced4e3fa3f7d94c91ccf8345756940593df69e12c1123541958cbbefa4195aa"
         }
       ],
-      "executed_at": "2026-09-23T15:24:11.273911+00:00",
-      "scope": "Typed projection, operational/dependency separation, evidence/temporal binding, immutable Object View and Action replay"
+      "executed_at": "2026-09-25T21:50:48Z",
+      "scope": "Typed operational/dependency projection, evidence/temporal binding, immutable Action replay and PPR context tests; A4 fixed-vector offline direct-ranking control covers 23 frozen facility candidates with unchanged physical facts. It is not a real classifier ablation or historical-city KG validation. Berlin/Baku ontology-typed current road/facility KG exports have candidate, provenance-bearing links; they are not actual event operational graphs. Separate Baku multimodal ontology/KG audit has 96,710 typed objects and mode-filterable turn candidates; pedestrian polygons are map geometry only, not typed KG objects or scored impacts. Berlin multimodal KG has 437,400 typed candidate objects. Baku active-mode corridor restriction overlays are typed and replayable, but not sourced event closures or measured graph change."
     },
     "GATE-PPR": {
       "status": "PASS",
-      "producer": "actual_product_validation",
-      "commit": "7d217b8dec9280a4a44d3774f16a0cfe88ed3a6c",
+      "producer": "github_actions_36193534591",
+      "commit": "d3a355cc96020c7b591e9309ef15b160966216f2",
       "commands": [
         {
-          "command": "PYTHONPATH=core:. uv run --frozen pytest -q test_suite tests --ignore=test_suite/live --junitxml=evidence/wp7/final_python_junit.xml",
+          "command": "GitHub Actions run 36193534591 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
           "exit_code": 0
         }
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/final_python_junit.xml",
-          "sha256": "0673c4ac4e2a5b42584ce0c9945c4f1e3409f2eff2d24b47e9b106ff05e5bf61"
+          "path": "evidence/wp7/ci_run_36193534591.json",
+          "sha256": "46ac7121da63c56352b8d65049c2a8f1593617502ded25970dbeac24383eeff8"
         },
         {
-          "path": "evidence/wp7/final_python.log",
-          "sha256": "b134143e14c0f0b6a5e8d3142a436e631ae62f1a74accda97260cc0830560c8c"
-        },
-        {
-          "path": "evidence/wp6/benchmark.json",
-          "sha256": "f902fadf4119f09136b522622c25767d21aa5dcc762b8d613b3a6c6b72310927"
+          "path": "evidence/wp6/a4_direct_control_offline.json",
+          "sha256": "b0bde2112035475cb9d0ea3fcee027f1098b7a0bf8af3375501692f6112e3996"
         }
       ],
-      "executed_at": "2026-09-23T15:24:11.273911+00:00",
-      "scope": "Sparse relation-mixture PPR versus dense/NetworkX independent oracles, full paired-context invariants and residual checks"
+      "executed_at": "2026-09-25T21:50:48Z",
+      "scope": "Sparse relation-mixture PPR versus dense/NetworkX independent oracles, paired-context invariants and residual checks; A3 policy epsilon binding and A4 no-PPR direct control tested with offline fixed policy only. Attention is relevance, not risk."
     },
     "GATE-QWEN-SYSTEM-ONE": {
       "status": "DEFERRED_USER",
@@ -139,57 +203,65 @@
     },
     "GATE-SUMO": {
       "status": "PASS",
-      "producer": "actual_product_validation",
-      "commit": "7d217b8dec9280a4a44d3774f16a0cfe88ed3a6c",
+      "producer": "github_actions_36193534591",
+      "commit": "d3a355cc96020c7b591e9309ef15b160966216f2",
       "commands": [
         {
-          "command": "PYTHONPATH=core:. uv run --frozen pytest -q test_suite tests --ignore=test_suite/live --junitxml=evidence/wp7/final_python_junit.xml",
+          "command": "GitHub Actions run 36193534591 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
+          "exit_code": 0
+        },
+        {
+          "command": "GitHub Actions run 36193534591 container: python3 deploy/container_repro.py --out .runtime/container-ci/reproduction.json",
           "exit_code": 0
         }
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/final_python_junit.xml",
-          "sha256": "0673c4ac4e2a5b42584ce0c9945c4f1e3409f2eff2d24b47e9b106ff05e5bf61"
-        },
-        {
-          "path": "evidence/wp7/final_python.log",
-          "sha256": "b134143e14c0f0b6a5e8d3142a436e631ae62f1a74accda97260cc0830560c8c"
-        },
-        {
-          "path": "evidence/wp4/validation.json",
-          "sha256": "da5f9995a86dd3d259a803d501e4e0bb3d803c832e4c901b6c383cf19d362fd2"
+          "path": "evidence/wp7/ci_run_36193534591.json",
+          "sha256": "46ac7121da63c56352b8d65049c2a8f1593617502ded25970dbeac24383eeff8"
         }
       ],
-      "executed_at": "2026-09-23T15:24:11.273911+00:00",
-      "scope": "Real pinned SUMO pair, bounded cancellation/failure/vehicle restrictions, native artifacts exported across cache reuse; synthetic demand only"
+      "executed_at": "2026-09-25T21:50:48Z",
+      "scope": "Pinned real SUMO baseline/event pair, cancellation/failure/vehicle restrictions, native artifact export and Linux installed-image SUMO smoke; synthetic demand only."
     },
     "GATE-WEB": {
       "status": "PASS",
-      "producer": "actual_product_validation",
-      "commit": "7d217b8dec9280a4a44d3774f16a0cfe88ed3a6c",
+      "producer": "github_actions_36193534591_and_local",
+      "commit": "d3a355cc96020c7b591e9309ef15b160966216f2",
       "commands": [
         {
-          "command": "npm --prefix web run build",
+          "command": "GitHub Actions run 36193534591 core: make build-web",
           "exit_code": 0
         },
         {
-          "command": "npm --prefix web run test:browser",
+          "command": "GitHub Actions run 36193534591 core: make test-browser",
           "exit_code": 0
         }
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp5/browser_validation.json",
-          "sha256": "9a480e5e0936dd30ec9d344617ab9bb80d0e232fa58991928c5c2064f202d017"
+          "path": "evidence/wp7/ci_run_36193534591.json",
+          "sha256": "46ac7121da63c56352b8d65049c2a8f1593617502ded25970dbeac24383eeff8"
         },
         {
-          "path": "evidence/wp5/results.json",
-          "sha256": "4e94695e66fb21a6683939a9aa75a5e7200a67218b6d9eaa7bd5623b6eb96dbc"
+          "path": "evidence/wp5/helsinki_outer_browser_smoke.json",
+          "sha256": "c699d7fa0754b454952578a135159bd778643a6e47fb1ebdd29ddea98a9c3b31"
+        },
+        {
+          "path": "evidence/events/berlin-2026-viz-pre-event-coverage.json",
+          "sha256": "cb99e5aae1f97ce3a8bd0ae4428e2d58f359037910054ece76d58f0868a9145f"
+        },
+        {
+          "path": "evidence/events/berlin-2026-viz-mapping-audit.json",
+          "sha256": "53c45e3ebe14c9b3a298ac99a817f79b790b37978f5490e93ea16e674b9705e5"
+        },
+        {
+          "path": "evidence/events/berlin-2026-mapping-sensitivity.json",
+          "sha256": "c961b11ddabf624eb8c43ecfaae731641300bfa889a58c0311622bae21628c70"
         }
       ],
-      "executed_at": "2026-09-23T15:24:11.273911+00:00",
-      "scope": "Two real browser hosts exercise actual API, actions, routing/PPR, object views and export; provider egress disabled"
+      "executed_at": "2026-09-25T21:50:48Z",
+      "scope": "Current-tree Web build and 17 CI browser tests. Berlin GIS map separates frozen plugin roads, restriction inputs, baseline VIZ coverage, 22 baseline-only matched control road segments, and later two-snapshot verdicts. A pre-event feasibility run found directional VIZ coverage for 25/51 prediction edges; 11 scorable matched VIZ segments each found two controls, with a 211.2 m minimum distance from predicted/restriction roads. The event-hour pair-adjusted median speed-drop indicator is descriptive only; there is no event-hour outcome or measured accuracy yet. Baku AYNA street-name overlap 23/32 (71.9%) and hypothetical active-mode exposure/connectivity are proxy/sensitivity results, not measured hit rate. No cross-device SLA. The Berlin event comparator now locks VIZ spatial overlap and control selection to a persisted pre-onset baseline and checks raw feed timestamp/count binding; event-hour results remain pending. A separate gitignored Berlin GIS bundle uses two real pre-incremental-onset VIZ feeds and labels spatial coincidence as background placebo rather than an event hit rate; only source hashes and aggregate counts are published. The local mapping-review GIS view colors notice-to-OSM input candidates by geometric support and shows 6 normalized VIZ report lines; CI verifies UI claim limits. Raw VIZ/HERE geometry remains ignored and unpublished. Pre-onset VIZ notice geometry supports 29/37 active candidate directed edges; dropping 8 unsupported edges leaves three frozen synthetic OD results unchanged. This does not verify actual closures or event-hour impacts."
     },
     "GATE-REAL-CITY": {
       "status": "BLOCKED_EXTERNAL",
@@ -217,10 +289,14 @@
         {
           "path": "evidence/wp2/helsinki_fire_product.json",
           "sha256": "16b06427a317fb8b675a52962e521d9a3a8deb4eb1050dc2432ee49ce5324c2a"
+        },
+        {
+          "path": "evidence/events/berlin-2026-active-observation-coverage.json",
+          "sha256": "e0c42a4c8d125bb50acb8ebf3175dc367810843a98778c1cddc7d7d4b9f7128a"
         }
       ],
       "executed_at": "2026-09-23T15:24:11.273911+00:00",
-      "scope": "Real Helsinki sources downloaded and current-network what-if executed; independent human source-to-road/entrance review and historical geometry are incomplete"
+      "scope": "Real Helsinki sources downloaded and current-network what-if executed; independent human source-to-road/entrance review and historical geometry are incomplete Berlin active-mode hourly counters were located and source-hashed, but no station directly covers the frozen motor-route output and no active-mode prediction or event-hour observation has been scored."
     },
     "GATE-ABLATION": {
       "status": "DEFERRED_USER",
@@ -247,65 +323,45 @@
     },
     "GATE-SECURITY": {
       "status": "PASS",
-      "producer": "actual_product_validation",
-      "commit": "7d217b8dec9280a4a44d3774f16a0cfe88ed3a6c",
+      "producer": "github_actions_36193534591",
+      "commit": "d3a355cc96020c7b591e9309ef15b160966216f2",
       "commands": [
         {
-          "command": "PYTHONPATH=core:. uv run --frozen pytest -q test_suite tests --ignore=test_suite/live --junitxml=evidence/wp7/final_python_junit.xml",
+          "command": "GitHub Actions run 36193534591 core: make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
           "exit_code": 0
         }
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/final_python_junit.xml",
-          "sha256": "0673c4ac4e2a5b42584ce0c9945c4f1e3409f2eff2d24b47e9b106ff05e5bf61"
-        },
-        {
-          "path": "evidence/wp7/final_python.log",
-          "sha256": "b134143e14c0f0b6a5e8d3142a436e631ae62f1a74accda97260cc0830560c8c"
-        },
-        {
-          "path": "evidence/wp7/repository_hygiene.json",
-          "sha256": "d31a584920d8b891dfa06b70dbcd6c7f3c411dae183b0798e693b35a64364c86"
-        },
-        {
-          "path": "evidence/wp7/npm_audit.json",
-          "sha256": "b36ff615640edba2936b6152ae53c9f4e791d01a486edd5e227e2005f9326d9a"
+          "path": "evidence/wp7/ci_run_36193534591.json",
+          "sha256": "46ac7121da63c56352b8d65049c2a8f1593617502ded25970dbeac24383eeff8"
         }
       ],
-      "executed_at": "2026-09-23T15:24:11.273911+00:00",
-      "scope": "Bounded automated API/input/egress/cache/export checks; repository credential heuristic and npm vulnerability audit, not a penetration test"
+      "executed_at": "2026-09-25T21:50:48Z",
+      "scope": "Automated API/input/egress/cache/export controls, repository secret heuristic, locked dependency/SBOM integrity, 20 security tests and high-severity npm audit; not a penetration test or legal license adjudication."
     },
     "GATE-REPRODUCE": {
       "status": "PASS",
-      "producer": "actual_product_validation",
-      "commit": "3cd96acabb6b93afdc1756593d128f274045a215",
+      "producer": "github_actions_36193534591",
+      "commit": "d3a355cc96020c7b591e9309ef15b160966216f2",
       "commands": [
         {
-          "command": "PYTHONPATH=core:. uv run --frozen python scripts/clean_checkout.py --allow-dependency-downloads --out evidence/wp7/clean_checkout.json",
-          "exit_code": 0
-        },
-        {
-          "command": "GitHub Actions run 35898788800: python3 deploy/container_repro.py --out .runtime/container-ci/reproduction.json",
+          "command": "GitHub Actions run 36193534591 container: python3 deploy/container_repro.py --out .runtime/container-ci/reproduction.json",
           "exit_code": 0
         }
       ],
       "evidence_files": [
         {
-          "path": "evidence/wp7/clean_checkout.json",
-          "sha256": "3d26634a501c5c5e2345bd244619ca7054ed6b800b8f63d470f5fc108f8af6ab"
+          "path": "evidence/wp7/ci_run_36193534591.json",
+          "sha256": "46ac7121da63c56352b8d65049c2a8f1593617502ded25970dbeac24383eeff8"
         },
         {
-          "path": "evidence/wp7/clean_checkout_offline.json",
-          "sha256": "c6850a3d679ddc0f2eba16b30eaa12969017b1eebedfff020c6c200646a0f501"
-        },
-        {
-          "path": "evidence/wp7/container_ci_pass.json",
-          "sha256": "f6ff4ccf04724bb52117ea9002c68c3543920da5b631d6113a469f93d508bec7"
+          "path": "evidence/wp7/clean_checkout_620_offline.json",
+          "sha256": "c8085818d2bd8ac4bebe236f8be4e46fbeaa73f5a3bfb75afbe13dc604f16d09"
         }
       ],
-      "executed_at": "2026-09-23T17:54:17.524515+00:00",
-      "scope": "Earlier commit 7d217b8 native clean checkout, toy pipeline and installed wheel PASS; PR #2 head 97ece0d Linux CI merge checkout built an amd64 image from pinned bases, recorded local image content digest sha256:63a1c22134a0266e7c64b14d4e61438f45092b5b7f1f070423f0c30806ac34d3 (not a published registry digest), and passed network-disabled read-only API/export plus real synthetic SUMO smoke. This does not validate historical city impacts or paid model calls."
+      "executed_at": "2026-09-25T21:50:48Z",
+      "scope": "Current identical code tree: Linux amd64 pinned-image build, network-disabled read-only installed-image API/export and real SUMO synthetic smoke PASS in CI. Earlier native macOS offline checkout on 620bc30 stopped at dependency sync because pinned sumo-data wheel was absent from local UV cache; no native retry on current b7bf9e7 tree. No published registry digest, paid classifier, measured-city validation or production deployment claim."
     }
   },
   "claims": {

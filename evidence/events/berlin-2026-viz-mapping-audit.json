@@ -1,0 +1,45 @@
+{
+  "schema_version": "1.0",
+  "status": "CANDIDATE_SPATIAL_AUDIT_ONLY",
+  "event_id": "berlin-marathon-2026",
+  "notice_source_id": "DE-BE-NOTICE-20260921",
+  "candidate_file_sha256": "d8135b957a50e8a112d1e3c143950f7d9d1ff75a16c2a6174ffbdb12f0b5bc13",
+  "citypack_sha256": "5781a8627f6b7680f70a81892b55dee33049554cb1b38946b86b1f818c1e67a0",
+  "viz_snapshot": "sep25-pre-event-evening",
+  "viz_captured_at_utc": "2026-09-25T18:45:10.063375+00:00",
+  "viz_reports_sha256": "d29358f373080937b8c8838aa437b4e7ed1e964d6e25c26d3f2682a5ff5c2ce1",
+  "viz_report_features": 384,
+  "marathon_line_reports": 6,
+  "match_rule": "Case street name must appear in VIZ report street; OSM directed edge must have at least min(25 m, 25% edge length) inside an 18 m buffer of one VIZ report line. VIZ report line has no road-direction approval.",
+  "claim_ceiling": "VIZ report lines are scheduled/announced closure geometry, not observed field execution. Spatial support does not verify direction, permissions, validity times or physical impacts; absent support in this snapshot does not disprove the notice. All 72 candidate edges remain CANDIDATE_UNREVIEWED.",
+  "cases": [
+    {
+      "case_id": "berlin-2026-active-17-juni",
+      "role": "known-starting-state candidate, not a prospective forecast of its own onset",
+      "candidate_directed_edges": 37,
+      "same_street_viz_reports": 2,
+      "within_18_m": 30,
+      "sufficient_overlap": 29,
+      "without_sufficient_overlap": 8,
+      "supported_directed_length_m": 3319.0,
+      "unsupported_directed_length_m": 183.2,
+      "median_nearest_gap_m": 10.036,
+      "maximum_nearest_gap_m": 186.023,
+      "direction_verified": 0
+    },
+    {
+      "case_id": "berlin-2026-upcoming-unter-den-linden",
+      "role": "prospective incremental closure candidate if prediction is frozen before 26 Sep 07:00 Berlin time",
+      "candidate_directed_edges": 35,
+      "same_street_viz_reports": 0,
+      "within_18_m": 0,
+      "sufficient_overlap": 0,
+      "without_sufficient_overlap": 35,
+      "supported_directed_length_m": 0,
+      "unsupported_directed_length_m": 1117.9,
+      "median_nearest_gap_m": null,
+      "maximum_nearest_gap_m": null,
+      "direction_verified": 0
+    }
+  ]
+}

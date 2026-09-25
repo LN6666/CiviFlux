@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "case_id": "baku-f1-2026-active-corridor-sensitivity",
+  "status": "HYPOTHETICAL_NOT_OBSERVED",
+  "source_case": "data/event_cases/baku-f1-2026-indirect-plan-case.json",
+  "analysis_at": "2026-09-25T12:00:00+04:00",
+  "window_start": "2026-09-25T11:00:00+04:00",
+  "window_end": "2026-09-25T13:00:00+04:00",
+  "corridor_buffer_m": [0.2, 15.0],
+  "modes": ["pedestrian", "bicycle"],
+  "origin_target_policy": "Reuse the two post-event synthetic coordinates in the bus case; snap separately to each permitted mode network without selecting by result",
+  "restriction_assumption": "Only for sensitivity analysis, block each mode-permitted linear edge whose geometry intersects the buffered, unreviewed BCC Pushkin motor-road candidate geometry. The road notice does not attest a walking or cycling closure.",
+  "speed_assumptions_mps": {"pedestrian": 1.4, "bicycle": 4.0},
+  "claim_ceiling": "Exploratory conditional topology and fixed-speed route sensitivity on current OSM; not race-day nonmotor access, actual detour, observed travel time or prediction accuracy"
+}

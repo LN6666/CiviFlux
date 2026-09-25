@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0",
+  "status": "SCOPED_CI_PASS",
+  "captured_at": "2026-09-25T19:38:05.230055+00:00",
+  "source": "GitHub Actions job metadata/log plus downloaded browser/container artifacts",
+  "repository": "LN6666/CiviFlux",
+  "pull_request": 7,
+  "run_id": 36180444113,
+  "run_url": "https://github.com/LN6666/CiviFlux/actions/runs/36180444113",
+  "head_commit": "c976f25fe89e153cf7fae1082ddbe55a0e156cc4",
+  "head_tree": "2e808a2614749316e228dd99fbe0453e7b163cef",
+  "checkout_merge_commit": "1d0dfd5b8e17c964848240600e57c0d5a78df254",
+  "checkout_merge_tree": "2e808a2614749316e228dd99fbe0453e7b163cef",
+  "exact_tree_match": true,
+  "tested_code_commit": "c976f25fe89e153cf7fae1082ddbe55a0e156cc4",
+  "jobs": {
+    "container": {
+      "job_id": 108221188206,
+      "conclusion": "success",
+      "completed_at": "2026-09-25T19:34:32Z",
+      "url": "https://github.com/LN6666/CiviFlux/actions/runs/36180444113/job/108221188206"
+    },
+    "core": {
+      "job_id": 108221188384,
+      "conclusion": "success",
+      "completed_at": "2026-09-25T19:35:49Z",
+      "url": "https://github.com/LN6666/CiviFlux/actions/runs/36180444113/job/108221188384"
+    }
+  },
+  "test_result_lines": [
+    "7 passed in 1.05s",
+    "210 passed, 1 warning in 9.14s",
+    "58 passed, 1 skipped, 1 warning in 1.97s",
+    "7 passed in 0.64s",
+    "11 passed in 12.61s",
+    "20 passed in 1.48s",
+    "15 passed (32.2s)"
+  ],
+  "ci_log_sha256": "2e42e34f6e91cf8e20412f012beea12fcaf4a4b4e44cd55c83fc7910e5973f83",
+  "artifacts": {
+    "linux-sbom-evidence": {
+      "id": 10884147144,
+      "digest": "sha256:32448f2100a143d21752165aec2d5b6f3644c0b05b6676e7a9fb3ef5d575206f",
+      "size_in_bytes": 455931
+    },
+    "browser-evidence": {
+      "id": 10883792666,
+      "digest": "sha256:ede00f92434fd2dc3ba3f1ee52505867752c81d4fd8e0ac1564007292cf5b6a6",
+      "size_in_bytes": 527765
+    },
+    "container-reproduction": {
+      "id": 10883449678,
+      "digest": "sha256:c4c0a22c54fed566ee6eb45ce28d8397dfc4418aa05829d962ffe6718474b221",
+      "size_in_bytes": 6938
+    }
+  },
+  "browser": {
+    "results_json_sha256": "f7797d703c539897e5a054e4da25c40b51e43aaebfc5725f46f37b107ee13e5f",
+    "stats": {
+      "startTime": "2026-09-25T19:35:11.299Z",
+      "duration": 32230.862,
+      "expected": 15,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "container": {
+    "reproduction_json_sha256": "a79343128d4559cb14d0a423dc29f09af4cbaf6efcd7ba573a2fa2a145aa0ea3",
+    "status": "PASS",
+    "stages": [
+      {
+        "stage": "git_commit",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_daemon",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_buildx",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_build",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "image_inspect",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "container_smoke",
+        "status": "PASS",
+        "exit_code": 0
+      }
+    ],
+    "image_id": "sha256:529ca34e71a1d822496570f481033d40b239ff22ee990d4bc038caa2662dfdc8"
+  },
+  "claim_ceiling": "Identical-tree CI verifies code, synthetic API/SUMO and 15 browser tests; one ignored Helsinki CityPack test skipped; Baku 71.9% is retrospective named-street plan overlap, not measured accuracy; active-mode geometry is candidate OSM topology without race-day restriction or impact scoring; no paid SimpleJev or full release claim"
+}

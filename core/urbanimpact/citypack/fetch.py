@@ -30,6 +30,24 @@ SOURCES = {
         "content_types": ["application/zip", "application/octet-stream"],
         "max_bytes": 100_000_000,
     },
+    "berlin-osm": {
+        "id": "DE-BE-OSM-20260924",
+        "url": "https://download.geofabrik.de/europe/germany/berlin-260922.osm.pbf",
+        "filename": "berlin-20260924.osm.pbf",
+        "license": "ODbL-1.0",
+        "attribution": "© OpenStreetMap contributors; Geofabrik extract",
+        "content_types": ["application/octet-stream"],
+        "max_bytes": 110_000_000,
+    },
+    "baku-osm": {
+        "id": "AZ-BAKU-OSM-20260918",
+        "url": "https://download.geofabrik.de/asia/azerbaijan-260918.osm.pbf",
+        "filename": "azerbaijan-20260918.osm.pbf",
+        "license": "ODbL-1.0",
+        "attribution": "© OpenStreetMap contributors; Geofabrik extract",
+        "content_types": ["application/octet-stream"],
+        "max_bytes": 55_000_000,
+    },
 }
 ALLOWED_HOSTS = frozenset(urlsplit(s["url"]).hostname for s in SOURCES.values())
 
@@ -59,7 +77,7 @@ def fetch(
     total_timeout_s: int = 300,
 ) -> dict:
     if source not in SOURCES:
-        raise ValueError("source must be registered: osm or gtfs")
+        raise ValueError("source must be registered")
     spec = SOURCES[source]
     destination.mkdir(parents=True, exist_ok=True)
     target = destination / spec["filename"]

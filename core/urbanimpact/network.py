@@ -10,6 +10,11 @@ from typing import Iterable, get_args
 from urbanimpact.contracts import CityPack, Scenario, VehicleClass
 from urbanimpact.util import digest
 
+# Explicit scenario assumptions for active-mode routing. Imported SUMO lane
+# speeds are often motor-road speeds even when walking/cycling is permitted.
+# These constants are not observations or claims about race-day movement.
+ACTIVE_MODE_SPEED_MPS = {"pedestrian": 1.4, "bicycle": 4.0}
+
 
 def physical_context_hash(city: CityPack, scenario: Scenario) -> str:
     """Identify physical inputs using the same field scope as the routing cache."""
@@ -78,11 +83,17 @@ class Router:
                 if vehicle_class in c.allowed_vehicle_classes
             }
         )
-        return nodes, edges, outgoing, turns
+        assumed_speed = ACTIVE_MODE_SPEED_MPS.get(vehicle_class)
+        costs = {
+            edge.id: edge.length_m / assumed_speed if assumed_speed else edge.travel_time_s
+            for edge in city.edges
+            if vehicle_class in edge.allowed_vehicle_classes
+        }
+        return nodes, edges, outgoing, turns, costs
 
     @staticmethod
     def _search(index: tuple, origin: str, targets: Iterable[str | None], blocked: Iterable[str]) -> dict:
-        nodes, edges, outgoing, turns = index
+        nodes, edges, outgoing, turns, costs = index
         if origin not in nodes:
             raise ValueError(f"Unknown origin: {origin}")
         forbidden = set(blocked)
@@ -116,7 +127,7 @@ class Router:
                     incoming and turns is not None and (incoming, edge.id) not in turns
                 ):
                     continue
-                candidate = (cost + edge.travel_time_s, path + (edge.id,))
+                candidate = (cost + costs[edge.id], path + (edge.id,))
                 if candidate < best.get(edge.id, (float("inf"), ())):
                     best[edge.id] = candidate
                     heapq.heappush(queue, (*candidate, edge.target, edge.id))
@@ -225,7 +236,7 @@ class Router:
                         interpretation="geometry proximity candidate; route use, delay and cancellation unverified",
                     )
                 )
-        return dict(
+        report = dict(
             od=od,
             vehicle_class=vehicle_class,
             analysis_at=scenario.analysis_at.isoformat(),
@@ -242,7 +253,9 @@ class Router:
             network_hash=digest(city),
             physical_context_hash=physical_context_hash(city, scenario),
             units={"distance": "m", "travel_time": "s"},
-            model="directed_turn_aware_fixed_travel_time",
+            model="directed_turn_aware_assumed_active_mode_speed"
+            if vehicle_class in ACTIVE_MODE_SPEED_MPS
+            else "directed_turn_aware_fixed_travel_time",
             limitations=[
                 "Fixed weights are not real-time congestion or emergency response time.",
                 "Emergency vehicles have only explicitly imported access permissions.",
@@ -253,6 +266,13 @@ class Router:
             if city.connections is not None
             else "topological connections; turn restrictions unavailable",
         )
+        if vehicle_class in ACTIVE_MODE_SPEED_MPS:
+            report["cost_policy"] = {
+                "kind": "fixed_speed_assumption",
+                "speed_mps": ACTIVE_MODE_SPEED_MPS[vehicle_class],
+                "not_observed": True,
+            }
+        return report
 
 
 def compare_boundaries(

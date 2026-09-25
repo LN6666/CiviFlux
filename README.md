@@ -16,6 +16,7 @@ CiviFlux 是部署者本地运行的道路限制与火灾**外部交通影响**�
 - [工程决策](docs/adr/0001-current-architecture.md)：不可变城市快照、Action overlay、成对计算与 API 边界。
 - [贡献约定](CONTRIBUTING.md)：文件归属、验证与可复现交付。
 - [变更记录](CHANGELOG.md)：当前实现与来源工程包的区别。
+- [赛事验证清单](docs/EVENT_VALIDATION_WATCHLIST.md)、[Baku 2026 F1 审计](docs/BAKU_2026_F1_DATA_FEASIBILITY.md)与[巴库间接 GIS 对照](docs/BAKU_2026_INDIRECT_GIS_COMPARISON.md)：按日期选择案例、区分计划公告与独立观测。[城市数据重建](data/README.md)记录 Berlin/Baku 的固定 OSM 与本体化 KG。
 
 ## 本地验证
 

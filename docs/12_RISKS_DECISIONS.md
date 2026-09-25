@@ -1,10 +1,12 @@
 # 12 · 风险与固定决策
 
+模型风险以下按[当前用户决定](../execution/USER_DECISIONS.md)解释：System-One 走托管 SimpleJev API，本地模型/GPU 不再是部署前提；生产付费调用未获授权仍阻塞对应验收。
+
 | 风险 | v1处理 | 不允许的替代 |
 |---|---|---|
 | 没有历史GTFS/流量 | current-network what-if标记，历史数值NOT_VALIDATED | 当前feed假装历史 |
 | 没有真实火灾警戒区 | 人工假设区明确记录 | 按severity捏造半径 |
-| Qwen System-One本地模型/硬件不可用 | rules继续、local-Qwen gate blocked | mock说local模型完成 |
+| SimpleJev 服务/授权/预算不可用 | rules/fixed PPR 可继续、生产模型 gate 保持 DEFERRED_USER 或真实故障状态 | demo/replay/mock 冒充生产调用通过 |
 | Qwen System-One不带来增益 |保留真实backend，fixedPPR可作默认，发负结果 | 改标签/只留赢的案例 |
 | 图只存道路没有语义 |必须跨road-route-facility关系与来源 |把OSM图改名KG |
 | 大图/仿真慢 |CSR/cache/受控job/boundary测试 |先上集群/GPU |

@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0",
+  "status": "SCOPED_CI_PASS",
+  "captured_at": "2026-09-25T20:59:11.805903+00:00",
+  "source": "GitHub Actions metadata/log plus downloaded browser/container artifacts",
+  "repository": "LN6666/CiviFlux",
+  "pull_request": 7,
+  "run_id": 36188723802,
+  "run_url": "https://github.com/LN6666/CiviFlux/actions/runs/36188723802",
+  "head_commit": "df0978e198d3af766ee2adec910aa29cb518d94b",
+  "head_tree": "dbb57a591193f48558158a97e7242c0cc2b1e0cf",
+  "checkout_merge_commit": "38f18f2484440cc09528972f208fd85badf9939f",
+  "checkout_merge_tree": "dbb57a591193f48558158a97e7242c0cc2b1e0cf",
+  "exact_tree_match": true,
+  "tested_code_commit": "df0978e198d3af766ee2adec910aa29cb518d94b",
+  "jobs": {
+    "container": {
+      "job_id": 108248389931,
+      "conclusion": "success",
+      "completed_at": "2026-09-25T20:57:24Z",
+      "url": "https://github.com/LN6666/CiviFlux/actions/runs/36188723802/job/108248389931"
+    },
+    "core": {
+      "job_id": 108248390187,
+      "conclusion": "success",
+      "completed_at": "2026-09-25T20:58:06Z",
+      "url": "https://github.com/LN6666/CiviFlux/actions/runs/36188723802/job/108248390187"
+    }
+  },
+  "test_result_lines": [
+    "7 passed in 0.74s",
+    "211 passed, 1 warning in 6.91s",
+    "69 passed, 1 skipped, 1 warning in 2.20s",
+    "7 passed in 0.43s",
+    "11 passed in 10.32s",
+    "20 passed in 0.50s",
+    "15 passed (22.4s)"
+  ],
+  "ci_log_sha256": "1f3e6f5e4badced1597973804ecb1156c02a3435f9d7c498a209b1831a662830",
+  "artifacts": {
+    "browser-evidence": {
+      "id": 10887398657,
+      "digest": "sha256:a2e3b0f2d735e496fa5e439232670d8831c1212d5bdba76a4e5799e34f586c9d",
+      "size_in_bytes": 521164
+    },
+    "container-reproduction": {
+      "id": 10887313591,
+      "digest": "sha256:9a87278392a4df46bf65f8dab0b11d9d3428fb4ea0526d9e8d0008c5788f6e78",
+      "size_in_bytes": 6960
+    },
+    "linux-sbom-evidence": {
+      "id": 10887303825,
+      "digest": "sha256:569401a70babbd31e9e2c593932aca44946e27882abe502d8a6d50920a058f97",
+      "size_in_bytes": 455931
+    }
+  },
+  "browser": {
+    "results_json_sha256": "2f338ebbef3e3063645cbb671955c2327d84829365f00ab5b68dd54e603ded6f",
+    "stats": {
+      "startTime": "2026-09-25T20:57:38.992Z",
+      "duration": 22366.302,
+      "expected": 15,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "container": {
+    "reproduction_json_sha256": "8b66a181a6acc92fd0d4984c04ea66f17dfca2f12a7175d0e4ec4c6b7d669438",
+    "status": "PASS",
+    "stages": [
+      {
+        "stage": "git_commit",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_daemon",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_buildx",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_build",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "image_inspect",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "container_smoke",
+        "status": "PASS",
+        "exit_code": 0
+      }
+    ],
+    "image_id": "sha256:c4536d2d99c41206ef7bb57ab4d440d733f71e39b39b5cc397e1798392716ce4"
+  },
+  "claim_ceiling": "Identical-tree CI verifies source/test changes, synthetic API/SUMO and 15 browser tests; one ignored Helsinki CityPack test skipped. Berlin comparison now requires pre-onset baseline map and source-bound fresh VIZ feeds; it has not yet used an event-hour pair. No measured Berlin event effect, Baku race-day active-mode outcome, paid SimpleJev call, or full release claim."
+}

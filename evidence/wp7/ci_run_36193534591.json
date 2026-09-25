@@ -1,0 +1,106 @@
+{
+  "schema_version": "1.0",
+  "status": "SCOPED_CI_PASS",
+  "captured_at": "2026-09-25T21:51:34.463863+00:00",
+  "source": "GitHub Actions metadata/log plus downloaded browser/container artifacts",
+  "repository": "LN6666/CiviFlux",
+  "pull_request": 7,
+  "run_id": 36193534591,
+  "run_url": "https://github.com/LN6666/CiviFlux/actions/runs/36193534591",
+  "head_commit": "d3a355cc96020c7b591e9309ef15b160966216f2",
+  "head_tree": "9a8f193a6e8db4648aa962a3572b70412d131454",
+  "checkout_merge_commit": "2e365170d05e2a9f353ab349aa939ab01461b9c8",
+  "checkout_merge_tree": "9a8f193a6e8db4648aa962a3572b70412d131454",
+  "exact_tree_match": true,
+  "tested_code_commit": "d3a355cc96020c7b591e9309ef15b160966216f2",
+  "jobs": {
+    "core": {
+      "job_id": 108264023692,
+      "conclusion": "success",
+      "completed_at": "2026-09-25T21:50:48Z",
+      "url": "https://github.com/LN6666/CiviFlux/actions/runs/36193534591/job/108264023692"
+    },
+    "container": {
+      "job_id": 108264023857,
+      "conclusion": "success",
+      "completed_at": "2026-09-25T21:49:21Z",
+      "url": "https://github.com/LN6666/CiviFlux/actions/runs/36193534591/job/108264023857"
+    }
+  },
+  "test_result_lines": [
+    "7 passed in 1.43s",
+    "211 passed, 1 warning in 9.45s",
+    "73 passed, 1 skipped, 1 warning in 2.36s",
+    "7 passed in 0.70s",
+    "11 passed in 14.53s",
+    "20 passed in 0.77s",
+    "17 passed (33.5s)"
+  ],
+  "ci_log_sha256": "7c01cd8ec00ba236893df997009dbff4540c4a2b8d991d42296e4745e419c11f",
+  "artifacts": {
+    "browser-evidence": {
+      "id": 10889142707,
+      "digest": "sha256:b03f0d422e17f0ef4af0293676a8803c3a1e9c2558e3e38af87a737f088f64e1",
+      "size_in_bytes": 521262
+    },
+    "container-reproduction": {
+      "id": 10888957893,
+      "digest": "sha256:ef1f152b282d8f2af48ed3df67ad1667537132cf3121e43513cc9677721e81f3",
+      "size_in_bytes": 6955
+    },
+    "linux-sbom-evidence": {
+      "id": 10888709934,
+      "digest": "sha256:5fced5c862104e291689785407dee2def5a7a735252ba742f5b616a1150704e4",
+      "size_in_bytes": 455931
+    }
+  },
+  "browser": {
+    "results_json_sha256": "d879d90633d26f594c1dc798986b14e309e5b733cf433aa55540078cda8e65f3",
+    "stats": {
+      "startTime": "2026-09-25T21:50:10.798Z",
+      "duration": 33520.89599999999,
+      "expected": 17,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    }
+  },
+  "container": {
+    "reproduction_json_sha256": "96bb2fe490fc76e0e7b1dc6387f1b0b10e21ddf247ac854ac608b5e97acafa6f",
+    "status": "PASS",
+    "stages": [
+      {
+        "stage": "git_commit",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_daemon",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_buildx",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_build",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "image_inspect",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "container_smoke",
+        "status": "PASS",
+        "exit_code": 0
+      }
+    ],
+    "image_id": "sha256:596b8009f1ee757d1f4c5028bf1792a9f2dd5b1e9405dd4ddaa12845d5d5c847"
+  },
+  "claim_ceiling": "Identical-tree CI verifies source-bound Berlin walking/cycling counter coverage audit and prior mapping tools, synthetic API/SUMO and 17 browser tests; one ignored Helsinki CityPack test skipped. Counter distance to a frozen motor-route corridor is not an active-mode prediction, observed event impact or hit rate. Paid SimpleJev and full release remain unvalidated."
+}

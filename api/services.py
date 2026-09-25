@@ -19,10 +19,19 @@ from urbanimpact.util import atomic_json, canonical, digest, file_hash
 
 
 class RunService:
-    def __init__(self, root: Path, cities: list[CityPack] | None = None, policy_backend=None):
+    def __init__(
+        self,
+        root: Path,
+        cities: list[CityPack] | None = None,
+        policy_backend=None,
+        citypack_scope_warnings: dict[str, str] | None = None,
+    ):
         self.root = root
         root.mkdir(parents=True, exist_ok=True)
         self.cities = {c.citypack_id: c for c in cities or [toy_city()]}
+        self.citypack_scope_warnings = dict(citypack_scope_warnings or {})
+        if set(self.citypack_scope_warnings) - set(self.cities):
+            raise ValueError("CityPack scope warning references an unknown CityPack")
         self.workspaces = {
             id: Workspace(root / "workspaces" / (digest(id) + ".sqlite"), city)
             for id, city in self.cities.items()
@@ -109,7 +118,10 @@ class RunService:
             if old:
                 if old[1] != request_hash:
                     raise ActionError("Idempotency key reused for different input")
-                return self.state(old[0])
+                old_state = self.state(old[0])
+                if old_state["status"] == "completed":
+                    self._read_result(old[0], old_state)
+                return old_state
             count = sum(
                 json.loads(r[0])["status"] in ("queued", "running")
                 for r in db.execute("SELECT state FROM runs")
@@ -158,6 +170,7 @@ class RunService:
             if event.is_set():
                 raise AnalysisCancelled()
             self._update(rid, status="running", stage="validating")
+            scope_warning = self.citypack_scope_warnings.get(city.citypack_id)
             self.analysis.run(
                 city,
                 s,
@@ -165,6 +178,7 @@ class RunService:
                 folder,
                 overlay_hash=digest(s),
                 action_log_hash=digest(history),
+                extra_limitations=(scope_warning,) if scope_warning else (),
                 stage=lambda name: self._update(rid, stage=name),
                 cancel=event,
             )
@@ -229,10 +243,18 @@ class RunService:
             )
             return self._update(rid, stage="cancelling")
 
+    def _read_result(self, rid, state):
+        result = json.loads((self.root / "runs" / rid / "result.json").read_text())
+        scope_warning = self.citypack_scope_warnings.get(state["citypack_id"])
+        if scope_warning and scope_warning not in result.get("limitations", ()):
+            raise ActionError("Run predates current CityPack scope evidence; create a new run")
+        return result
+
     def result(self, rid):
-        if self.state(rid)["status"] != "completed":
+        state = self.state(rid)
+        if state["status"] != "completed":
             raise ActionError("Results unavailable until run completes")
-        return json.loads((self.root / "runs" / rid / "result.json").read_text())
+        return self._read_result(rid, state)
 
     def export(self, rid):
         state = self.state(rid)

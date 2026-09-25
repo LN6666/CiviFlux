@@ -1,0 +1,106 @@
+{
+  "status": "BLOCKED_ENVIRONMENT",
+  "scope": "committed HEAD frozen Python installation, toy routing/PPR and wheel resources",
+  "created_at": "2026-09-23T20:44:39.337817+00:00",
+  "python": "3.12.13",
+  "platform": "macOS-27.0-arm64-arm-64bit",
+  "allow_dependency_downloads": true,
+  "network": "frozen registry wheels allowed during dependency_sync only; no data/model calls",
+  "checks": [
+    {
+      "stage": "committed_head",
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.008,
+      "output": "0fa00f8072d9b92d5805e6af84d573333943e7d3\n",
+      "status": "PASS"
+    },
+    {
+      "stage": "uv_version",
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.006,
+      "output": "uv 0.11.23 (Homebrew 2026-06-19 aarch64-apple-darwin)\n",
+      "status": "PASS"
+    },
+    {
+      "stage": "working_tree",
+      "command": [
+        "git",
+        "status",
+        "--porcelain"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.011,
+      "output": "",
+      "status": "PASS"
+    },
+    {
+      "stage": "export_head",
+      "command": [
+        "git",
+        "archive",
+        "--format=tar",
+        "--output",
+        "<TEMP>/head.tar",
+        "0fa00f8072d9b92d5805e6af84d573333943e7d3"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.025,
+      "output": "",
+      "status": "PASS"
+    },
+    {
+      "stage": "dependency_sync",
+      "command": [
+        "uv",
+        "sync",
+        "--frozen",
+        "--no-install-project",
+        "--no-build",
+        "--python",
+        "3.12",
+        "--no-python-downloads"
+      ],
+      "returncode": 0,
+      "elapsed_s": 25.054,
+      "output": "Using CPython 3.12.13 interpreter at: /opt/homebrew/opt/python@3.12/bin/python3.12\nCreating virtual environment at: .venv\nDownloading pyproj (4.8MiB)\nDownloading osmium (1.3MiB)\nDownloading sumo-data (110.8MiB)\nDownloading scipy (19.5MiB)\nDownloading pydantic-core (1.8MiB)\nDownloading networkx (2.0MiB)\nDownloading numpy (5.2MiB)\nDownloading ruff (9.4MiB)\nDownloading pyarrow (32.6MiB)\nDownloading eclipse-sumo (51.3MiB)\nDownloading shapely (1.6MiB)\n Downloaded osmium\n Downloaded pydantic-core\n Downloaded networkx\n Downloaded shapely\n Downloaded pyproj\n Downloaded numpy\n Downloaded ruff\n Downloaded scipy\n Downloaded pyarrow\n Downloaded eclipse-sumo\n Downloaded sumo-data\nPrepared 28 packages in 23.12s\nInstalled 46 packages in 1.91s\n + annotated-doc==0.0.5\n + annotated-types==0.8.0\n + anyio==4.15.1\n + attrs==26.1.0\n + certifi==2026.7.22\n + charset-normalizer==3.5.1\n + click==8.5.0\n + coverage==7.16.1\n + defusedxml==0.7.1\n + eclipse-sumo==1.27.1\n + fastapi==0.141.1\n + h11==0.16.0\n + httpcore==1.0.9\n + httpx==0.28.1\n + hypothesis==6.168.1\n + idna==3.20\n + iniconfig==2.3.0\n + jsonschema==4.26.0\n + jsonschema-specifications==2025.9.1\n + networkx==3.7\n + numpy==2.5.3\n + osmium==4.3.1\n + packaging==26.3\n + pluggy==1.6.0\n + pyarrow==23.0.1\n + pydantic==2.13.5\n + pydantic-core==2.46.5\n + pygments==2.21.0\n + pyproj==3.8.0\n + pytest==9.1.1\n + pytest-cov==7.1.0\n + pyyaml==6.0.3\n + referencing==0.37.0\n + requests==2.34.2\n + rpds-py==2026.6.3\n + ruff==0.16.8\n + scipy==1.18.1\n + shapely==2.1.2\n + sortedcontainers==2.4.0\n + starlette==1.7.0\n + sumo-data==1.27.1\n + sumolib==1.27.1\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n + urllib3==2.8.0\n + uvicorn==0.53.0\n",
+      "status": "PASS"
+    },
+    {
+      "stage": "offline_sync",
+      "command": [
+        "uv",
+        "sync",
+        "--frozen",
+        "--offline",
+        "--python",
+        "3.12",
+        "--no-python-downloads"
+      ],
+      "returncode": 1,
+      "elapsed_s": 0.176,
+      "output": "   Building civiflux @ file://<TEMP>/checkout\n  × Failed to build `civiflux @\n  │ file://<TEMP>/checkout`\n  ├─▶ Failed to resolve requirements from `build-system.requires`\n  ├─▶ No solution found when resolving: `hatchling`, `editables~=0.3`\n  ╰─▶ Because editables was not found in the cache and you require\n      editables>=0.3,<1.dev0, we can conclude that your requirements are\n      unsatisfiable.\n\nhint: Packages were unavailable because the network was disabled. When the network is disabled, registry packages may only be read from the cache.",
+      "status": "BLOCKED_ENVIRONMENT"
+    }
+  ],
+  "commit": "0fa00f8072d9b92d5805e6af84d573333943e7d3",
+  "uv_version": "uv 0.11.23 (Homebrew 2026-06-19 aarch64-apple-darwin)",
+  "working_tree": "",
+  "temporary_directory_removed": true,
+  "archive_sha256": "b6165ae332c62e93891fdf696e80bf147865b31027c073ce649e0ccc7add15f5",
+  "input_hashes": {
+    "uv.lock": "f69a0c8d075db182089e3298d733e88527fc8f264746e2890ca2666d01e75b26",
+    "pyproject.toml": "3240daf08623b672f20fa821146b44e7b7a1a502b826c91626cf45fe58ea7944"
+  },
+  "failed_stage": "offline_sync",
+  "detail": "Command failed; inspect recorded stage output",
+  "exit_code": 2
+}

@@ -1,5 +1,7 @@
 # 03 · 契约：所有结果都能知道“依据什么”
 
+当前 wire contract 以代码生成的 schema/Pydantic、[当前架构](CURRENT_ARCHITECTURE.md)及[用户决定](../execution/USER_DECISIONS.md)为准。原工程包中的本地 Qwen 字段属于历史设计，不能据此启动本地推理或把普通 chat 输出当作 SimpleJev。
+
 JSON Schema 的初稿在 contracts/。它们是 wire-level 最低约束，生产 Pydantic 仍需做跨字段校验。必须从同一权威模型生成/一致性测试 TS types 与 OpenAPI，不能维护三个逐渐分叉的定义。
 
 ## Scenario v1
@@ -23,9 +25,9 @@ relation: `id, src, dst, relation_type, evidence_refs[], asserted_or_derived, de
 
 rank record 含 `attention_score, delta_attention, rank_within_type, policy_hash, seed_hash, node_universe_hash, alpha, residual_l1, convergence, explanation_paths`。不提供 `risk_percent` 字段。
 
-System-One policy record 使用 `policy.schema.json` v1.1，除 scores 外必须保存 backend/model revision、permutations、calibration hash（可空但必须显式）、device/dtype 与 applied transition hash；token usage 只是可选诊断字段，不再是本地 Qwen 完成条件。
+System-One policy record 除 scores 外保存实际 provider mode、模型 ID、客户端/请求契约、rubric、请求/响应哈希、usage 和 applied transition hash。托管服务未报告的服务器/权重 revision、device/dtype、permutations 与 calibration 只能记为未公开/未验证，不能填造本地 pin；token usage 只是调用诊断，不代表模型正确率。
 
-`ResultBundle` 必须标明 `demand_kind=synthetic|estimated|measured`、`network_temporality`、`transit_temporality`、`simulation_status`、`provider_mode=local_qwen|replay|rules|mock_test`。前端不能去掉这些标签。
+`ResultBundle` 必须标明 `demand_kind=synthetic|estimated|measured`、`network_temporality`、`transit_temporality`、`simulation_status` 和实际 `provider_mode`。当前 SimpleJev 的 `simplejev_demo`/`simplejev_api`，以及 `replay`、`rules`、`mock_test`、可选普通 `qwen_api` 均不能互相冒充；旧 schema 兼容的 `local_qwen`/`remote_reflex` 不满足当前 release gate。前端不能去掉这些标签。
 
 ## 本地 API（WP0 创建并保持稳定）
 

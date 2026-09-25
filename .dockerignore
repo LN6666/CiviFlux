@@ -9,4 +9,5 @@ experiments/vendor
 web/node_modules
 web/test-results
 web/dist
+web/public/validation/*-local.json
 evidence

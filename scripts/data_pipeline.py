@@ -18,7 +18,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("command", choices=["fetch", "build", "review"])
     parser.add_argument("--allow-egress", action="store_true")
-    parser.add_argument("--source", choices=["osm", "gtfs", "all"], default="all")
+    parser.add_argument("--source", choices=["osm", "gtfs", "berlin-osm", "baku-osm", "all"], default="all")
     args = parser.parse_args()
     if args.command == "fetch":
         sources = ["osm", "gtfs"] if args.source == "all" else [args.source]

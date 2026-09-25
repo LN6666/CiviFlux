@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "status": "SCOPED_LOCAL_DATA_PASS",
+  "recorded_at": "2026-09-23T20:14:42.654641+00:00",
+  "commit": "3260ccd417cdfbc37780d2e0be61c058762f1b81",
+  "command": "make test-data",
+  "exit_code": 0,
+  "result": "50 passed, 1 warning",
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "data_source": "existing unbundled local Helsinki CityPack and raw source bytes, temporarily linked into checkout",
+  "citypack_path": "data/citypacks/helsinki-current/citypack.json",
+  "citypack_sha256": "5c3b703c2def3712592fe40c42678fe98c994124d76556efe55afd1ec8e3cc18",
+  "sources": [
+    {
+      "id": "S03-OSM",
+      "path": "data/raw/hsl.osm.pbf",
+      "sha256": "07489394d83e34003a64f3aabc0b05669b6345bc3d02fbc550fc851c9f123c6d"
+    },
+    {
+      "id": "S03-GTFS",
+      "path": "data/raw/hsl.zip",
+      "sha256": "0b12f3f5fb763a40f13d84d44f6026cec202c6cefa1e4851bb000bfe4a98679a"
+    }
+  ],
+  "log_path": "evidence/wp7/current_data_test.log",
+  "log_sha256": "1e0d0dc9be062158f28036d8cfe3e8ba9ddffa5776c1cf7353056e87b158f2d8",
+  "limitations": [
+    "Current OSM/GTFS snapshot is not event-date history.",
+    "Passing loader tests does not validate human road mapping, historical traffic effects, or fire perimeter."
+  ]
+}

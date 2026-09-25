@@ -1,0 +1,90 @@
+{
+  "status": "BLOCKED_ENVIRONMENT",
+  "scope": "committed HEAD frozen Python installation, toy routing/PPR and wheel resources",
+  "created_at": "2026-09-23T21:18:43.997624+00:00",
+  "python": "3.14.6",
+  "platform": "macOS-27.0-arm64-arm-64bit-Mach-O",
+  "allow_dependency_downloads": false,
+  "network": "disabled for uv; no data/model calls",
+  "checks": [
+    {
+      "stage": "committed_head",
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.009,
+      "output": "620bc302fac15a4c214ac6c5fb1e7c46467a4039\n",
+      "status": "PASS"
+    },
+    {
+      "stage": "uv_version",
+      "command": [
+        "uv",
+        "--version"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.008,
+      "output": "uv 0.11.23 (Homebrew 2026-06-19 aarch64-apple-darwin)\n",
+      "status": "PASS"
+    },
+    {
+      "stage": "working_tree",
+      "command": [
+        "git",
+        "status",
+        "--porcelain"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.013,
+      "output": "",
+      "status": "PASS"
+    },
+    {
+      "stage": "export_head",
+      "command": [
+        "git",
+        "archive",
+        "--format=tar",
+        "--output",
+        "<TEMP>/head.tar",
+        "620bc302fac15a4c214ac6c5fb1e7c46467a4039"
+      ],
+      "returncode": 0,
+      "elapsed_s": 0.053,
+      "output": "",
+      "status": "PASS"
+    },
+    {
+      "stage": "offline_sync",
+      "command": [
+        "uv",
+        "sync",
+        "--frozen",
+        "--offline",
+        "--no-editable",
+        "--python",
+        "3.12",
+        "--no-python-downloads"
+      ],
+      "returncode": 1,
+      "elapsed_s": 0.053,
+      "output": "Using CPython 3.12.13 interpreter at: /opt/homebrew/opt/python@3.12/bin/python3.12\nCreating virtual environment at: .venv\n  × Failed to download `sumo-data==1.27.1`\n  ╰─▶ Network connectivity is disabled, but the\n      requested data wasn't found in the cache for:\n      `https://files.pythonhosted.org/packages/ea/f9/0ed46d6d8bed8d96f5901907903baea2200196741b579b1b6768396a9f7c/sumo_data-1.27.1-py3-none-macosx_14_0_arm64.whl`\n\nhint: `sumo-data` (v1.27.1) was included because `civiflux` (v0.1.0) depends on `eclipse-sumo` (v1.27.1) which depends on `sumo-data`",
+      "status": "BLOCKED_ENVIRONMENT"
+    }
+  ],
+  "commit": "620bc302fac15a4c214ac6c5fb1e7c46467a4039",
+  "uv_version": "uv 0.11.23 (Homebrew 2026-06-19 aarch64-apple-darwin)",
+  "working_tree": "",
+  "temporary_directory_removed": true,
+  "archive_sha256": "321eacd89975f2163a14b827bc96acf3cff90731a0cd10a58ec1bb26d74e6a08",
+  "input_hashes": {
+    "uv.lock": "f69a0c8d075db182089e3298d733e88527fc8f264746e2890ca2666d01e75b26",
+    "pyproject.toml": "3240daf08623b672f20fa821146b44e7b7a1a502b826c91626cf45fe58ea7944"
+  },
+  "failed_stage": "offline_sync",
+  "detail": "Command failed; inspect recorded stage output",
+  "exit_code": 2
+}

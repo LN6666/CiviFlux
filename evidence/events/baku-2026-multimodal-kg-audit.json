@@ -1,0 +1,68 @@
+{
+  "status": "PASS_CURRENT_MULTIMODAL_LINEAR_CANDIDATE",
+  "case_id": "baku-f1-2026",
+  "citypack_id": "baku-f1-2026-multimodal-dcc67352ccb0",
+  "citypack_sha256": "c6679caad099a40b1f88bc2c32ff9956afb6e8dbecb9d523c3c89080bc0acf9a",
+  "source_sha256": "5134c55378dda62dfe4257b6aa7eec06fe9c67594f7e578bcd6186fbaac5c363",
+  "source_last_modified": "Fri, 18 Sep 2026 23:28:25 GMT",
+  "bbox": [
+    49.78,
+    40.32,
+    49.96,
+    40.44
+  ],
+  "counts": {
+    "junctions": 45071,
+    "directed_road_segments": 95904,
+    "turn_connections": 140184,
+    "candidate_facilities": 805,
+    "ontology_objects": 96710,
+    "evidence_links": 96709,
+    "bicycle_permitted_segments": 81173,
+    "pedestrian_permitted_segments": 93436,
+    "dedicated_nonmotor_segments": 15990
+  },
+  "knowledge_graph": {
+    "schema": "civiflux-city-kg-jsonl-v1",
+    "citypack_id": "baku-f1-2026-multimodal-dcc67352ccb0",
+    "ontology_version": "1.0.0",
+    "objects": 96710,
+    "links_by_type": {
+      "FACILITY_ACCESSED_VIA": 2752,
+      "ROAD_CONNECTS_TO": 140184,
+      "SEGMENT_ACCESS_TO_FACILITY": 2752,
+      "SUPPORTED_BY_EVIDENCE": 96709
+    },
+    "skipped_turns_without_common_vehicle_class": 0,
+    "artifacts": [
+      {
+        "path": "kg_objects.jsonl.gz",
+        "sha256": "27f66c7cf9d01d9db9c007f28d3bfb1daa32fd0a90454ac16ed402227d77d397",
+        "size_bytes": 1491677
+      },
+      {
+        "path": "kg_links.jsonl.gz",
+        "sha256": "d846e51631b01be4892ab31622812f039140ba8a1e20c8f52bf58a5dd979e6b6",
+        "size_bytes": 7581216
+      }
+    ],
+    "interpretation": "candidate imported topology and facility access; operational PPR projections must re-filter vehicle permissions and scenario time"
+  },
+  "mode_specific_candidate_turns": {
+    "bus": 55524,
+    "bicycle": 138684,
+    "pedestrian": 134863
+  },
+  "claim_ceiling": "current ontology-typed multimodal linear network candidate inventory only; walking/cycling restriction mapping and event impact not validated",
+  "unresolved": [
+    "announced_closure_to_directed_edge_review",
+    "actual_closure_operation",
+    "independent_measured_event_outcomes",
+    "GTFS",
+    "boundary_sensitivity",
+    "pedestrian_area_geometry",
+    "mode_specific_access_review",
+    "crossing_connectivity_review",
+    "mode_specific_validation"
+  ]
+}

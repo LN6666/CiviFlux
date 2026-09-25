@@ -18,11 +18,13 @@ import jsonschema
 ROOT = Path(__file__).resolve().parents[1]
 
 # Be conservative: every PASS gate is invalidated by a change to any versioned
-# product, test, data fixture, dependency, or build input. Documentation and
-# evidence are deliberately excluded: attesting a manifest must not change the
-# code it attests. Keep this list broader than an individual gate's inputs.
+# product, test, data fixture, dependency, build input, or runtime case input.
+# Attestation output is excluded to avoid changing the code it attests, but the
+# formal boundary report is read by the API and must invalidate prior PASSes.
+# Keep this list broader than an individual gate's inputs.
 CONTROLLED_INPUTS = (
     ".github/workflows",
+    ".dockerignore",
     ".gitignore",
     ".env.example",
     "Makefile",
@@ -35,6 +37,7 @@ CONTROLLED_INPUTS = (
     "core",
     "data",
     "deploy",
+    "evidence/wp2/helsinki_formal_boundary_case.json",
     "experiments",
     "ontology",
     "prompts",

@@ -1,0 +1,702 @@
+"""Capture Berlin's official traffic feeds and build a local GIS comparison bundle.
+
+The frozen route probe is the prediction. VIZ traffic and closure reports are
+independent display layers. Raw VIZ responses stay ignored until redistribution
+rights and event-hour observation semantics have been checked.
+"""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import math
+import statistics
+import sys
+import tempfile
+import urllib.parse
+import urllib.request
+from datetime import UTC, datetime
+from pathlib import Path
+
+from shapely.geometry import LineString
+from shapely.ops import transform, unary_union
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "core"))
+
+from urbanimpact.citypack.fetch import sha256_file
+
+CITY = ROOT / "data/citypacks/berlin-marathon-2026/citypack.json"
+PROBE = ROOT / "evidence/events/berlin-2026-incremental-pre-onset-probe.json"
+CANDIDATES = ROOT / "data/event_cases/berlin-marathon-2026-closure-candidates.json"
+RAW = ROOT / "data/raw/berlin-validation"
+LOCAL_BUNDLE = ROOT / "web/public/validation/berlin-local.json"
+BBOX = (13.33, 52.50, 13.44, 52.55)
+TRAFFIC_URL = "https://api.viz.berlin.de/geoserver/mdh/ows"
+REPORT_URL = "https://api.viz.berlin.de/tic3/baustellen_sperrungen_tic.json"
+INCREMENTAL_ONSET = datetime.fromisoformat("2026-09-26T05:00:00+00:00")
+MAX_FEED_AGE_S = 900
+
+
+def _collection(features: list[dict]) -> dict:
+    return {"type": "FeatureCollection", "features": features}
+
+
+def _marathon_line_reports(features: list[dict]) -> list[dict]:
+    """Expose only line components of VIZ's point-plus-line report geometry."""
+    lines = []
+    for feature in features:
+        if "marathon" not in str(feature.get("properties", {}).get("content", "")).lower():
+            continue
+        geometry = feature.get("geometry", {})
+        parts = geometry.get("geometries", []) if geometry.get("type") == "GeometryCollection" else [geometry]
+        for part in parts:
+            if part.get("type") == "LineString":
+                lines.append({"type": "Feature", "geometry": part, "properties": feature["properties"]})
+    return lines
+
+
+def _metric_line(coordinates: list[list[float]]) -> LineString:
+    # Local Berlin equirectangular projection, used only for short segment
+    # matching. Scores retain the original WGS84 geometries for map display.
+    return transform(lambda x, y, z=None: (x * 67650.0, y * 111130.0), LineString(coordinates))
+
+
+def _same_direction(first: LineString, second: LineString) -> bool:
+    ax = first.coords[-1][0] - first.coords[0][0]
+    ay = first.coords[-1][1] - first.coords[0][1]
+    bx = second.coords[-1][0] - second.coords[0][0]
+    by = second.coords[-1][1] - second.coords[0][1]
+    norm = (ax * ax + ay * ay) ** 0.5 * (bx * bx + by * by) ** 0.5
+    return norm > 0 and (ax * bx + ay * by) / norm >= 0.5
+
+
+def _unique_features(features: list[dict], label: str) -> dict[str, dict]:
+    indexed: dict[str, dict] = {}
+    for feature in features:
+        key = feature["properties"].get("unique_id")
+        if not isinstance(key, str) or not key or key in indexed:
+            raise ValueError(f"{label} has missing or duplicate VIZ unique_id")
+        indexed[key] = feature
+    return indexed
+
+
+def _receipt_feed_time(receipt: dict, label: str) -> tuple[datetime, int]:
+    """Require fresh, timezone-aware traffic bytes before scoring a live pair."""
+    captured = datetime.fromisoformat(receipt["captured_at_utc"])
+    feed = datetime.fromisoformat(receipt["traffic"]["feed_time_stamp"])
+    if captured.tzinfo is None or feed.tzinfo is None:
+        raise ValueError(f"{label} traffic timestamp lacks timezone")
+    age_s = round((captured - feed).total_seconds())
+    if not -120 <= age_s <= MAX_FEED_AGE_S:
+        raise ValueError(f"{label} traffic feed is stale or future-dated: {age_s} s")
+    return feed, age_s
+
+
+def _validate_traffic_binding(receipt: dict, traffic: dict, label: str) -> None:
+    if traffic.get("type") != "FeatureCollection" or traffic.get("timeStamp") != receipt["traffic"]["feed_time_stamp"]:
+        raise ValueError(f"{label} receipt feed timestamp differs from source bytes")
+    if len(traffic.get("features", [])) != receipt["traffic"]["feature_count"]:
+        raise ValueError(f"{label} receipt feature count differs from source bytes")
+    _receipt_feed_time(receipt, label)
+
+
+def _comparison_timing(baseline: dict, event: dict) -> dict:
+    baseline_feed, baseline_age = _receipt_feed_time(baseline, "baseline")
+    event_feed, event_age = _receipt_feed_time(event, "event")
+    baseline_capture = datetime.fromisoformat(baseline["captured_at_utc"])
+    event_capture = datetime.fromisoformat(event["captured_at_utc"])
+    if not baseline_capture < INCREMENTAL_ONSET <= event_capture:
+        raise ValueError("capture times do not straddle the announced onset")
+    if not baseline_feed < INCREMENTAL_ONSET <= event_feed:
+        raise ValueError("traffic feed timestamps do not straddle the announced onset")
+    if event_feed <= baseline_feed:
+        raise ValueError("event feed must follow baseline feed")
+    return {
+        "announced_onset_utc": INCREMENTAL_ONSET.isoformat(),
+        "baseline_feed_utc": baseline_feed.isoformat(),
+        "event_feed_utc": event_feed.isoformat(),
+        "baseline_feed_age_s": baseline_age,
+        "event_feed_age_s": event_age,
+        "maximum_allowed_feed_age_s": MAX_FEED_AGE_S,
+    }
+
+
+def _placebo_timing(baseline: dict, later: dict) -> dict:
+    """A pre-onset pair measures background variation, not event outcomes."""
+    baseline_feed, baseline_age = _receipt_feed_time(baseline, "placebo baseline")
+    later_feed, later_age = _receipt_feed_time(later, "placebo later")
+    baseline_capture = datetime.fromisoformat(baseline["captured_at_utc"])
+    later_capture = datetime.fromisoformat(later["captured_at_utc"])
+    if not baseline_capture < later_capture < INCREMENTAL_ONSET:
+        raise ValueError("placebo captures must both precede announced onset and be ordered")
+    if not baseline_feed < later_feed < INCREMENTAL_ONSET:
+        raise ValueError("placebo feeds must both precede announced onset and be ordered")
+    return {
+        "announced_onset_utc": INCREMENTAL_ONSET.isoformat(),
+        "baseline_feed_utc": baseline_feed.isoformat(),
+        "later_feed_utc": later_feed.isoformat(),
+        "baseline_feed_age_s": baseline_age,
+        "later_feed_age_s": later_age,
+        "maximum_allowed_feed_age_s": MAX_FEED_AGE_S,
+    }
+
+
+def _check_frozen_baseline(
+    saved: dict,
+    receipt: dict,
+    prediction_sha256: str,
+    citypack_sha256: str,
+    control_plan: dict,
+    control_features: list[dict],
+) -> None:
+    """Reject a post-onset or changed plan before publishing event metrics."""
+    built = datetime.fromisoformat(saved["built_at_utc"])
+    if built.tzinfo is None or built >= INCREMENTAL_ONSET:
+        raise ValueError("frozen baseline map was not built before announced onset")
+    if (
+        saved.get("status") != "PRE_EVENT_BASELINE_ONLY"
+        or saved.get("observation_snapshot") != receipt
+        or saved.get("prediction_sha256") != prediction_sha256
+        or saved.get("citypack_sha256") != citypack_sha256
+        or saved.get("control_plan") != control_plan
+        or saved.get("layers", {}).get("viz_controls") != _collection(control_features)
+    ):
+        raise ValueError("frozen baseline map or selected controls differ from current baseline")
+
+
+def compare_snapshots(predicted: list[dict], before: list[dict], after: list[dict]) -> tuple[list[dict], dict]:
+    """Score matched VIZ segments; unknown/unmatched segments are not negatives."""
+    prediction_lines = [_metric_line(f["geometry"]["coordinates"]) for f in predicted]
+    prediction_area = unary_union([line.buffer(18) for line in prediction_lines])
+    evaluation_area = prediction_area.buffer(1000)
+    earlier = _unique_features(before, "baseline")
+    later = _unique_features(after, "event")
+    # Spatial coverage is a property of the frozen baseline, not of geometry
+    # that an event feed can add, omit, or move after the prediction was made.
+    baseline_matches: dict[str, list[int]] = {}
+    for key, feature in earlier.items():
+        geometry = _metric_line(feature["geometry"]["coordinates"])
+        if not geometry.intersects(evaluation_area):
+            continue
+        baseline_matches[key] = [
+            index for index, line in enumerate(prediction_lines)
+            if line.distance(geometry) <= 18
+            and _same_direction(line, geometry)
+            and line.buffer(18).intersection(geometry).length >= min(geometry.length * 0.25, 25)
+        ]
+    observed = []
+    covered_predictions = {index for matches in baseline_matches.values() for index in matches}
+    counts = {"hit": 0, "miss": 0, "false_alarm": 0, "correct_negative": 0, "unscored": 0}
+    for feature in after:
+        props = feature["properties"]
+        key = props["unique_id"]
+        geometry = _metric_line(feature["geometry"]["coordinates"])
+        if not geometry.intersects(evaluation_area):
+            continue
+        old = earlier.get(key)
+        aligned = bool(baseline_matches.get(key, [])) if old else None
+        old_p = old["properties"] if old else {}
+        old_geometry = _metric_line(old["geometry"]["coordinates"]) if old else None
+        old_speed = old_p.get("speedavg")
+        new_speed = props.get("speedavg")
+        if old is None:
+            change = "unscored_missing_baseline"
+            slowdown = None
+        elif not _same_direction(old_geometry, geometry) or old_geometry.hausdorff_distance(geometry) > 25:
+            change = "unscored_geometry_changed"
+            slowdown = None
+        elif old_p.get("closed") != 1 and props.get("closed") == 1:
+            change = "newly_reported_closed"
+            slowdown = None
+        elif old_p.get("closed") == 1 or props.get("closed") == 1:
+            change = "unscored_preexisting_closure"
+            slowdown = None
+        elif not isinstance(old_speed, (int, float)) or not isinstance(new_speed, (int, float)) or old_speed <= 0 or new_speed <= 0:
+            change = "unscored_missing_speed"
+            slowdown = None
+        else:
+            slowdown = (old_speed - new_speed) / old_speed
+            change = "speed_drop_30pct" if slowdown >= 0.3 else "no_large_speed_drop"
+        if change.startswith("unscored"):
+            verdict = "unscored"
+        elif change in {"newly_reported_closed", "speed_drop_30pct"}:
+            verdict = "hit" if aligned else "miss"
+        else:
+            verdict = "false_alarm" if aligned else "correct_negative"
+        counts[verdict] += 1
+        observed.append({
+            "type": "Feature",
+            "geometry": feature["geometry"],
+            "properties": {
+                "unique_id": key,
+                "predicted_overlap": aligned,
+                "change_class": change,
+                "verdict": verdict,
+                "baseline_speed_kph": old_speed,
+                "event_speed_kph": new_speed,
+                "slowdown_fraction": slowdown,
+                "baseline_closed": old_p.get("closed"),
+                "event_closed": props.get("closed"),
+            },
+        })
+    for key, feature in earlier.items():
+        event_feature = later.get(key)
+        if event_feature and _metric_line(event_feature["geometry"]["coordinates"]).intersects(evaluation_area):
+            continue
+        geometry = _metric_line(feature["geometry"]["coordinates"])
+        if not geometry.intersects(evaluation_area):
+            continue
+        event_props = event_feature["properties"] if event_feature else {}
+        counts["unscored"] += 1
+        observed.append({
+            "type": "Feature",
+            "geometry": feature["geometry"],
+            "properties": {
+                "unique_id": key,
+                "predicted_overlap": bool(baseline_matches.get(key, [])),
+                "change_class": "unscored_geometry_moved_out" if event_feature else "unscored_missing_event",
+                "verdict": "unscored",
+                "baseline_speed_kph": feature["properties"].get("speedavg"),
+                "event_speed_kph": event_props.get("speedavg"),
+                "slowdown_fraction": None,
+                "baseline_closed": feature["properties"].get("closed"),
+                "event_closed": event_props.get("closed"),
+            },
+        })
+    positive = counts["hit"] + counts["false_alarm"]
+    actual = counts["hit"] + counts["miss"]
+    metrics = {
+        **counts,
+        "comparison_unit": "VIZ directed unique_id segment",
+        "scored_segments": sum(counts.values()) - counts["unscored"],
+        "predicted_edge_count": len(prediction_lines),
+        "predicted_edges_with_viz_match": len(covered_predictions),
+        "predicted_edges_without_viz_match": len(prediction_lines) - len(covered_predictions),
+        "matched_prediction_indices": sorted(covered_predictions),
+        "matched_viz_segments": sum(f["properties"]["predicted_overlap"] is True for f in observed),
+        "scored_matched_viz_segments": sum(
+            f["properties"]["predicted_overlap"] is True and f["properties"]["verdict"] != "unscored"
+            for f in observed
+        ),
+        "precision": counts["hit"] / positive if positive else None,
+        "recall": counts["hit"] / actual if actual else None,
+        "rule": "Within 1 km of the frozen predicted paths; spatial overlap is fixed from baseline VIZ geometry, same travel direction (endpoint cosine >=0.5), within 18 m and at least min(25 m,25%) of the baseline VIZ segment. Same-ID event geometry must retain direction and stay within 25 m Hausdorff distance. Newly reported closure or >=30% lower positive nonclosed speed is a change. Different-hour snapshots cannot isolate the event effect.",
+    }
+    return observed, metrics
+
+
+def select_matched_controls(
+    predicted: list[dict], restricted: list[dict], baseline: list[dict], baseline_comparison: list[dict]
+) -> tuple[dict, list[dict]]:
+    """Freeze nearby, untreated VIZ controls using only baseline data.
+
+    Controls are descriptive time-of-day comparators. Distance from both the
+    predicted paths and announcement-derived restrictions reduces direct
+    overlap; it cannot guarantee that an event has no spillover there.
+    """
+    indexed = _unique_features(baseline, "control baseline")
+    prediction_lines = [_metric_line(f["geometry"]["coordinates"]) for f in predicted]
+    excluded_lines = prediction_lines + [_metric_line(f["geometry"]["coordinates"]) for f in restricted]
+    exclusion = unary_union(excluded_lines)
+    evaluation_area = unary_union(prediction_lines).buffer(1000)
+    treated_ids = sorted(
+        f["properties"]["unique_id"] for f in baseline_comparison
+        if f["properties"]["predicted_overlap"] is True and f["properties"]["verdict"] != "unscored"
+    )
+    candidates = []
+    for feature in baseline:
+        props = feature["properties"]
+        speed, freeflow = props.get("speedavg"), props.get("freeflowspeed")
+        if props.get("closed") == 1 or not isinstance(speed, (int, float)) or not isinstance(freeflow, (int, float)) or speed <= 0 or freeflow <= 0:
+            continue
+        geometry = _metric_line(feature["geometry"]["coordinates"])
+        if geometry.length < 25 or not geometry.intersects(evaluation_area) or geometry.distance(exclusion) < 200:
+            continue
+        candidates.append((props["unique_id"], geometry, props))
+    used: set[str] = set()
+    groups = []
+    for treated_id in treated_ids:
+        treated = indexed[treated_id]
+        props = treated["properties"]
+        treated_speed, treated_freeflow = props.get("speedavg"), props.get("freeflowspeed")
+        if not isinstance(treated_speed, (int, float)) or not isinstance(treated_freeflow, (int, float)) or treated_speed <= 0 or treated_freeflow <= 0:
+            groups.append({"treated_id": treated_id, "control_ids": []})
+            continue
+        geometry = _metric_line(treated["geometry"]["coordinates"])
+        ranked = []
+        for control_id, control_geometry, control in candidates:
+            if control_id in used or control.get("strkat_1") != props.get("strkat_1") or not _same_direction(geometry, control_geometry):
+                continue
+            freeflow_ratio = control["freeflowspeed"] / treated_freeflow
+            length_ratio = control_geometry.length / geometry.length
+            normalized_speed_gap = abs(control["speedavg"] / control["freeflowspeed"] - treated_speed / treated_freeflow)
+            if not 0.5 <= freeflow_ratio <= 2 or not 0.25 <= length_ratio <= 4 or normalized_speed_gap > 0.3:
+                continue
+            cost = abs(math.log(freeflow_ratio)) + normalized_speed_gap + 0.15 * abs(math.log(length_ratio))
+            ranked.append((cost, control_id))
+        chosen = [control_id for _, control_id in sorted(ranked)[:2]]
+        used.update(chosen)
+        groups.append({"treated_id": treated_id, "control_ids": chosen})
+    selected = [
+        {
+            "type": "Feature",
+            "geometry": indexed[control_id]["geometry"],
+            "properties": {
+                "unique_id": control_id,
+                "layer": "viz_control",
+                "baseline_speed_kph": indexed[control_id]["properties"]["speedavg"],
+                "freeflow_speed_kph": indexed[control_id]["properties"]["freeflowspeed"],
+            },
+        }
+        for control_id in sorted(used)
+    ]
+    plan = {
+        "method": "baseline-only nearest VIZ class/direction/freeflow/speed-ratio matching; maximum 2 unique controls per treated segment, within 1 km of prediction and >=200 m from prediction and restriction inputs",
+        "treated_segments": len(treated_ids),
+        "treated_segments_with_controls": sum(bool(group["control_ids"]) for group in groups),
+        "control_segments": len(used),
+        "groups": groups,
+    }
+    return plan, selected
+
+
+def summarize_control_indicator(plan: dict, observed: list[dict]) -> dict:
+    """Describe treated-versus-control speed changes without causal claims."""
+    by_id = {feature["properties"]["unique_id"]: feature["properties"] for feature in observed}
+
+    def slowdown(key: str) -> float | None:
+        props = by_id.get(key)
+        if not props or props["verdict"] == "unscored" or props["baseline_closed"] == 1 or props["event_closed"] == 1:
+            return None
+        old, new = props["baseline_speed_kph"], props["event_speed_kph"]
+        if not isinstance(old, (int, float)) or not isinstance(new, (int, float)) or old <= 0 or new <= 0:
+            return None
+        return (old - new) / old
+
+    treated_drops, control_drops, adjusted_drops = [], [], []
+    matched_control_ids = {control_id for group in plan["groups"] for control_id in group["control_ids"]}
+    for group in plan["groups"]:
+        treated_drop = slowdown(group["treated_id"])
+        controls = [drop for key in group["control_ids"] if (drop := slowdown(key)) is not None]
+        if treated_drop is None or not controls:
+            continue
+        control_drop = statistics.median(controls)
+        treated_drops.append(treated_drop)
+        control_drops.append(control_drop)
+        adjusted_drops.append(treated_drop - control_drop)
+    treated_ids = {group["treated_id"] for group in plan["groups"]}
+    return {
+        "status": "DESCRIPTIVE_CONTROL_ONLY" if adjusted_drops else "INSUFFICIENT_VALID_PAIRS",
+        "valid_treated_control_groups": len(adjusted_drops),
+        "selected_treated_segments": len(treated_ids),
+        "selected_control_segments": len(matched_control_ids),
+        "median_treated_speed_drop_fraction": statistics.median(treated_drops) if treated_drops else None,
+        "median_control_speed_drop_fraction": statistics.median(control_drops) if control_drops else None,
+        "median_pair_adjusted_speed_drop_fraction": statistics.median(adjusted_drops) if adjusted_drops else None,
+        "newly_reported_closed_treated": sum(by_id.get(key, {}).get("change_class") == "newly_reported_closed" for key in treated_ids),
+        "newly_reported_closed_controls": sum(by_id.get(key, {}).get("change_class") == "newly_reported_closed" for key in matched_control_ids),
+        "interpretation": "Baseline-selected controls can absorb some common time-of-day speed changes, but event spillover, other works, weather and demand differences remain. This is a descriptive indirect indicator, not a causal event effect, measured travel-time prediction, or classifier accuracy.",
+    }
+
+
+def _within(geometry: list[list[float]], bbox: tuple[float, ...] = BBOX) -> bool:
+    xmin, ymin, xmax, ymax = bbox
+    return any(xmin <= point[0] <= xmax and ymin <= point[1] <= ymax for point in geometry)
+
+
+def _download(url: str) -> tuple[bytes, str]:
+    request = urllib.request.Request(url, headers={"User-Agent": "CiviFlux/0.1 (open-source event validation)"})
+    with urllib.request.urlopen(request, timeout=30) as response:
+        if response.status != 200:
+            raise ValueError(f"official source HTTP {response.status}")
+        return response.read(), response.headers.get("Date", "")
+
+
+def _validate_snapshot_name(name: str) -> None:
+    if not name.isascii() or not name.replace("-", "").isalnum() or len(name) > 48:
+        raise ValueError("name must be a short ASCII alphanumeric/hyphen label")
+
+
+def capture(name: str) -> dict:
+    _validate_snapshot_name(name)
+    RAW.mkdir(parents=True, exist_ok=True)
+    traffic_path = RAW / f"{name}-traffic.json"
+    reports_path = RAW / f"{name}-reports.json"
+    receipt_path = RAW / f"{name}-receipt.json"
+    if any(path.exists() for path in (traffic_path, reports_path, receipt_path)):
+        raise FileExistsError("snapshot name already exists; captures are immutable")
+    query = {
+        "service": "WFS",
+        "version": "2.0.0",
+        "request": "GetFeature",
+        "typeNames": "mdh:vmzlos-step",
+        "outputFormat": "application/json",
+        "srsName": "EPSG:4326",
+        "bbox": ",".join(map(str, BBOX)) + ",EPSG:4326",
+        "count": "10000",
+    }
+    traffic_url = TRAFFIC_URL + "?" + urllib.parse.urlencode(query)
+    traffic_bytes, traffic_http_date = _download(traffic_url)
+    reports_bytes, reports_http_date = _download(REPORT_URL)
+    traffic = json.loads(traffic_bytes)
+    reports = json.loads(reports_bytes)
+    if traffic.get("type") != "FeatureCollection" or reports.get("type") != "FeatureCollection":
+        raise ValueError("official source did not return GeoJSON")
+    if traffic.get("numberMatched", 0) > 10000 or not traffic.get("features"):
+        raise ValueError("traffic bbox response missing or truncated")
+    for feature in traffic["features"]:
+        props = feature.get("properties", {})
+        if feature.get("geometry", {}).get("type") != "LineString" or "unique_id" not in props:
+            raise ValueError("traffic feed schema changed")
+    captured_at = datetime.now(UTC).isoformat()
+    receipt = {
+        "captured_at_utc": captured_at,
+        "traffic": {
+            "url": traffic_url,
+            "http_date": traffic_http_date,
+            "feed_time_stamp": traffic.get("timeStamp"),
+            "sha256": hashlib.sha256(traffic_bytes).hexdigest(),
+            "feature_count": len(traffic["features"]),
+            "local_path": str(traffic_path.relative_to(ROOT)),
+        },
+        "reports": {
+            "url": REPORT_URL,
+            "http_date": reports_http_date,
+            "sha256": hashlib.sha256(reports_bytes).hexdigest(),
+            "feature_count": len(reports["features"]),
+            "local_path": str(reports_path.relative_to(ROOT)),
+        },
+        "interpretation": "VIZ live traffic fields are a time-stamped service snapshot. A zero speed on a closed link is not a measured speed. VIZ closure reports may be scheduled and are not proof of field execution.",
+    }
+    _validate_traffic_binding(receipt, traffic, "capture")
+    traffic_path.write_bytes(traffic_bytes)
+    reports_path.write_bytes(reports_bytes)
+    receipt_path.write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + "\n")
+    return receipt
+
+
+def build(snapshot_name: str, output: Path = LOCAL_BUNDLE, event_name: str | None = None) -> dict:
+    _validate_snapshot_name(snapshot_name)
+    if event_name:
+        _validate_snapshot_name(event_name)
+    receipt_path = RAW / f"{snapshot_name}-receipt.json"
+    receipt = json.loads(receipt_path.read_text())
+    traffic_path = ROOT / receipt["traffic"]["local_path"]
+    reports_path = ROOT / receipt["reports"]["local_path"]
+    if traffic_path.resolve() != (RAW / f"{snapshot_name}-traffic.json").resolve() or reports_path.resolve() != (RAW / f"{snapshot_name}-reports.json").resolve():
+        raise ValueError("baseline receipt paths differ from immutable snapshot name")
+    if sha256_file(traffic_path) != receipt["traffic"]["sha256"] or sha256_file(reports_path) != receipt["reports"]["sha256"]:
+        raise ValueError("snapshot bytes changed after capture")
+    city_path, probe_path, candidates_path = CITY, PROBE, CANDIDATES
+    city = json.loads(city_path.read_text())
+    probe = json.loads(probe_path.read_text())
+    candidates = json.loads(candidates_path.read_text())
+    if sha256_file(city_path) != probe["citypack_sha256"] or sha256_file(candidates_path) != probe["closure_candidates_sha256"]:
+        raise ValueError("prediction no longer matches frozen city/candidate inputs")
+    edges = {edge["id"]: edge for edge in city["edges"]}
+    changed = [
+        route for route in probe["routes"]
+        if route["known_active_candidate_arm"] != route["active_plus_upcoming_candidate_arm"]
+    ]
+    affected_ids = {edge_id for route in changed for edge_id in route["known_active_candidate_arm"]["edge_ids"]}
+    candidate_ids = {edge_id for case in candidates["cases"] for edge_id in case["candidate_directed_edge_ids"]}
+    if not affected_ids or not affected_ids <= edges.keys() or not candidate_ids <= edges.keys():
+        raise ValueError("frozen prediction references unknown roads")
+
+    def road_feature(edge_id: str, layer: str) -> dict:
+        edge = edges[edge_id]
+        return {
+            "type": "Feature",
+            "geometry": {"type": "LineString", "coordinates": edge["geometry"]},
+            "properties": {
+                "id": edge_id,
+                "name": edge["name"],
+                "layer": layer,
+                "source_id": edge["source_id"],
+                "route_labels": [r["label"] for r in changed if edge_id in r["known_active_candidate_arm"]["edge_ids"]],
+            },
+        }
+
+    # A sparse visual context keeps the browser responsive. The comparison
+    # layers below always retain every frozen candidate and prediction edge.
+    context = [
+        road_feature(eid, "context") for eid, e in edges.items()
+        if e["geometry"] and e["name"] and e["length_m"] >= 50 and _within(e["geometry"])
+    ]
+    traffic = json.loads(traffic_path.read_text())
+    _validate_traffic_binding(receipt, traffic, "baseline")
+    predicted = [road_feature(eid, "predicted_route_impact") for eid in sorted(affected_ids)]
+    restricted = [road_feature(eid, "restriction_input") for eid in sorted(candidate_ids)]
+    baseline_comparison, pre_event_coverage = compare_snapshots(predicted, traffic["features"], traffic["features"])
+    if pre_event_coverage["hit"] or pre_event_coverage["miss"]:
+        raise ValueError("same-snapshot spatial control reported a traffic change")
+    control_plan, control_features = select_matched_controls(
+        predicted, restricted, traffic["features"], baseline_comparison
+    )
+    control_plan["baseline_traffic_sha256"] = receipt["traffic"]["sha256"]
+    control_plan["baseline_feed_utc"] = receipt["traffic"]["feed_time_stamp"]
+    control_plan["selection_sha256"] = hashlib.sha256(
+        json.dumps(control_plan["groups"], sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
+    frozen_baseline_sha256 = None
+    if event_name:
+        frozen_baseline_path = RAW / f"{snapshot_name}-baseline-map.json"
+        if output.resolve() == frozen_baseline_path.resolve():
+            raise ValueError("event output cannot overwrite the frozen baseline map")
+        saved = json.loads(frozen_baseline_path.read_text())
+        _check_frozen_baseline(
+            saved,
+            receipt,
+            sha256_file(probe_path),
+            sha256_file(city_path),
+            control_plan,
+            control_features,
+        )
+        frozen_baseline_sha256 = sha256_file(frozen_baseline_path)
+    covered_indices = set(pre_event_coverage["matched_prediction_indices"])
+    for index, feature in enumerate(predicted):
+        feature["properties"]["viz_baseline_coverage"] = index in covered_indices
+    report_source = json.loads(reports_path.read_text())
+    reports = _marathon_line_reports(report_source["features"])
+    event_receipt = None
+    observed_change: list[dict] = []
+    comparison_metrics = None
+    control_indicator = None
+    if event_name:
+        event_receipt = json.loads((RAW / f"{event_name}-receipt.json").read_text())
+        event_traffic_path = ROOT / event_receipt["traffic"]["local_path"]
+        if event_traffic_path.resolve() != (RAW / f"{event_name}-traffic.json").resolve():
+            raise ValueError("event receipt path differs from immutable snapshot name")
+        if sha256_file(event_traffic_path) != event_receipt["traffic"]["sha256"]:
+            raise ValueError("event traffic bytes changed after capture")
+        event_traffic = json.loads(event_traffic_path.read_text())
+        _validate_traffic_binding(event_receipt, event_traffic, "event")
+        timing = _comparison_timing(receipt, event_receipt)
+        observed_change, comparison_metrics = compare_snapshots(
+            predicted,
+            traffic["features"],
+            event_traffic["features"],
+        )
+        comparison_metrics["timing"] = timing
+        control_indicator = summarize_control_indicator(control_plan, observed_change)
+    bundle = {
+        "schema_version": "civiflux-validation-map-v1",
+        "event_id": "berlin-marathon-2026",
+        "built_at_utc": datetime.now(UTC).isoformat(),
+        "prediction_frozen_at_utc": probe["frozen_at_utc"],
+        "prediction_sha256": sha256_file(probe_path),
+        "citypack_sha256": sha256_file(city_path),
+        "observation_snapshot": receipt,
+        "event_snapshot": event_receipt,
+        "status": "TWO_SNAPSHOT_SPATIAL_COMPARISON" if event_receipt else "PRE_EVENT_BASELINE_ONLY",
+        "comparison_metrics": comparison_metrics,
+        "control_plan": control_plan,
+        "frozen_baseline_map_sha256": frozen_baseline_sha256,
+        "control_indicator": control_indicator,
+        "pre_event_coverage": {
+            "predicted_edges_with_viz_match": pre_event_coverage["predicted_edges_with_viz_match"],
+            "predicted_edges_without_viz_match": pre_event_coverage["predicted_edges_without_viz_match"],
+            "matched_viz_segments": pre_event_coverage["matched_viz_segments"],
+            "scored_matched_viz_segments": pre_event_coverage["scored_matched_viz_segments"],
+            "interpretation": "Spatial observation coverage only, frozen from the baseline feed; unmatched prediction edges cannot be scored as hits or false alarms.",
+        },
+        "counts": {
+            "context_roads": len(context),
+            "predicted_route_impact_edges": len(affected_ids),
+            "restriction_input_edges": len(candidate_ids),
+            "traffic_segments": len(traffic["features"]),
+            "marathon_reports": len(reports),
+        },
+        "layers": {
+            "context_roads": _collection(context),
+            "predicted_route_impact": _collection(predicted),
+            "restriction_inputs": _collection(restricted),
+            "viz_traffic": _collection(traffic["features"]),
+            "viz_controls": _collection(control_features),
+            "viz_marathon_reports": _collection(reports),
+            "observed_change": _collection(observed_change),
+        },
+        "comparison_note": "The orange paths are frozen plugin routing outputs for two declared OD pairs, not closure inputs. Purple paths are announcement-derived restriction inputs. Blue control segments are selected using baseline VIZ class/direction/speed only, away from predicted and input roads. Two-snapshot spatial scores and any pair-adjusted speed indicator are descriptive; controls cannot establish event causation.",
+    }
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(bundle, ensure_ascii=False, separators=(",", ":")) + "\n")
+    return {"output": str(output), "counts": bundle["counts"], "status": bundle["status"]}
+
+
+def build_placebo(snapshot_name: str, later_name: str, output: Path) -> dict:
+    """Map same-rule pre-onset background changes without reporting a hit rate."""
+    _validate_snapshot_name(snapshot_name)
+    _validate_snapshot_name(later_name)
+    if snapshot_name == later_name:
+        raise ValueError("placebo requires two different snapshots")
+    baseline_receipt = json.loads((RAW / f"{snapshot_name}-receipt.json").read_text())
+    later_receipt = json.loads((RAW / f"{later_name}-receipt.json").read_text())
+    timing = _placebo_timing(baseline_receipt, later_receipt)
+    later_path = ROOT / later_receipt["traffic"]["local_path"]
+    if later_path.resolve() != (RAW / f"{later_name}-traffic.json").resolve():
+        raise ValueError("placebo receipt path differs from immutable snapshot name")
+    if sha256_file(later_path) != later_receipt["traffic"]["sha256"]:
+        raise ValueError("placebo traffic bytes changed after capture")
+    later_traffic = json.loads(later_path.read_text())
+    _validate_traffic_binding(later_receipt, later_traffic, "placebo later")
+    with tempfile.TemporaryDirectory(prefix="civiflux-berlin-placebo-") as directory:
+        baseline_path = Path(directory) / "baseline.json"
+        build(snapshot_name, baseline_path)
+        bundle = json.loads(baseline_path.read_text())
+    baseline_path = ROOT / baseline_receipt["traffic"]["local_path"]
+    baseline_traffic = json.loads(baseline_path.read_text())
+    observed, metrics = compare_snapshots(
+        bundle["layers"]["predicted_route_impact"]["features"],
+        baseline_traffic["features"],
+        later_traffic["features"],
+    )
+    indicator = summarize_control_indicator(bundle["control_plan"], observed)
+    bundle["status"] = "PRE_ONSET_PLACEBO"
+    bundle["placebo_snapshot"] = later_receipt
+    bundle["placebo_metrics"] = {
+        "scored_segments": metrics["scored_segments"],
+        "overlap_with_background_change": metrics["hit"],
+        "nearby_background_change_without_overlap": metrics["miss"],
+        "overlap_without_large_change": metrics["false_alarm"],
+        "unscored": metrics["unscored"],
+        "timing": timing,
+    }
+    bundle["control_indicator"] = indicator
+    bundle["layers"]["observed_change"] = _collection(observed)
+    bundle["comparison_note"] = (
+        "Both official VIZ feeds precede the announced incremental onset. "
+        "Any spatial coincidence here is background variation, not a predicted event hit. "
+        "Do not compute event precision or recall from this placebo pair."
+    )
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(bundle, ensure_ascii=False, separators=(",", ":")) + "\n")
+    return {"output": str(output), "status": bundle["status"], "placebo_metrics": bundle["placebo_metrics"]}
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    sub = parser.add_subparsers(dest="command", required=True)
+    capture_parser = sub.add_parser("capture")
+    capture_parser.add_argument("name")
+    build_parser = sub.add_parser("build")
+    build_parser.add_argument("snapshot_name")
+    build_parser.add_argument("--event-name")
+    build_parser.add_argument("--output", type=Path, default=LOCAL_BUNDLE)
+    placebo_parser = sub.add_parser("placebo")
+    placebo_parser.add_argument("snapshot_name")
+    placebo_parser.add_argument("later_name")
+    placebo_parser.add_argument("--output", type=Path, default=RAW / "berlin-placebo-local.json")
+    args = parser.parse_args()
+    if args.command == "capture":
+        result = capture(args.name)
+    elif args.command == "placebo":
+        result = build_placebo(args.snapshot_name, args.later_name, args.output)
+    else:
+        result = build(args.snapshot_name, args.output, args.event_name)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+
+
+if __name__ == "__main__":
+    main()

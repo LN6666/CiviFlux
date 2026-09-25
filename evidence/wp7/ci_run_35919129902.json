@@ -1,0 +1,205 @@
+{
+  "schema_version": "1.0",
+  "status": "SCOPED_CI_PASS",
+  "captured_at": "2026-09-23T20:59:43.443128+00:00",
+  "source": "GitHub Actions jobs, logs, and downloaded artifacts",
+  "repository": "LN6666/CiviFlux",
+  "pull_request": 7,
+  "run_id": 35919129902,
+  "run_url": "https://github.com/LN6666/CiviFlux/actions/runs/35919129902",
+  "head_commit": "fe4100ac71756740149d407b3243748ad96d7759",
+  "head_tree": "60f9fca8d70d3f1c4a11d056e18f214dd8cbd8a1",
+  "checkout_merge_commit": "abd4ea2e239c759954cee777a4250240bcd07b75",
+  "checkout_merge_tree": "60f9fca8d70d3f1c4a11d056e18f214dd8cbd8a1",
+  "exact_tree_match": true,
+  "tested_code_commit": "ada0475629919b6d1aa4d5cea3ed3bf85f3977c4",
+  "controlled_inputs_identical_between_tested_code_and_ci_head": true,
+  "jobs": {
+    "core": {
+      "job_id": 107378261651,
+      "url": "https://github.com/LN6666/CiviFlux/actions/runs/35919129902/job/107378261651",
+      "conclusion": "success",
+      "completed_at": "2026-09-23T20:57:07Z",
+      "required_steps": [
+        "Run make bootstrap",
+        "Run make test-fast test-data test-outcomes test-sumo security-check sbom-host-check",
+        "Run make build-web",
+        "Run make test-browser"
+      ]
+    },
+    "container": {
+      "job_id": 107378261311,
+      "url": "https://github.com/LN6666/CiviFlux/actions/runs/35919129902/job/107378261311",
+      "conclusion": "success",
+      "completed_at": "2026-09-23T20:55:54Z",
+      "required_steps": [
+        "Run python3 deploy/container_repro.py --out .runtime/container-ci/reproduction.json"
+      ]
+    }
+  },
+  "test_result_lines": [
+    "7 passed in 3.79s",
+    "206 passed, 1 warning in 9.69s",
+    "49 passed, 1 skipped, 1 warning in 1.52s",
+    "6 passed in 0.58s",
+    "11 passed in 14.17s",
+    "20 passed in 0.66s",
+    "11 passed (24.3s)"
+  ],
+  "core_log_sha256": "99fb66a170d482c7d5785bfb2e548bdef8bd003d2864b0b7a6b738e32971ea07",
+  "container_log_sha256": "cb4ea451d0fa2ba68ada4b075b574b4100b27d4934dad1125297a549aa858b7e",
+  "browser": {
+    "artifact_id": 10776103618,
+    "artifact_digest": "sha256:23dc34a7ce559bb3846bd49c8bcb5a64d29270fe1152c9667253bdb12e40ad5d",
+    "results_json_sha256": "75513ecffc21bdd1121c294223a7950219da2411a584ad1719db78a7749a149b",
+    "stats": {
+      "startTime": "2026-09-23T20:56:39.743Z",
+      "duration": 24262.869,
+      "expected": 11,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "tests": [
+      {
+        "title": "attention search and pages keep a large result browsable",
+        "ok": true
+      },
+      {
+        "title": "vanilla component releases subscriptions and aborts in-flight requests across repeated mounts",
+        "ok": true
+      },
+      {
+        "title": "MapLibre host disposes real map instances while remounting the same component",
+        "ok": true
+      },
+      {
+        "title": "unmounting during a real active job clears poll timer and stops browser requests",
+        "ok": true
+      },
+      {
+        "title": "Cancel in the browser reaches terminal cancelled state with no completed result",
+        "ok": true
+      },
+      {
+        "title": "map host executes actual backend, object view and reproducible export",
+        "ok": true
+      },
+      {
+        "title": "vanilla host executes actual backend, object view and reproducible export",
+        "ok": true
+      },
+      {
+        "title": "fire requires explicit polygon and assumption before a real run",
+        "ok": true
+      },
+      {
+        "title": "Qwen API unavailable is distinct from computed results and never falls back",
+        "ok": true
+      },
+      {
+        "title": "invalid time window is rejected before committing an action",
+        "ok": true
+      },
+      {
+        "title": "map selection opens baseline object and routing vehicle is independent of blocked class",
+        "ok": true
+      }
+    ]
+  },
+  "container": {
+    "artifact_id": 10775928716,
+    "artifact_digest": "sha256:93dc959ec2dea148cc030436d681a11f5e040577dea2f0b04ed29b6118f50646",
+    "reproduction_json_sha256": "50bd2d9433f713c6f1cc6004624cc9a59ad0fd29f39eb27ea532799057196666",
+    "image": {
+      "architecture": "amd64",
+      "buildx_manifest_digest": "sha256:2a7986d91e0084b389e6d9c2c31d4ebec90a6703732abf0c30b3399e47994c05",
+      "id": "sha256:2a7986d91e0084b389e6d9c2c31d4ebec90a6703732abf0c30b3399e47994c05",
+      "os": "linux",
+      "repo_digests": [],
+      "tag": "civiflux-container-check:8c7e291e5cad"
+    },
+    "checks": [
+      {
+        "stage": "git_commit",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_daemon",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_buildx",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_build",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "image_inspect",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "container_smoke",
+        "status": "PASS",
+        "exit_code": 0
+      }
+    ],
+    "smoke": {
+      "api": {
+        "citypack_id": "TOY-DUAL-CORRIDOR",
+        "export_sha256": "ff9b9310efa3a43e2c01471f2627917852d38d0bf3d212a4723630f2b77ab563",
+        "health": {
+          "ontology_version": "1.0.0",
+          "status": "ok",
+          "version": "0.1.0"
+        },
+        "od_count": 1,
+        "ppr_converged": true,
+        "qwen_status": "BLOCKED_API_SETUP",
+        "scenario_status": "completed"
+      },
+      "model_egress": "disabled_by_environment_and_docker_network_none",
+      "python": "3.12.13",
+      "scope": "Linux installed image; synthetic city, actual local SUMO, API HTTP and export; no hosted model or measured-city claim",
+      "status": "PASS",
+      "sumo": {
+        "baseline_arrived": 1,
+        "demand_kind": "synthetic",
+        "engine": "real_local_sumo",
+        "event_arrived": 1,
+        "native_linker_missing_libraries": {
+          "netconvert": [],
+          "sumo": []
+        },
+        "network_sha256": "235dd4cf25cb2f05b54cc52288a5aa81f9e75d90e8ef4fa0ddce22abeab50eae",
+        "version": "1.27.1"
+      },
+      "web_bundle": true
+    }
+  },
+  "sbom_artifact": {
+    "artifact_id": 10776551926,
+    "artifact_digest": "sha256:91bfea1353a7f52870cadf98c16d9f56b5f93539339296a47a3619c362a555d5"
+  },
+  "native_clean_checkout": {
+    "path": "evidence/wp7/clean_checkout_ada_offline.json",
+    "sha256": "7816205059eaa47369b4c630fe43ada3598a017cbebef24e0d206f6ddf5e145d",
+    "commit": "ada0475629919b6d1aa4d5cea3ed3bf85f3977c4",
+    "status": "PASS",
+    "network": "disabled for uv; no data/model calls",
+    "scope": "existing frozen dependency cache on macOS; not a cold-cache or new-machine proof"
+  },
+  "limitations": [
+    "CI data suite skips the raw-citypack test because ignored local Helsinki bytes are absent.",
+    "No paid classifier call, independent model calibration, expert road mapping, measured historical traffic, or fire perimeter validation.",
+    "Native offline clean checkout used an existing dependency cache; a new machine must obtain the pinned wheels first.",
+    "Passing tests and container smoke do not constitute complete v1 release acceptance."
+  ]
+}

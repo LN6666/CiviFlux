@@ -4,15 +4,16 @@ from __future__ import annotations
 
 import json
 import shutil
+from collections.abc import Callable
 from importlib.metadata import version
 from pathlib import Path
 from threading import Event
-from typing import Callable, Protocol
+from typing import Protocol
 
 from .contracts import MANIFEST, CityPack, ResultBundle, Scenario
 from .graph import paired_projection
 from .network import Router
-from .ranking import RELATION_DEFINITIONS, compare
+from .ranking import RELATION_DEFINITIONS, compare, direct_relation_rank
 from .util import atomic_json, digest, file_hash
 
 
@@ -65,6 +66,7 @@ class AnalysisService:
         *,
         overlay_hash: str,
         action_log_hash: str,
+        extra_limitations: tuple[str, ...] = (),
         stage: Callable[[str], None] = lambda _: None,
         cancel: Event | None = None,
     ) -> ResultBundle:
@@ -112,17 +114,19 @@ class AnalysisService:
         scores = {name: 1.0 for name in RELATION_DEFINITIONS}
         policy = None
         provider = "rules"
+        policy_epsilon = 0.1
         if scenario.ranking in ("A3", "A4"):
             checkpoint("system_one_api")
             if self.policy_backend is None:
                 raise RuntimeError("BLOCKED_API_SETUP: configure SimpleJev endpoint and call budget")
             policy = self.policy_backend.score_relations(scenario.objective, RELATION_DEFINITIONS)
             scores = policy["scores"]
+            policy_epsilon = policy["epsilon"]
             provider = policy["provider_mode"]
         pair = paired_projection(city, scenario, facts, digest(scores))
         checkpoint("ranking")
         if scenario.ranking in ("A2", "A3", "A5"):
-            attention = compare(pair, scenario.seed_spec.entity_ids, scores)
+            attention = compare(pair, scenario.seed_spec.entity_ids, scores, epsilon=policy_epsilon)
             if policy:
                 policy["applied_transition_hash"] = digest(attention["transition_hashes"])
         elif scenario.ranking == "A1":
@@ -145,12 +149,10 @@ class AnalysisService:
                 "convergence": None,
             }
         elif scenario.ranking == "A4":
-            attention = {
-                "kind": "relation_policy_without_ppr",
-                "relation_scores": scores,
-                "records": [],
-                "convergence": None,
-            }
+            attention = direct_relation_rank(
+                pair, scores, [facility.id for facility in city.facilities], epsilon=policy_epsilon
+            )
+            policy["applied_transition_hash"] = digest(attention["transition_hashes"])
         else:
             attention = {"kind": "physical_facts_only", "records": [], "convergence": None}
         attention["variant"] = scenario.ranking
@@ -178,6 +180,7 @@ class AnalysisService:
             assumptions=scenario.assumptions,
             sources=city.sources,
             limitations=tuple(city.warnings)
+            + extra_limitations
             + (
                 "Planning/research support; not operational dispatch or evacuation guidance.",
                 "Fixed network travel time is not congestion or emergency response time.",

@@ -1,0 +1,215 @@
+{
+  "schema_version": "1.0",
+  "status": "SCOPED_CI_PASS",
+  "captured_at": "2026-09-23T21:34:01.543661+00:00",
+  "source": "GitHub Actions job metadata/logs and downloaded artifacts",
+  "repository": "LN6666/CiviFlux",
+  "pull_request": 7,
+  "run_id": 35922643950,
+  "run_url": "https://github.com/LN6666/CiviFlux/actions/runs/35922643950",
+  "head_commit": "9cd06d7a54762f23806f37e694715de0f0c0c2ab",
+  "head_tree": "be8f96a072f1f304fe223f298ccab489e96d3f15",
+  "checkout_merge_commit": "aec5c9dc40e46e6d4fb722a26325326bcd6673d7",
+  "checkout_merge_tree": "be8f96a072f1f304fe223f298ccab489e96d3f15",
+  "exact_tree_match": true,
+  "tested_code_commit": "9cd06d7a54762f23806f37e694715de0f0c0c2ab",
+  "controlled_inputs_identical_between_tested_code_and_ci_head": true,
+  "jobs": {
+    "container": {
+      "job_id": 107390097037,
+      "url": "https://github.com/LN6666/CiviFlux/actions/runs/35922643950/job/107390097037",
+      "conclusion": "success",
+      "completed_at": "2026-09-23T21:29:11Z"
+    },
+    "core": {
+      "job_id": 107390097282,
+      "url": "https://github.com/LN6666/CiviFlux/actions/runs/35922643950/job/107390097282",
+      "conclusion": "success",
+      "completed_at": "2026-09-23T21:30:08Z"
+    }
+  },
+  "test_result_lines": [
+    "7 passed in 1.07s",
+    "210 passed, 1 warning in 8.25s",
+    "49 passed, 1 skipped, 1 warning in 1.52s",
+    "7 passed in 0.63s",
+    "11 passed in 11.88s",
+    "20 passed in 0.55s",
+    "12 passed (23.1s)"
+  ],
+  "core_log_sha256": "0d9bd87c11d81b558fef1f2ff61b0699238a093b79c4cb0598794d6a3b9b16b0",
+  "container_log_sha256": "3de3a2089d710a1cc90e58dd503c77d7a19c508d4ecdc10bd41ae5b22fd6cce2",
+  "browser": {
+    "artifact_id": 10778011939,
+    "artifact_digest": "sha256:22d60a026c15bf55b4b02652efd5680d1ac620c27961178f83368e00cd673100",
+    "results_json_sha256": "68a73ce5e420de635a3e3eddc3d7b0650575ffe963a79546f7b11747cbb5332f",
+    "stats": {
+      "startTime": "2026-09-23T21:29:38.863Z",
+      "duration": 23141.945,
+      "expected": 12,
+      "skipped": 0,
+      "unexpected": 0,
+      "flaky": 0
+    },
+    "tests": [
+      {
+        "title": "attention search and pages keep a large result browsable",
+        "ok": true
+      },
+      {
+        "title": "vanilla component releases subscriptions and aborts in-flight requests across repeated mounts",
+        "ok": true
+      },
+      {
+        "title": "MapLibre host disposes real map instances while remounting the same component",
+        "ok": true
+      },
+      {
+        "title": "unmounting during a real active job clears poll timer and stops browser requests",
+        "ok": true
+      },
+      {
+        "title": "Cancel in the browser reaches terminal cancelled state with no completed result",
+        "ok": true
+      },
+      {
+        "title": "large citypacks search roads without rendering every road as an option",
+        "ok": true
+      },
+      {
+        "title": "map host executes actual backend, object view and reproducible export",
+        "ok": true
+      },
+      {
+        "title": "vanilla host executes actual backend, object view and reproducible export",
+        "ok": true
+      },
+      {
+        "title": "fire requires explicit polygon and assumption before a real run",
+        "ok": true
+      },
+      {
+        "title": "Qwen API unavailable is distinct from computed results and never falls back",
+        "ok": true
+      },
+      {
+        "title": "invalid time window is rejected before committing an action",
+        "ok": true
+      },
+      {
+        "title": "map selection opens baseline object and routing vehicle is independent of blocked class",
+        "ok": true
+      }
+    ],
+    "road_picker_test_scope": "1200 synthetic roads intercepted at real local CityPack API; no options before search, at most 50 matched options, selected road retained; not a city-scale latency benchmark"
+  },
+  "container": {
+    "artifact_id": 10777921803,
+    "artifact_digest": "sha256:16dca90122ff40e915cebc4640e47cd202315bf7e58492d817006d53f48801e5",
+    "reproduction_json_sha256": "3f6de8ae91cc8eb344064573facdf6cf2fd5aa0fc52a28ab66478e11648626da",
+    "image": {
+      "architecture": "amd64",
+      "buildx_manifest_digest": "sha256:d01ed5e9acd53826178e5789a5191dbc1f8f0b738fa99c5be24de27b8c28f71e",
+      "id": "sha256:d01ed5e9acd53826178e5789a5191dbc1f8f0b738fa99c5be24de27b8c28f71e",
+      "os": "linux",
+      "repo_digests": [],
+      "tag": "civiflux-container-check:8c7e291e5cad"
+    },
+    "checks": [
+      {
+        "stage": "git_commit",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_daemon",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_buildx",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "docker_build",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "image_inspect",
+        "status": "PASS",
+        "exit_code": 0
+      },
+      {
+        "stage": "container_smoke",
+        "status": "PASS",
+        "exit_code": 0
+      }
+    ],
+    "smoke": {
+      "api": {
+        "citypack_id": "TOY-DUAL-CORRIDOR",
+        "export_sha256": "bc90db221da9e7c64cde5122cc6c6d19e1ca5d2186e759b4f735c5eb23d5775c",
+        "health": {
+          "ontology_version": "1.0.0",
+          "status": "ok",
+          "version": "0.1.0"
+        },
+        "od_count": 1,
+        "ppr_converged": true,
+        "qwen_status": "BLOCKED_API_SETUP",
+        "scenario_status": "completed"
+      },
+      "model_egress": "disabled_by_environment_and_docker_network_none",
+      "python": "3.12.13",
+      "scope": "Linux installed image; synthetic city, actual local SUMO, API HTTP and export; no hosted model or measured-city claim",
+      "status": "PASS",
+      "sumo": {
+        "baseline_arrived": 1,
+        "demand_kind": "synthetic",
+        "engine": "real_local_sumo",
+        "event_arrived": 1,
+        "native_linker_missing_libraries": {
+          "netconvert": [],
+          "sumo": []
+        },
+        "network_sha256": "25afd21c20bf5d07dddab1ee53821e0bad053f4ba98e7ae6f9cf2e938e0a9828",
+        "version": "1.27.1"
+      },
+      "web_bundle": true
+    }
+  },
+  "sbom_artifact": {
+    "artifact_id": 10777229386,
+    "artifact_digest": "sha256:06f8a3e6f21cf8645f44f3672eaa87a6b2ce80a1700c5c78f7ada737adac3b62"
+  },
+  "local_current_data": {
+    "path": "evidence/wp7/current_data_test_620.json",
+    "sha256": "a92242417e75b057d9ef9ebaf4fbae5f89f2986a13ada5929c4e256d77d32bb6",
+    "status": "PASS_ON_ANCESTOR_620",
+    "tests_passed": 50,
+    "scope": "ignored Helsinki current CityPack, backend/data unchanged after ancestor 620; absent from CI"
+  },
+  "offline_a4_control": {
+    "path": "evidence/wp6/a4_direct_control_offline.json",
+    "sha256": "b0bde2112035475cb9d0ea3fcee027f1098b7a0bf8af3375501692f6112e3996",
+    "status": "PASS_OFFLINE_KERNEL_ONLY_ON_ANCESTOR_620",
+    "provider_network_calls": 0
+  },
+  "native_clean_checkout": {
+    "path": "evidence/wp7/clean_checkout_620_offline.json",
+    "sha256": "c8085818d2bd8ac4bebe236f8be4e46fbeaa73f5a3bfb75afbe13dc604f16d09",
+    "commit": "620bc302fac15a4c214ac6c5fb1e7c46467a4039",
+    "status": "BLOCKED_ENVIRONMENT",
+    "scope": "Earlier code, macOS offline UV cache lacks pinned sumo-data wheel; no current 9cd native retry. Current Linux clean container PASS."
+  },
+  "limitations": [
+    "CI data suite skips raw CityPack test because ignored Helsinki bytes are absent.",
+    "Browser test verifies bounded DOM option count but not cross-device performance or entire Helsinki pack on current UI tree.",
+    "A4 fixed-vector offline kernel is not real hosted classifier efficacy or full A3/A4 ablation.",
+    "No paid classifier call, expert road mapping, event-hour independent traffic measurements, or fire perimeter validation.",
+    "Native macOS clean checkout was not repeated on current 9cd tree; earlier offline run stopped at missing pinned cache wheel.",
+    "Scoped CI does not constitute complete v1 release acceptance."
+  ]
+}

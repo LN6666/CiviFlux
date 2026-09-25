@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "case_id": "baku-f1-2026-pushkin-indirect",
+  "status": "RETROSPECTIVE_PLAN_TO_PLAN_SUBSET",
+  "citypack_sha256": "8adba2949ca4d6637b0250ef8eb72fd6833456abcad3674dcfeb3fcfe1577c89",
+  "multimodal_citypack_sha256": "c6679caad099a40b1f88bc2c32ff9956afb6e8dbecb9d523c3c89080bc0acf9a",
+  "multimodal_osm_roi_sha256": "ed9ff1c56ddf60e941d28085e770cecfbab97ac5b7790f0bf409ef5a186f86c7",
+  "closure_input": {
+    "source_id": "AZ-BCC-2026-TRAFFIC",
+    "source_sha256": "3aeb95b9dc259127ebf17360e8a9dd96a5f6dc90baa3342d3287b139bd03629b",
+    "fact_id": "BCC-PUSHKIN",
+    "street_name_in_citypack": "Puşkin küçəsi",
+    "announced_extent": "Pushkin Street between Uzeyir Hajibeyli Street and Neftchilar Avenue",
+    "mapping_method": "exact street name plus analyst-drawn midpoint box around the two announced intersections; unreviewed directed edges",
+    "midpoint_bbox": [49.8538, 40.37345, 49.8556, 40.37555],
+    "vehicle_class": "bus"
+  },
+  "synthetic_od_pairs": [
+    {
+      "id": "pushkin_to_neftchilar",
+      "start_lon_lat": [49.85384340255172, 40.375697345346886],
+      "end_lon_lat": [49.85577627655045, 40.37351993168591],
+      "purpose": "test a short crossing of the mapped Pushkin restriction"
+    },
+    {
+      "id": "pushkin_to_east_port",
+      "start_lon_lat": [49.85310678082814, 40.37698516413891],
+      "end_lon_lat": [49.85834012525581, 40.37422526688074],
+      "purpose": "test a longer eastbound crossing of the mapped Pushkin restriction"
+    }
+  ],
+  "held_out_announced_detour_streets": {
+    "source_id": "AZ-AYNA-2026-BUS",
+    "source_sha256": "80eef8066cb08d0c0878849d89761efae83002e709fa3800de26e972d8b4befe",
+    "notice_window_local": "2026-09-21/26",
+    "selection": "selected central-city street names from AYNA's 21–26 Sep diversion paragraphs, not complete bus-route geometry or actual operation",
+    "exact_citypack_names": [
+      "Kövkəb Səfərəliyeva küçəsi",
+      "Neftçilər prospekti",
+      "Afiyəddin Cəlilov küçəsi",
+      "Yusif Səfərov küçəsi",
+      "28 May küçəsi",
+      "Rəşid Behbudov küçəsi",
+      "Dilarə Əliyeva küçəsi",
+      "Azadlıq prospekti",
+      "Puşkin küçəsi",
+      "Şeyx Şamil küçəsi",
+      "Lermontov küçəsi",
+      "Bünyad Sərdarov küçəsi"
+    ],
+    "mapping_status": "STREET_NAME_CANDIDATE_ONLY",
+    "used_to_choose_od_or_restriction": false
+  },
+  "claim_ceiling": "Only a retrospective, synthetic-OD conditional route versus separately announced detour street-name comparison; no real bus trace, observed road speed, verified closure edge mapping or predictive accuracy"
+}

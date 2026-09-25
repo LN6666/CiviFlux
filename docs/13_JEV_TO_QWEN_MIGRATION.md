@@ -1,5 +1,7 @@
 # 13 · Jev → Qwen System-One 迁移说明
 
+**历史迁移说明，不是当前执行方案。** 本页从 TypeSafe Jev 迁到自托管 Reflex/Qwen 的路径已再次被用户的[托管 Featherless SimpleJev 决定](../execution/USER_DECISIONS.md)覆盖；当前契约和调用限制见 [adapter 文档](../adapters/system_one/README.md)。不要运行本页的本地部署、权重下载或旧测试命令。
+
 核查日期：2026-09-23。[S22–S24]
 
 ## 为什么迁移

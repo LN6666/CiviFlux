@@ -34,13 +34,13 @@
 
 不做多模型“交叉投票”判断代码对不对。用test、oracle、mypy/tsc、浏览器测试。Reviewer只看验收指标、diff和失败证据，不让三个agents各自重新写完整方案。
 
-至多3个实现worker并行，每个有不重叠的目录owner和返回格式；契约/lockfile只有integrator改。代码代理运行token按工具实际usage记账，无usage则unknown，不造精确数。项目System-One本地算力账本和Codex编程token账本分开。
+至多3个实现worker并行，每个有不重叠的目录owner和返回格式；契约/lockfile只有integrator改。代码代理运行 token 按工具实际 usage 记账，无 usage 则 unknown，不造精确数。项目托管 SimpleJev 的调用次数/费用账本和 Codex 编程 token 账本分开。
 
 ## 每次handoff只写
 
 `WP/GOAL状态 | 本次可运行产物 | 执行命令与退出码 | 失败/blocked根因 | 剩余budget | 下一个完整WP`。
 
-缺少本地GPU/模型缓存/数据等环境信息只记录一次blocked，绝不在每步重复问城市/架构/是否3D。用户已选择Web、本地、Road&Fire、Qwen System-One+KG+PPR全v1，保持不变。
+缺少已授权生产 API 配额或城市数据等环境条件时只记录一次准确的阻塞状态，绝不在每步重复问城市/架构/是否 3D。用户已选择 Web、本地城市数据分析、Road & Fire、托管 SimpleJev+KG+PPR 的 v1 范围，保持不变。
 
 ## 暂停规则不是半成品借口
 

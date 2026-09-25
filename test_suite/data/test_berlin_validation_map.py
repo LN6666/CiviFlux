@@ -1,0 +1,238 @@
+from __future__ import annotations
+
+import pytest
+
+from scripts.berlin_validation_map import (
+    _check_frozen_baseline,
+    _comparison_timing,
+    _placebo_timing,
+    _receipt_feed_time,
+    _validate_snapshot_name,
+    _validate_traffic_binding,
+    compare_snapshots,
+    select_matched_controls,
+    summarize_control_indicator,
+)
+
+
+def road(key: str, x: float, speed: float, closed: int = 0) -> dict:
+    return {
+        "type": "Feature",
+        "geometry": {"type": "LineString", "coordinates": [[x, 52.52], [x + 0.001, 52.52]]},
+        "properties": {"unique_id": key, "speedavg": speed, "freeflowspeed": 50, "strkat_1": "I", "closed": closed},
+    }
+
+
+def test_snapshot_comparison_separates_hits_misses_false_alarms_and_missing() -> None:
+    predicted = [road("prediction", 13.380, 20), road("prediction2", 13.383, 20)]
+    before = [road("hit", 13.380, 40), road("false", 13.383, 40), road("miss", 13.390, 40), road("closed", 13.392, 0, 1)]
+    after = [road("hit", 13.380, 20), road("false", 13.383, 38), road("miss", 13.390, 0, 1), road("closed", 13.392, 0, 1), road("missing", 13.394, 15)]
+    features, metrics = compare_snapshots(predicted, before, after)
+    by_id = {f["properties"]["unique_id"]: f["properties"] for f in features}
+    assert by_id["hit"]["verdict"] == "hit"
+    assert by_id["false"]["verdict"] == "false_alarm"
+    assert by_id["miss"]["verdict"] == "miss"
+    assert by_id["closed"]["verdict"] == "unscored"
+    assert by_id["missing"]["verdict"] == "unscored"
+    assert metrics["precision"] == pytest.approx(0.5)
+    assert metrics["recall"] == pytest.approx(0.5)
+    assert metrics["unscored"] == 2
+    assert metrics["predicted_edge_count"] == 2
+    assert metrics["predicted_edges_with_viz_match"] == 2
+    assert metrics["predicted_edges_without_viz_match"] == 0
+    assert metrics["matched_viz_segments"] == 2
+    assert metrics["scored_matched_viz_segments"] == 2
+
+
+def test_snapshot_comparison_does_not_treat_preexisting_zero_speed_as_measured_drop() -> None:
+    predicted = [road("prediction", 13.380, 20)]
+    features, metrics = compare_snapshots(predicted, [road("x", 13.380, 0, 1)], [road("x", 13.380, 0, 1)])
+    assert features[0]["properties"]["change_class"] == "unscored_preexisting_closure"
+    assert metrics["scored_segments"] == 0
+    assert metrics["precision"] is None
+
+
+def test_snapshot_comparison_keeps_opposite_direction_separate() -> None:
+    prediction = road("prediction", 13.380, 20)
+    old_opposite = road("opposite", 13.380, 40)
+    old_opposite["geometry"]["coordinates"].reverse()
+    opposite = road("opposite", 13.380, 20)
+    opposite["geometry"]["coordinates"].reverse()
+    features, metrics = compare_snapshots([prediction], [old_opposite], [opposite])
+    assert features[0]["properties"]["predicted_overlap"] is False
+    assert metrics["miss"] == 1
+
+
+def test_snapshot_comparison_does_not_score_reidentified_geometry_or_missing_event_segment() -> None:
+    predicted = [road("prediction", 13.380, 20)]
+    before = [road("changed", 13.380, 40), road("vanished", 13.381, 40), road("moved", 13.382, 40)]
+    after = [road("changed", 13.380, 15), road("moved", 13.500, 10)]
+    after[0]["geometry"]["coordinates"].reverse()
+    features, metrics = compare_snapshots(predicted, before, after)
+    by_id = {f["properties"]["unique_id"]: f["properties"] for f in features}
+    assert by_id["changed"]["change_class"] == "unscored_geometry_changed"
+    assert by_id["vanished"]["change_class"] == "unscored_missing_event"
+    assert by_id["vanished"]["predicted_overlap"] is True
+    assert by_id["moved"]["change_class"] == "unscored_geometry_moved_out"
+    assert by_id["moved"]["predicted_overlap"] is False
+    assert metrics["scored_segments"] == 0
+    assert metrics["unscored"] == 3
+    assert metrics["scored_matched_viz_segments"] == 0
+    assert metrics["precision"] is None
+
+
+def test_duplicate_viz_ids_and_stale_feed_cannot_produce_a_score() -> None:
+    predicted = [road("prediction", 13.380, 20)]
+    with pytest.raises(ValueError, match="duplicate VIZ unique_id"):
+        compare_snapshots(predicted, [road("same", 13.380, 40)] * 2, [road("same", 13.380, 15)])
+    receipt = {
+        "captured_at_utc": "2026-09-26T06:30:00+00:00",
+        "traffic": {"feed_time_stamp": "2026-09-26T06:00:00Z"},
+    }
+    with pytest.raises(ValueError, match="stale or future-dated"):
+        _receipt_feed_time(receipt, "event")
+    receipt["traffic"]["feed_time_stamp"] = "2026-09-26T06:29:50Z"
+    assert _receipt_feed_time(receipt, "event")[1] == 10
+
+
+def test_receipt_must_match_embedded_feed_time_and_feature_count() -> None:
+    receipt = {
+        "captured_at_utc": "2026-09-26T04:45:10+00:00",
+        "traffic": {"feed_time_stamp": "2026-09-26T04:45:00Z", "feature_count": 1},
+    }
+    traffic = {"type": "FeatureCollection", "timeStamp": "2026-09-26T04:45:00Z", "features": [road("x", 13.38, 30)]}
+    _validate_traffic_binding(receipt, traffic, "baseline")
+    with pytest.raises(ValueError, match="timestamp differs"):
+        _validate_traffic_binding(receipt, {**traffic, "timeStamp": "2026-09-25T04:45:00Z"}, "baseline")
+    with pytest.raises(ValueError, match="feature count differs"):
+        _validate_traffic_binding(receipt, {**traffic, "features": []}, "baseline")
+    receipt["captured_at_utc"] = "2026-09-26T05:01:00+00:00"
+    with pytest.raises(ValueError, match="stale or future-dated"):
+        _validate_traffic_binding(receipt, traffic, "baseline")
+
+
+def test_capture_and_feed_both_must_straddle_announced_onset() -> None:
+    baseline = {
+        "captured_at_utc": "2026-09-26T04:45:00+00:00",
+        "traffic": {"feed_time_stamp": "2026-09-26T04:44:55Z"},
+    }
+    event = {
+        "captured_at_utc": "2026-09-26T06:30:00+00:00",
+        "traffic": {"feed_time_stamp": "2026-09-26T06:29:55Z"},
+    }
+    assert _comparison_timing(baseline, event)["event_feed_age_s"] == 5
+    event["captured_at_utc"] = "2026-09-26T04:59:30+00:00"
+    event["traffic"]["feed_time_stamp"] = "2026-09-26T05:00:10Z"
+    with pytest.raises(ValueError, match="capture times"):
+        _comparison_timing(baseline, event)
+    event["captured_at_utc"] = "2026-09-26T06:30:00+00:00"
+    event["traffic"]["feed_time_stamp"] = "2026-09-26T06:29:55Z"
+    baseline["captured_at_utc"] = "2026-09-26T04:59:30+00:00"
+    baseline["traffic"]["feed_time_stamp"] = "2026-09-26T05:00:10Z"
+    with pytest.raises(ValueError, match="feed timestamps"):
+        _comparison_timing(baseline, event)
+
+
+def test_placebo_pair_must_stay_before_onset_and_snapshot_names_are_bounded() -> None:
+    baseline = {
+        "captured_at_utc": "2026-09-25T18:45:10+00:00",
+        "traffic": {"feed_time_stamp": "2026-09-25T18:45:05Z"},
+    }
+    later = {
+        "captured_at_utc": "2026-09-25T21:03:41+00:00",
+        "traffic": {"feed_time_stamp": "2026-09-25T21:03:35Z"},
+    }
+    assert _placebo_timing(baseline, later)["later_feed_age_s"] == 6
+    later["captured_at_utc"] = "2026-09-26T05:01:00+00:00"
+    later["traffic"]["feed_time_stamp"] = "2026-09-26T05:00:55Z"
+    with pytest.raises(ValueError, match="both precede"):
+        _placebo_timing(baseline, later)
+    with pytest.raises(ValueError, match="short ASCII"):
+        _validate_snapshot_name("../outside")
+
+
+def test_baseline_only_controls_avoid_restricted_roads_and_adjust_common_speed_change() -> None:
+    predicted = [road("prediction", 13.380, 30)]
+    restricted = [road("input", 13.383, 30)]
+    baseline = [
+        road("treated", 13.380, 40),
+        road("near_input", 13.383, 40),
+        road("control_a", 13.389, 40),
+        road("control_b", 13.390, 40),
+        road("wrong_class", 13.391, 40),
+    ]
+    baseline[-1]["properties"]["strkat_1"] = "II"
+    baseline_observed, _ = compare_snapshots(predicted, baseline, baseline)
+    plan, features = select_matched_controls(predicted, restricted, baseline, baseline_observed)
+    assert plan["treated_segments"] == 1
+    assert plan["control_segments"] == 2
+    assert {feature["properties"]["unique_id"] for feature in features} == {"control_a", "control_b"}
+    assert all(group["control_ids"] != ["near_input"] for group in plan["groups"])
+
+    event = [
+        road("treated", 13.380, 20),
+        road("near_input", 13.383, 40),
+        road("control_a", 13.389, 36),
+        road("control_b", 13.390, 36),
+        road("wrong_class", 13.391, 40),
+    ]
+    observed, _ = compare_snapshots(predicted, baseline, event)
+    indicator = summarize_control_indicator(plan, observed)
+    assert indicator["status"] == "DESCRIPTIVE_CONTROL_ONLY"
+    assert indicator["valid_treated_control_groups"] == 1
+    assert indicator["median_pair_adjusted_speed_drop_fraction"] == pytest.approx(0.4)
+
+
+def test_control_indicator_excludes_new_closures_from_speed_math() -> None:
+    plan = {"groups": [{"treated_id": "treated", "control_ids": ["control"]}]}
+    observed, _ = compare_snapshots(
+        [road("prediction", 13.380, 30)],
+        [road("treated", 13.380, 40), road("control", 13.389, 40)],
+        [road("treated", 13.380, 0, 1), road("control", 13.389, 0, 1)],
+    )
+    indicator = summarize_control_indicator(plan, observed)
+    assert indicator["status"] == "INSUFFICIENT_VALID_PAIRS"
+    assert indicator["median_pair_adjusted_speed_drop_fraction"] is None
+    assert indicator["newly_reported_closed_treated"] == 1
+    assert indicator["newly_reported_closed_controls"] == 1
+
+
+def test_event_geometry_cannot_change_baseline_prediction_coverage() -> None:
+    prediction = road("prediction", 13.380, 20)
+    before = [road("baseline_match", 13.380, 40), road("baseline_miss", 13.380, 40)]
+    after = [road("baseline_match", 13.380, 20), road("baseline_miss", 13.380, 20)]
+    for feature, latitude in zip(before, (52.52010, 52.52025), strict=True):
+        for point in feature["geometry"]["coordinates"]:
+            point[1] = latitude
+    for feature, latitude in zip(after, (52.52024, 52.52012), strict=True):
+        for point in feature["geometry"]["coordinates"]:
+            point[1] = latitude
+    observed, metrics = compare_snapshots([prediction], before, after)
+    by_id = {f["properties"]["unique_id"]: f["properties"] for f in observed}
+    assert by_id["baseline_match"]["verdict"] == "hit"
+    assert by_id["baseline_miss"]["verdict"] == "miss"
+    assert metrics["predicted_edges_with_viz_match"] == 1
+    assert metrics["matched_viz_segments"] == 1
+
+
+def test_event_control_plan_requires_pre_onset_saved_baseline() -> None:
+    receipt = {"traffic": {"sha256": "baseline-bytes"}}
+    plan = {"groups": [{"treated_id": "treated", "control_ids": ["control"]}]}
+    controls = [{"type": "Feature", "properties": {"unique_id": "control"}}]
+    saved = {
+        "built_at_utc": "2026-09-26T04:50:00+00:00",
+        "status": "PRE_EVENT_BASELINE_ONLY",
+        "observation_snapshot": receipt,
+        "prediction_sha256": "prediction-bytes",
+        "citypack_sha256": "city-bytes",
+        "control_plan": plan,
+        "layers": {"viz_controls": {"type": "FeatureCollection", "features": controls}},
+    }
+    _check_frozen_baseline(saved, receipt, "prediction-bytes", "city-bytes", plan, controls)
+    with pytest.raises(ValueError, match="selected controls differ"):
+        _check_frozen_baseline(saved, receipt, "prediction-bytes", "city-bytes", {"groups": []}, controls)
+    with pytest.raises(ValueError, match="selected controls differ"):
+        _check_frozen_baseline(saved, {"traffic": {"sha256": "different"}}, "prediction-bytes", "city-bytes", plan, controls)
+    saved["built_at_utc"] = "2026-09-26T05:01:00+00:00"
+    with pytest.raises(ValueError, match="not built before"):
+        _check_frozen_baseline(saved, receipt, "prediction-bytes", "city-bytes", plan, controls)

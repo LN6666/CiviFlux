@@ -11,6 +11,12 @@
   "R1": {
     "actual_operated_restriction_verified": false,
     "candidate_mapped_count": 3,
+    "generated_case_report_count_ignored": 0,
+    "generated_operation_flag_ignored": false,
+    "human_acceptance_basis": {
+      "accepted_fact_count": 0,
+      "status": "NOT_SUBMITTED"
+    },
     "human_accepted_count": 0,
     "motor_road_fact_count": 3,
     "planned_not_observed": true,
@@ -29,6 +35,7 @@
     "event-matched measured traffic outcomes and controls not registered"
   ],
   "citypack": {
+    "generated_network_status_ignored": false,
     "gtfs_covers_both_events": false,
     "historical_network_ready": false,
     "id": "helsinki-current-482a4af607e4",
@@ -38,9 +45,9 @@
   "input_sha256": {
     "cases/helsinki_cityrun_2026/case_evidence.json": "0f86ac2063fc84d98741297b27379372434029cb582661ab3b83cc9268f2799e",
     "cases/helsinki_fire_2026/case_evidence.json": "4463d85553ad35b7de007e231bc2c6b1153e2fefc631dae0a8bed51fe2d092af",
-    "evidence/wp1/case_review.json": "bcfbb1e71bd65fd0771b0dfb5852e79141ee8efd424d16eb1f889ba0d962d84e",
+    "evidence/wp1/case_review.json": "1542d6b47ca71b40368c2699f70b1af71589eb89eadcebd5b4d0700e1bb2cfcc",
     "evidence/wp1/citypack_audit.json": "1123a3f7d4c5bb2c55fbc920be58a4a052e845d48a1b8fc542b675d7011f4f6a",
-    "evidence/wp1/evaluation_split_manifest.json": "0dc0840246a2aa6c0f3a8a9b0fb2de487d5cd5a7f38086936f0ef96228fd060d",
+    "evidence/wp1/evaluation_split_manifest.json": "ae1cf2ed469f14d0b91799c8f427bc375fac3c68ac0336e6aaecb43d80a68d72",
     "evidence/wp1/missing_data_report.json": "e813618823cfbb79d331ab32a0ce6a24ef5a5186639af49f62bdd78f0653e649"
   },
   "overall_historical_numeric_claim": "NOT_VALIDATED",

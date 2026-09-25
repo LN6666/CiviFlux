@@ -1,5 +1,7 @@
 # 01 · 架构与实现取舍
 
+本页保留原工程包的架构取舍；模型运行方式与当前实现请以 [用户决定](../execution/USER_DECISIONS.md)、[当前架构](CURRENT_ARCHITECTURE.md)和 [SimpleJev adapter](../adapters/system_one/README.md) 为准。下文涉及本地 Reflex/Qwen 的缓存 pin 或部署要求已被托管 API 决定覆盖。
+
 ## 固定结构
 
 ```text

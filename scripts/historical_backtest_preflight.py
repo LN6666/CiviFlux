@@ -14,6 +14,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from urbanimpact.citypack.mapping_review import REVIEW_RELATIVE_PATH, validate_review
+
 INPUTS = (
     "evidence/wp1/citypack_audit.json",
     "evidence/wp1/case_review.json",
@@ -43,19 +45,32 @@ def assess(root: Path) -> dict[str, Any]:
 
     road_review = review.get("road_case", {})
     fire_review = review.get("fire_case", {})
-    mapped = road_review.get("candidate_mapped_fact_count", 0)
-    accepted = road_review.get("human_accepted_mapping_count", 0)
-    source_count = road_review.get("motor_road_fact_count", 0)
+    motor_fact_ids = {fact["fact_id"] for fact in road.get("facts", []) if "road_name" in fact}
+    mapped = len({fact.get("fact_id") for fact in road_review.get("mapping", [])} & motor_fact_ids)
+    # A count in the generated case report is not a human review. Only a
+    # separately submitted, source- and candidate-bound record can contribute.
+    review_path = root / REVIEW_RELATIVE_PATH
+    mapping_review = {"status": "NOT_SUBMITTED", "accepted_fact_count": 0}
+    if review_path.exists():
+        submitted, digest = _load(root, str(REVIEW_RELATIVE_PATH))
+        mapping_review = validate_review(root, submitted)
+        loaded[str(REVIEW_RELATIVE_PATH)] = submitted, digest
+    accepted = mapping_review["accepted_fact_count"]
+    source_count = len(motor_fact_ids)
     coverage = audit.get("gtfs_coverage", {}).get("historical_case_dates", {})
     event_dates = road.get("event_dates", [])
     fire_date = fire.get("event_date")
     historical_gtfs = bool(event_dates and fire_date) and all(
         coverage.get(date) is True for date in [*event_dates, fire_date]
     )
-    historical_network = missing.get("historical_network") == "VALIDATED_EVENT_DATE"
+    # This generated missing-data report does not register or verify an
+    # event-date network snapshot. A changed status string cannot make one real.
+    historical_network_reported_validated = missing.get("historical_network") == "VALIDATED_EVENT_DATE"
     traffic = missing.get("traffic_counts", {})
     measured_targets = split.get("heldout_measured_targets", [])
-    actual_road_operation_verified = road_review.get("observed_operation_verified") is True
+    # The case-review file is machine-generated. An operation log and its
+    # provenance need a separate validation contract before V1b can advance.
+    actual_road_operation_verified = False
 
     return {
         "schema_version": "1.0",
@@ -65,28 +80,29 @@ def assess(root: Path) -> dict[str, Any]:
         "citypack": {
             "status": audit.get("status"),
             "id": audit.get("citypack_id"),
-            "historical_network_ready": historical_network,
+            "historical_network_ready": False,
+            "generated_network_status_ignored": historical_network_reported_validated,
             "gtfs_covers_both_events": historical_gtfs,
         },
         "R1": {
             "source_fact_kind": road.get("source_status"),
             "planned_not_observed": road.get("source_status") == "planned_notice_web_verified",
             "actual_operated_restriction_verified": actual_road_operation_verified,
+            "generated_operation_flag_ignored": road_review.get("observed_operation_verified") is True,
             "motor_road_fact_count": source_count,
             "candidate_mapped_count": mapped,
             "human_accepted_count": accepted,
+            "human_acceptance_basis": mapping_review,
+            "generated_case_report_count_ignored": road_review.get("human_accepted_mapping_count", 0),
             "v1_source_transcription": "AVAILABLE" if road.get("facts") and source_count else "MISSING",
-            "v1_historical_reconstruction": (
-                "READY_TO_AUDIT" if accepted == source_count and source_count > 0
-                and historical_network and actual_road_operation_verified
-                else "NOT_VALIDATED"
-            ),
+            "v1_historical_reconstruction": "NOT_VALIDATED",
             "v2_independent_operations": "NOT_REGISTERED",
             "v3_measured_numeric": "NOT_VALIDATED",
         },
         "F1": {
             "incident_fact_kind": fire.get("incident_facts_status"),
-            "exact_building_known": fire.get("coordinates") is not None or fire.get("address_number") is not None,
+            "exact_building_known": fire.get("coordinates") is not None
+            or fire.get("address_number") is not None,
             "actual_cordon_known": fire.get("actual_cordon") is not None,
             "v1_incident_facts": "AVAILABLE" if fire_review.get("incident_facts") else "MISSING",
             "v1_historical_restriction_reconstruction": "NOT_VALIDATED",
@@ -97,7 +113,16 @@ def assess(root: Path) -> dict[str, Any]:
         "traffic_source_status": traffic.get("status"),
         "overall_historical_numeric_claim": "NOT_VALIDATED",
         "blocking_evidence": [
-            "R1 directed-edge mapping requires independent human acceptance",
+            *(
+                ["R1 directed-edge mapping requires independent human acceptance"]
+                if accepted != source_count or source_count == 0
+                else []
+            ),
+            *(
+                ["R1 submitted reviewer identity and independence require external confirmation"]
+                if mapping_review["status"].startswith("SELF_ATTESTED")
+                else []
+            ),
             "R1 planned restriction notice does not confirm actual operated closure intervals",
             "F1 actual cordon/road restriction geometry and exact building remain unknown",
             "event-date network/GTFS not validated",

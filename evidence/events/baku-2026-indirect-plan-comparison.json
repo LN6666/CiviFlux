@@ -1,0 +1,69 @@
+{
+  "status": "RETROSPECTIVE_INDIRECT_PLAN_COMPARISON",
+  "case_id": "baku-f1-2026-pushkin-indirect",
+  "citypack_sha256": "8adba2949ca4d6637b0250ef8eb72fd6833456abcad3674dcfeb3fcfe1577c89",
+  "multimodal_citypack_sha256": "c6679caad099a40b1f88bc2c32ff9956afb6e8dbecb9d523c3c89080bc0acf9a",
+  "multimodal_osm_roi_sha256": "ed9ff1c56ddf60e941d28085e770cecfbab97ac5b7790f0bf409ef5a186f86c7",
+  "case_sha256": "4c782e44cfdad5129a92a5b31b1182c66bf99ee8396b805f7ba4984dc7a3c673",
+  "bcc_notice_sha256": "3aeb95b9dc259127ebf17360e8a9dd96a5f6dc90baa3342d3287b139bd03629b",
+  "ayna_notice_sha256": "80eef8066cb08d0c0878849d89761efae83002e709fa3800de26e972d8b4befe",
+  "input_candidate_directed_edges": 12,
+  "synthetic_od_routes": [
+    {
+      "id": "pushkin_to_neftchilar",
+      "synthetic": true,
+      "origin_node": "osm:node:7384081390:5afb40ae",
+      "target_node": "osm:node:2558449292:f60b0ada",
+      "origin_snap_gap_m": 0.0,
+      "target_snap_gap_m": 0.0,
+      "baseline_distance_m": 220.6,
+      "conditional_distance_m": 1318.07,
+      "delta_distance_m": 1097.5,
+      "baseline_freeflow_time_s": 8.759179265658748,
+      "conditional_freeflow_time_s": 68.3321849668943,
+      "delta_freeflow_time_s": 59.6,
+      "baseline_uses_candidate_edges": 8,
+      "new_detour_directed_edges": 32
+    },
+    {
+      "id": "pushkin_to_east_port",
+      "synthetic": true,
+      "origin_node": "osm:node:12282027663:a2f9e5a7",
+      "target_node": "osm:node:4396634688:d928d1f0",
+      "origin_snap_gap_m": 0.0,
+      "target_snap_gap_m": 0.0,
+      "baseline_distance_m": 546.67,
+      "conditional_distance_m": 1398.24,
+      "delta_distance_m": 851.6,
+      "baseline_freeflow_time_s": 29.7956341777001,
+      "conditional_freeflow_time_s": 71.66525614963399,
+      "delta_freeflow_time_s": 41.9,
+      "baseline_uses_candidate_edges": 8,
+      "new_detour_directed_edges": 26
+    }
+  ],
+  "unique_new_detour_directed_edges": 32,
+  "ayna_selected_street_names": 12,
+  "ayna_independent_street_names": 10,
+  "indirect_exact_street_name_agreement_edges": 23,
+  "proxy_new_detour_edge_name_overlap_pct": 71.9,
+  "indirect_exact_street_name_agreement_names": [
+    "28 May küçəsi",
+    "Azadlıq prospekti"
+  ],
+  "active_mobility_candidate_layers": {
+    "walk_only_directed_edges": 422,
+    "cycle_only_directed_edges": 35,
+    "walk_cycle_directed_edges": 0,
+    "pedestrian_area_polygons": 4,
+    "spatial_scope": "central Pushkin map subset for linear links; full displayed Baku map extent for explicit pedestrian area=yes polygons",
+    "event_restrictions_mapped": false
+  },
+  "not_scored": [
+    "actual_bus_path",
+    "actual_road_closure",
+    "speed_change",
+    "prediction_accuracy"
+  ],
+  "claim_ceiling": "Only a retrospective, synthetic-OD conditional route versus separately announced detour street-name comparison; no real bus trace, observed road speed, verified closure edge mapping or predictive accuracy"
+}
