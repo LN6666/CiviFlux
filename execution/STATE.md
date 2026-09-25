@@ -1,6 +1,16 @@
 # 当前执行状态 / Handoff state
 
-更新：2026-09-24。状态：**IMPLEMENTED_PARTIAL_ACCEPTANCE**。不能把手交包的 66 项 reference tests 当作产品验收。
+更新：2026-09-25 UTC。状态：**IMPLEMENTED_PARTIAL_ACCEPTANCE**。不能把手交包的 66 项 reference tests 当作产品验收。
+
+## 最新工作树检查点：城市 KG 与赛事验证准备
+
+当前开发线为 draft [PR #7](https://github.com/LN6666/CiviFlux/pull/7) 的 `codex/directed-mapping-review`。下文按提交记录列出的早期 CI/哈希是**历史检查点**；新增 Berlin/Baku 城市图代码在更新的 CI 通过和 release manifest 重绑定前，不继承旧代码树的 PASS。新数据与结果的范围如下：
+
+- Berlin 的固定 Geofabrik OSM 源 SHA-256 为 `ff4ac9a01c7d7c13dc3a9a47e4a5031152c82cfed36720fe2a1bf99543fb1a76`；[城市 KG 审计](../evidence/events/berlin-2026-city-kg-audit.json)记录 153,264 条有向道路、239,430 条转向关系和 153,900 个 ontology objects。9 月 21 日官方公告仅有 2 段街道经算法提出 37/35 条候选有向边，均为 `CANDIDATE_UNREVIEWED`；不能宣称完整封路网络。
+- Berlin [增量条件探针](../evidence/events/berlin-2026-incremental-pre-onset-probe.json)于 `2026-09-25T18:20:40Z` 冻结，早于 26 Sep 07:00 CEST 的**计划**封路起点。相同当前网络、OD 与已知起始候选下，两组东西向 OD 在新增候选封路时不可达，北侧对照 OD 不变。此敏感性是未审阅候选映射上的自由流路径结果；真实道路运行、其他先前封路、需求/拥堵、边界外绕行和独立观测均未验证，不能列为 V2/V3 预测准确性。
+- Baku 已下载 18 Sep 2026、首批公告限制开始前的 [Geofabrik OSM](https://download.geofabrik.de/asia/azerbaijan.html)（46,189,332 bytes；SHA-256 `5134c55378dda62dfe4257b6aa7eec06fe9c67594f7e578bcd6186fbaac5c363`）；[城市 KG 审计](../evidence/events/baku-2026-city-kg-audit.json)记录 74,289 条有向道路、130,326 条转向关系和 75,095 个 ontology objects。官方 2026 赛事交通公告与 AYNA 公交改线以[来源事实卡](../data/event_cases/baku-f1-2026-source-facts.json)固定；[可行性审计](../docs/BAKU_2026_F1_DATA_FEASIBILITY.md)区分 V1a 计划事实与缺失的 V1b 人工映射、V2 实际运营和 V3 数值观测。巴库封路 19/20 Sep 已开始，不能追认事前预测。
+- 本机执行 `make test-fast test-data test-outcomes test-sumo security-check`：fast 210、当次 data 51 PASS/1 SKIP、outcomes 7、SUMO 11、安全 20，通过；加入 freeze guard 后复跑 `make test-data` 为 **53 PASS/1 SKIP**。data 的 1 项跳过因本开发工作树未带 ignored Helsinki 城市包，不能视为发布所需真实数据验证通过。城市原始 PBF 与大型 CityPack/KG 保持 ignored，本仓库只提交脚本、小型来源卡和哈希证据。
+- 上述城市构建和离线验证**不需要 Featherless 订阅**；免费 demo 三次已耗尽，付费生产调用继续 `DEFERRED_USER`。如将来必须付费，先告知用户用途、调用限额和估算费用。
 
 ## 当前权威入口
 

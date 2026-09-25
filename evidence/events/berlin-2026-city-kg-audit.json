@@ -1,0 +1,56 @@
+{
+  "status": "PASS_CURRENT_ROAD_ONLY_CANDIDATE",
+  "case_id": "berlin-marathon-2026",
+  "citypack_id": "berlin-marathon-2026-f3446e3ecbd9",
+  "citypack_sha256": "5781a8627f6b7680f70a81892b55dee33049554cb1b38946b86b1f818c1e67a0",
+  "source_sha256": "ff4ac9a01c7d7c13dc3a9a47e4a5031152c82cfed36720fe2a1bf99543fb1a76",
+  "source_last_modified": "Tue, 22 Sep 2026 23:53:57 GMT",
+  "bbox": [
+    13.24,
+    52.45,
+    13.48,
+    52.56
+  ],
+  "counts": {
+    "junctions": 76928,
+    "directed_road_segments": 153264,
+    "turn_connections": 239430,
+    "candidate_facilities": 635,
+    "ontology_objects": 153900,
+    "evidence_links": 153899
+  },
+  "knowledge_graph": {
+    "schema": "civiflux-city-kg-jsonl-v1",
+    "citypack_id": "berlin-marathon-2026-f3446e3ecbd9",
+    "ontology_version": "1.0.0",
+    "objects": 153900,
+    "links_by_type": {
+      "FACILITY_ACCESSED_VIA": 2423,
+      "ROAD_CONNECTS_TO": 239430,
+      "SEGMENT_ACCESS_TO_FACILITY": 2423,
+      "SUPPORTED_BY_EVIDENCE": 153899
+    },
+    "skipped_turns_without_common_vehicle_class": 0,
+    "artifacts": [
+      {
+        "path": "kg_objects.jsonl.gz",
+        "sha256": "1a27e97d8509a829fdaecb6d7682710b83a80f0433940c8264adc5754ef142aa",
+        "size_bytes": 2655952
+      },
+      {
+        "path": "kg_links.jsonl.gz",
+        "sha256": "fe375602f31ee4ef6da5880c720466875bc776dfe4c5ba9daf93ee06d2d0cc7b",
+        "size_bytes": 12883177
+      }
+    ],
+    "interpretation": "candidate imported topology and facility access; operational PPR projections must re-filter vehicle permissions and scenario time"
+  },
+  "claim_ceiling": "current ontology-typed road/facility inventory only; no event prediction validated",
+  "unresolved": [
+    "announced_closure_to_directed_edge_review",
+    "actual_closure_operation",
+    "independent_measured_event_outcomes",
+    "GTFS",
+    "boundary_sensitivity"
+  ]
+}

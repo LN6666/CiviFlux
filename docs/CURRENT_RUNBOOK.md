@@ -105,6 +105,10 @@ PYTHONPATH=core:. uv run --frozen python scripts/boundary_sensitivity.py
 
 历史事件回测须把来源事实、事发时路网/时刻、独立运营影响记录和独立数值观测分开验收；流程和指标见[回测协议](HISTORICAL_BACKTEST_PROTOCOL.md)。`python3 scripts/historical_backtest_preflight.py`只盘点当前证据，输出与[保存报告](../evidence/wp6/historical_backtest_preflight.json)可核对；它不会运行模型或把当前网络 what-if 评为历史预测。现有 R1 映射尚无人工接受，F1 实际警戒区未知，事发日期 GTFS 与独立实测目标均缺，历史数值结论继续 `NOT_VALIDATED`。
 
+### Berlin/Baku 大型活动城市图
+
+用户现优先要求按活动时间建立城市本体/KG。Berlin 和 Baku 的注册 OSM 下载、CityPack 与 typed KG 重建命令统一在[data/README](../data/README.md)。原始 PBF、HTML 来源快照和大型生成文件留在 ignored `data/raw/`、`data/citypacks/`，公开仓库保存获取方法、SHA-256、体量及小型来源事实/构建审计。Berlin 的[候选封路映射](../data/event_cases/berlin-marathon-2026-closure-candidates.json)与[9 月 26 日 07:00 CEST 前冻结的路径探针](../evidence/events/berlin-2026-incremental-pre-onset-probe.json)不代表真实交通结果；探针的源文件和输出哈希绑定，不可改写后冒称原预测。Baku 的[2026 赛事数据审计](BAKU_2026_F1_DATA_FEASIBILITY.md)说明可做计划公告转录与候选图构建，但尚无可评分的实际封路/事件小时道路观测。两座城市均无 GTFS、需求校准或经过人工接受的公告到有向边映射。不得将这两个本地构建自动注册为通过历史验证的正式产品案例。
+
 ## 6. SimpleJev Qwen classifier 与暂缓的付费 gate
 
 用户指定的服务是 **Featherless SimpleJev**，目标模型为 `featherless-ai/Qwen3.8-27B-classifier`。官方文档区分生产 `https://api.featherless.ai/v1/classifier` 与公开 demo `https://simple-jev-demo-api.featherless.ai/v1/classifier`；生产要求账号 key，demo 无需 key、受较小上下文与速率限制。可用模型应通过服务列表核验，不能仅凭配置名认定可用。[官方 API 文档](https://simple-jev.featherless.ai/docs)。

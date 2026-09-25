@@ -1,10 +1,12 @@
 # CiviFlux 轮替交接：给下一位 Codex
 
-这是当前项目的**执行入口**。先读本文件及[用户要求对照](USER_REQUIREMENTS_TRACE.md)，再看 [`execution/STATE.md`](../execution/STATE.md)、[`execution/ACCEPTANCE.md`](../execution/ACCEPTANCE.md) 和 [`evidence/current_product_release.json`](../evidence/current_product_release.json)。旧 `MASTER_PLAN.md`、编号设计文档、旧 prompt 和 `evidence/product_release.json` 是导入时的历史基线，不能覆盖当前用户决定或运行状态。
+这是当前项目的**执行入口**。先读本文件及[用户要求对照](USER_REQUIREMENTS_TRACE.md)，再看 [`execution/STATE.md`](../execution/STATE.md)、[`execution/ACCEPTANCE.md`](../execution/ACCEPTANCE.md) 和 [`evidence/current_product_release.json`](../evidence/current_product_release.json)。旧 `MASTER_PLAN.md`、编号设计文档、旧 prompt 和 `evidence/product_release.json` 是导入时的历史基线，不能覆盖当前用户决定或运行状态。本文较早提交号/CI 数字是当时的检查点；以紧接的最新检查点和实际 PR HEAD 为准。
 
 仓库：[LN6666/CiviFlux](https://github.com/LN6666/CiviFlux)，公开。所有人可读；其他账号贡献时 fork 或创建有权限的分支并提交 PR，由仓库维护者审核。不得假定自己拥有原始账号的 Featherless、GitHub 或本机凭据，也不能自动继承本次 Codex 会话的 goal 状态。`main` 是集成线；开发分支使用 `codex/` 前缀。先读 `git status`、最近提交和 CI，不重做已完成实验，也不改写共享历史。
 
 **交接锚点：**[PR #1](https://github.com/LN6666/CiviFlux/pull/1) 已以 squash 方式合入 `main`（集成提交 `776bf2c`）。当前 `main` 仍为 42 PASS/10 PARTIAL。[PR #2](https://github.com/LN6666/CiviFlux/pull/2) 至 [PR #5](https://github.com/LN6666/CiviFlux/pull/5) 是未合并的分项改动；draft [PR #6](https://github.com/LN6666/CiviFlux/pull/6) 组合验证这些改动，draft [PR #7](https://github.com/LN6666/CiviFlux/pull/7) 基于 #6 增加 Helsinki 有向映射审阅、范围绑定与浏览器分页，并修复离线干净检出。接手当前组合工作可用 `gh pr checkout 7`，先检查其 base/head、最新提交与 CI，再继续开发；不要把待审内容当成 `main`。
+
+**最新工作线，25 Sep 2026 UTC：**用户现要求优先按大型活动时间建设城市 ontology/KG，并核查 Berlin Marathon 与 Baku F1 的验证可行性。[Berlin 城市图审计](../evidence/events/berlin-2026-city-kg-audit.json)和[Baku 城市图审计](../evidence/events/baku-2026-city-kg-audit.json)记录固定 OSM 来源、范围、有向道路/转向/typed links 数量与结果哈希；原始数据和大型 CityPack/KG **gitignored，不会随 Git clone 自动到达**，按 [data/README](../data/README.md)重建。Berlin 的[官方封路候选](../data/event_cases/berlin-marathon-2026-closure-candidates.json)未经人工核验；[事前冻结的条件探针](../evidence/events/berlin-2026-incremental-pre-onset-probe.json)只给出未验证候选下的自由流路径敏感性。Baku 的[2026 来源事实卡](../data/event_cases/baku-f1-2026-source-facts.json)与[可行性审计](BAKU_2026_F1_DATA_FEASIBILITY.md)显示公告充分、赛前 OSM 可得，但封路起点已过、实际运营和独立道路数值观测未核验。**不能把公告、PPR 或这些探针写成交通预测验证。** 当前本地检查结果和下一步缺口见[STATE](../execution/STATE.md)；新代码须以最新 CI 重新核验。
 
 ## 新账户的第一步
 
@@ -42,6 +44,6 @@
 
 ## 新会话可以直接使用的起始提示
 
-> 请进入 goal 模式，继续公开仓库 `LN6666/CiviFlux` 的 Road & Fire GIS v1。先读取 `docs/CODEX_HANDOFF.md`、`docs/USER_REQUIREMENTS_TRACE.md`、`execution/STATE.md`、`execution/ACCEPTANCE.md`、`execution/USER_DECISIONS.md` 和 `evidence/current_product_release.json`，检查当前 Git/CI 与开放 PR。PR #1 已合并，之后开发分支提交须另开 PR。沿当前未完成目标做最小有证据的实现与修复，完成相应测试、文档和 PR。Featherless SimpleJev Qwen3.8-27B 只通过托管 API；免费 Demo 三次已用完，生产付费未经授权，预算为零，不本地部署模型。保持本体只服务 v1、物理 facts 与语义 attention 分离、不能将候选数据或模型评分当成核验事实。Helsinki 第一外圈只对本轮 48 个可配对目标提供限定范围稳定性；历史数值预测尚无独立观测。不要重跑未受变更影响的冻结实验；不能完成的外部 gate 如实标记并继续独立工作。
+> 请进入 goal 模式，继续公开仓库 `LN6666/CiviFlux` 的 Road & Fire GIS v1。先读取 `docs/CODEX_HANDOFF.md`、`docs/USER_REQUIREMENTS_TRACE.md`、`execution/STATE.md`、`execution/ACCEPTANCE.md`、`execution/USER_DECISIONS.md` 和 `evidence/current_product_release.json`，检查当前 Git/CI 与开放 PR。PR #1 已合并，之后开发分支提交须另开 PR。当前先按活动时间优先做城市 ontology/KG 和独立验证准备：Berlin 与 Baku 的固定源、候选城市图和小型证据已在 draft PR #7 工作线；大文件需重建，Berlin 候选封路待人工复核，Baku 有公告但无已核实的实际路段观测。沿当前未完成目标做最小有证据的实现与修复，完成相应测试、文档和 PR。Featherless SimpleJev Qwen3.8-27B 只通过托管 API；免费 Demo 三次已用完，生产付费未经授权，预算为零，不本地部署模型。需要订阅时先告知用户用途、上限和费用，不自动购买。保持本体只服务 v1、物理 facts 与语义 attention 分离、不能将候选数据或模型评分当成核验事实。Helsinki 第一外圈只对本轮 48 个可配对目标提供限定范围稳定性；历史数值预测尚无独立观测。不要重跑未受变更影响的冻结实验；不能完成的外部 gate 如实标记并继续独立工作。
 
 这是一份项目工作说明，不代替来自当前用户的新指示。接手者应以本次任务中的用户要求为准，保留已作出的授权和费用边界。

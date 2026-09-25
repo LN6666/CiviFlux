@@ -120,7 +120,15 @@ def extract_roi(source: Path, target: Path, bbox: list[float]) -> dict:
     }
 
 
-def convert_network(osm_path: Path, output: Path, netconvert: Path, log_path: Path, extraction: dict) -> dict:
+def convert_network(
+    osm_path: Path,
+    output: Path,
+    netconvert: Path,
+    log_path: Path,
+    extraction: dict,
+    *,
+    source_id: str = "S03-OSM",
+) -> dict:
     import sumolib
 
     command = [
@@ -176,7 +184,7 @@ def convert_network(osm_path: Path, output: Path, netconvert: Path, log_path: Pa
                 "speed_kph": edge.getSpeed() * 3.6,
                 "allowed_vehicle_classes": [v for v in VEHICLES if edge.allows(v)],
                 "geometry": [list(net.convertXY2LonLat(*p)) for p in edge.getShape()],
-                "source_id": "S03-OSM",
+                "source_id": source_id,
                 "external_id": edge.getID(),
                 "name": edge.getName() or tags.get("name", ""),
                 "oneway": True,
@@ -206,7 +214,7 @@ def convert_network(osm_path: Path, output: Path, netconvert: Path, log_path: Pa
         e["target"] for e in edges if "passenger" in e["allowed_vehicle_classes"]
     }
     road_nodes = [n for n in nodes if n["id"] in eligible_nodes]
-    facilities = extraction["facilities"]
+    facilities = [{**facility, "source_id": source_id} for facility in extraction["facilities"]]
     for facility in facilities:
         point = [facility["lon"], facility["lat"]]
         if road_nodes:

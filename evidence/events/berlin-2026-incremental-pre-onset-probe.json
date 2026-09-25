@@ -1,0 +1,219 @@
+{
+  "status": "FROZEN_PRE_ONSET_CONDITIONAL_PROBE",
+  "frozen_at_utc": "2026-09-25T18:20:40.771407+00:00",
+  "announced_upcoming_start": "2026-09-26T07:00:00+02:00",
+  "citypack_id": "berlin-marathon-2026-f3446e3ecbd9",
+  "citypack_sha256": "5781a8627f6b7680f70a81892b55dee33049554cb1b38946b86b1f818c1e67a0",
+  "closure_candidates_sha256": "d8135b957a50e8a112d1e3c143950f7d9d1ff75a16c2a6174ffbdb12f0b5bc13",
+  "notice_sha256": "a83157701a57001f1d93e24fe0869fc7936a13264bef51357f715b8d9ee4abd9",
+  "source_code_sha256": "ab73484146916359cda9aac26af84c290b66da53e74e4605b9b7338a4ff22092",
+  "od_spec_sha256": "47bccacd5c76ebba6cf767a808466875cef9b48e932d31bb4d7a526a60e3b01e",
+  "method": "same directed current OSM/SUMO network, static free-flow edge costs and explicit turns; candidate active restrictions in both arms; candidate future restriction only in second arm",
+  "vehicle_class": "passenger",
+  "known_active_candidate_count": 37,
+  "upcoming_candidate_count": 35,
+  "routes": [
+    {
+      "label": "west_to_east",
+      "origin_coordinate": [
+        13.38,
+        52.5162
+      ],
+      "target_coordinate": [
+        13.392,
+        52.5176
+      ],
+      "origin_node": "osm:node:26914118:b359799c",
+      "target_node": "osm:node:10189040386:6ed56f1e",
+      "known_active_candidate_arm": {
+        "status": "available",
+        "reachable": true,
+        "edge_ids": [
+          "osm:edge:424323348:0edefde7",
+          "osm:edge:30805074_1:42c5f8f7",
+          "osm:edge:30805074_2:642526f8",
+          "osm:edge:24240246_0:b7722efb",
+          "osm:edge:24240246_1:22428911",
+          "osm:edge:1125871262_1:6e08a08c",
+          "osm:edge:1125871619_1:a4aa354e",
+          "osm:edge:1125871619_3:7ddbaf04",
+          "osm:edge:1170522574:be197e4e",
+          "osm:edge:236092221_0:af4cdcf3",
+          "osm:edge:236092221_1:0d4822d5",
+          "osm:edge:236092221_2:a4a6bd4b",
+          "osm:edge:236092221_3:08380c5a",
+          "osm:edge:342968607_0:eab6a193",
+          "osm:edge:342968607_1:c19778b5",
+          "osm:edge:1170522572_0:e2e4907e",
+          "osm:edge:1170522572_1:38cce665",
+          "osm:edge:1170522572_2:008ff0f2",
+          "osm:edge:461526152_0:9c94e449",
+          "osm:edge:461526152_1:a86e0c5c",
+          "osm:edge:1126234503_0:00e08018",
+          "osm:edge:1126234503_1:cbc267ff",
+          "osm:edge:1126234503_2:d094fa95",
+          "osm:edge:1126237668_0:321d25c5",
+          "osm:edge:1126237668_1:7d7f910e",
+          "osm:edge:1079495669_0:dffad032",
+          "osm:edge:-110676319:64d14329",
+          "osm:edge:1217865061_0:2527ea1d",
+          "osm:edge:1217865061_1:c3db4d0b"
+        ],
+        "distance_m": 864.73,
+        "travel_time_s": 70.69469262602877
+      },
+      "active_plus_upcoming_candidate_arm": {
+        "status": "unreachable",
+        "reachable": false,
+        "edge_ids": [],
+        "distance_m": null,
+        "travel_time_s": null,
+        "reason": "No permitted directed route at the declared time"
+      },
+      "delta_freeflow_route_time_s": null
+    },
+    {
+      "label": "east_to_west",
+      "origin_coordinate": [
+        13.392,
+        52.5176
+      ],
+      "target_coordinate": [
+        13.38,
+        52.5162
+      ],
+      "origin_node": "osm:node:10189040386:6ed56f1e",
+      "target_node": "osm:node:26914118:b359799c",
+      "known_active_candidate_arm": {
+        "status": "available",
+        "reachable": true,
+        "edge_ids": [
+          "osm:edge:1077923225_0:d20f3a4d",
+          "osm:edge:1077923225_1:9acaa197",
+          "osm:edge:1077923225_2:45c26135",
+          "osm:edge:882389494_0:d9584ed5",
+          "osm:edge:882389494_1:59a1de55",
+          "osm:edge:340498988_0:a8e7d1c7",
+          "osm:edge:340498988_1:70722af9",
+          "osm:edge:340498988_2:42f886ed",
+          "osm:edge:188386313_0:53519008",
+          "osm:edge:188386313_1:814f1542",
+          "osm:edge:1119935327_1:676110de",
+          "osm:edge:1119935543_0:815f0a94",
+          "osm:edge:1119935543_1:b97ff04f",
+          "osm:edge:1119935543_2:58faad0f",
+          "osm:edge:1119936840_0:cfd85113",
+          "osm:edge:1119936840_1:a1b33c44",
+          "osm:edge:1119937599_2:be526174",
+          "osm:edge:530085625_1:8744c626",
+          "osm:edge:530085625_2:74cec81e",
+          "osm:edge:24240245_0:908073ba",
+          "osm:edge:24240245_1:2195e8a6",
+          "osm:edge:210668637_0:7d4c3538"
+        ],
+        "distance_m": 716.05,
+        "travel_time_s": 60.950559638682144
+      },
+      "active_plus_upcoming_candidate_arm": {
+        "status": "unreachable",
+        "reachable": false,
+        "edge_ids": [],
+        "distance_m": null,
+        "travel_time_s": null,
+        "reason": "No permitted directed route at the declared time"
+      },
+      "delta_freeflow_route_time_s": null
+    },
+    {
+      "label": "north_south_control",
+      "origin_coordinate": [
+        13.407,
+        52.532
+      ],
+      "target_coordinate": [
+        13.407,
+        52.526
+      ],
+      "origin_node": "osm:node:9077192736:14a1d497",
+      "target_node": "osm:node:10761523695:4ff39300",
+      "known_active_candidate_arm": {
+        "status": "available",
+        "reachable": true,
+        "edge_ids": [
+          "osm:edge:-4606230_1:42082831",
+          "osm:edge:-1052758759_2:0c419605",
+          "osm:edge:-1460514194_1:431a8116",
+          "osm:edge:1098856683_0:e8a132a1",
+          "osm:edge:1098856683_2:f0d1e4d3",
+          "osm:edge:1460514190_0:5049ec9e",
+          "osm:edge:1460514190_1:688bc650",
+          "osm:edge:1460514191_1:deabf516",
+          "osm:edge:1133761618_2:40747d18",
+          "osm:edge:41926994:d6b75138",
+          "osm:edge:102984483:57e6f807",
+          "osm:edge:1460514252:07a10e81",
+          "osm:edge:1101404336:cf40f808",
+          "osm:edge:1445876236:2e90a050",
+          "osm:edge:44427221:e44af917",
+          "osm:edge:11103453:54e948cf",
+          "osm:edge:44427219_0:0df1d9a7",
+          "osm:edge:44427219_2:3c7fd761",
+          "osm:edge:850240180_1:5acecd69",
+          "osm:edge:-1095407474_4:d92e598d",
+          "osm:edge:-1095407474_2:1ce90538",
+          "osm:edge:-1095407474_1:ff382f19",
+          "osm:edge:-1095407474_0:d55513d5",
+          "osm:edge:-1150954111_4:5906a95f",
+          "osm:edge:-1150954111_2:e8787606",
+          "osm:edge:-1150954111_0:645dcd96",
+          "osm:edge:-24241762_0:e7815e59"
+        ],
+        "distance_m": 689.96,
+        "travel_time_s": 74.97201904519906
+      },
+      "active_plus_upcoming_candidate_arm": {
+        "status": "available",
+        "reachable": true,
+        "edge_ids": [
+          "osm:edge:-4606230_1:42082831",
+          "osm:edge:-1052758759_2:0c419605",
+          "osm:edge:-1460514194_1:431a8116",
+          "osm:edge:1098856683_0:e8a132a1",
+          "osm:edge:1098856683_2:f0d1e4d3",
+          "osm:edge:1460514190_0:5049ec9e",
+          "osm:edge:1460514190_1:688bc650",
+          "osm:edge:1460514191_1:deabf516",
+          "osm:edge:1133761618_2:40747d18",
+          "osm:edge:41926994:d6b75138",
+          "osm:edge:102984483:57e6f807",
+          "osm:edge:1460514252:07a10e81",
+          "osm:edge:1101404336:cf40f808",
+          "osm:edge:1445876236:2e90a050",
+          "osm:edge:44427221:e44af917",
+          "osm:edge:11103453:54e948cf",
+          "osm:edge:44427219_0:0df1d9a7",
+          "osm:edge:44427219_2:3c7fd761",
+          "osm:edge:850240180_1:5acecd69",
+          "osm:edge:-1095407474_4:d92e598d",
+          "osm:edge:-1095407474_2:1ce90538",
+          "osm:edge:-1095407474_1:ff382f19",
+          "osm:edge:-1095407474_0:d55513d5",
+          "osm:edge:-1150954111_4:5906a95f",
+          "osm:edge:-1150954111_2:e8787606",
+          "osm:edge:-1150954111_0:645dcd96",
+          "osm:edge:-24241762_0:e7815e59"
+        ],
+        "distance_m": 689.96,
+        "travel_time_s": 74.97201904519906
+      },
+      "delta_freeflow_route_time_s": 0.0
+    }
+  ],
+  "claim_ceiling": "pre-onset conditional sensitivity on unreviewed candidate closures, not actual traffic prediction or V2/V3 validation",
+  "limitations": [
+    "The known starting state is partial; other announced closures are not mapped.",
+    "Candidate edge selection has no independent directed-road review.",
+    "No measured demand, congestion, actual closure operation, event-hour outcomes, or unaffected matched controls are present.",
+    "Current network crop excludes diversion alternatives outside its boundary."
+  ]
+}

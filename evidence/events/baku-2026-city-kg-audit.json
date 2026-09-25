@@ -1,0 +1,56 @@
+{
+  "status": "PASS_CURRENT_ROAD_ONLY_CANDIDATE",
+  "case_id": "baku-f1-2026",
+  "citypack_id": "baku-f1-2026-be751eb6856f",
+  "citypack_sha256": "8adba2949ca4d6637b0250ef8eb72fd6833456abcad3674dcfeb3fcfe1577c89",
+  "source_sha256": "5134c55378dda62dfe4257b6aa7eec06fe9c67594f7e578bcd6186fbaac5c363",
+  "source_last_modified": "Fri, 18 Sep 2026 23:28:25 GMT",
+  "bbox": [
+    49.78,
+    40.32,
+    49.96,
+    40.44
+  ],
+  "counts": {
+    "junctions": 33035,
+    "directed_road_segments": 74289,
+    "turn_connections": 130326,
+    "candidate_facilities": 805,
+    "ontology_objects": 75095,
+    "evidence_links": 75094
+  },
+  "knowledge_graph": {
+    "schema": "civiflux-city-kg-jsonl-v1",
+    "citypack_id": "baku-f1-2026-be751eb6856f",
+    "ontology_version": "1.0.0",
+    "objects": 75095,
+    "links_by_type": {
+      "FACILITY_ACCESSED_VIA": 2866,
+      "ROAD_CONNECTS_TO": 130326,
+      "SEGMENT_ACCESS_TO_FACILITY": 2866,
+      "SUPPORTED_BY_EVIDENCE": 75094
+    },
+    "skipped_turns_without_common_vehicle_class": 0,
+    "artifacts": [
+      {
+        "path": "kg_objects.jsonl.gz",
+        "sha256": "928b5d7b9a57994f6c4f980504c7a5c2e7741a799548386d8983cf26dc8c8ccc",
+        "size_bytes": 1180607
+      },
+      {
+        "path": "kg_links.jsonl.gz",
+        "sha256": "6134e41f1c81ffe9cb7b9b6c84126870cba604552ce769cb991033a19361c3a4",
+        "size_bytes": 6632806
+      }
+    ],
+    "interpretation": "candidate imported topology and facility access; operational PPR projections must re-filter vehicle permissions and scenario time"
+  },
+  "claim_ceiling": "current ontology-typed road/facility inventory only; no event prediction validated",
+  "unresolved": [
+    "announced_closure_to_directed_edge_review",
+    "actual_closure_operation",
+    "independent_measured_event_outcomes",
+    "GTFS",
+    "boundary_sensitivity"
+  ]
+}

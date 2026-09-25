@@ -2,6 +2,8 @@
 
 This protocol answers a narrow question: **which parts of a past Road & Fire disturbance can CiviFlux reproduce or predict against evidence that it did not already ingest?** A historical event name, a real city map and a running SUMO job do not together establish historical accuracy. Run `python3 scripts/historical_backtest_preflight.py` from the repository root for the current evidence inventory; its report is a readiness check, not a validation score.
 
+For prospective cases outside Helsinki, start from the [EU/İstanbul event watchlist](EVENT_VALIDATION_WATCHLIST.md), freeze predictions before outcomes, and apply the same evidence levels below. Listing an event does not register an observed closure or a validated CityPack.
+
 ## Evidence levels and claim ceilings
 
 | Level | Reference evidence needed | What is scored | Permitted claim |

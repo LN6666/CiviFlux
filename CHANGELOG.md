@@ -19,6 +19,7 @@ The repository has progressed from a specification/reference-test pack to a prod
 - Exhaustively permuted six frozen SimpleJev relation scores (720 orderings) in an offline graph control; the result tests implementation sensitivity, not model quality.
 - Compared three nested Helsinki crops, then replayed the scoped 48-target outer-ring Road/Fire cases through typed Action, routing, KG projection and fixed PPR. Missing and resnapped entrances remain unresolved.
 - Added a source-tiered historical backtest protocol and a read-only evidence preflight. No event-matched observed traffic outcomes are available for numeric validation.
+- Added pinned Berlin and pre-closure Baku OSM imports, bounded road-only CityPacks and provenance-bearing ontology KG exports; froze an unreviewed Berlin incremental routing probe before a planned closure and documented Baku 2026 F1 source/validation limits. Neither constitutes observed event-impact accuracy.
 - Pinned container build inputs and added an offline Linux CI smoke. Three initial runs exposed missing SUMO native libraries; adding `libxrender1`, `libatomic1` and concise ELF linker diagnostics led to a passing Linux `core`/`container` run. The container report is scoped to a synthetic city and disabled model egress.
 - After PR #1 was squash-merged, moved subsequent work to a fresh branch/PR path. PR branch pushes now run a single pull-request workflow to avoid duplicate failure notifications.
 - Protected `main` now requires both passing `core` and `container` checks before ordinary PR merges.

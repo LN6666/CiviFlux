@@ -1,0 +1,74 @@
+{
+  "case_id": "baku-f1-2026",
+  "status": "V1A_PLANNED_FACTS_TRANSCRIBED",
+  "timezone": "Asia/Baku",
+  "citypack_id": "baku-f1-2026-be751eb6856f",
+  "citypack_sha256": "8adba2949ca4d6637b0250ef8eb72fd6833456abcad3674dcfeb3fcfe1577c89",
+  "sources": [
+    {
+      "id": "AZ-BCC-2026-TRAFFIC",
+      "url": "https://www.bakucitycircuit.com/news/additional-traffic-options-to-be-provided-during-formula-1",
+      "local_ignored_path": "data/raw/baku-f1-2026-circuit-traffic.html",
+      "sha256": "3aeb95b9dc259127ebf17360e8a9dd96a5f6dc90baa3342d3287b139bd03629b",
+      "retrieved_at_utc_date": "2026-09-25",
+      "kind": "organizer_planned_traffic_notice"
+    },
+    {
+      "id": "AZ-AYNA-2026-BUS",
+      "url": "https://www.ayna.gov.az/az/news/formula-1-azerbaycan-qran-prisi-ile-elaqedar-bir-sira-marsrutlarin-hereket-sxemi-deyisdirilir-1229",
+      "local_ignored_path": "data/raw/baku-f1-2026-ayna-bus-diversion.html",
+      "sha256": "80eef8066cb08d0c0878849d89761efae83002e709fa3800de26e972d8b4befe",
+      "published_local_date": "2026-09-19",
+      "retrieved_at_utc_date": "2026-09-25",
+      "kind": "agency_planned_bus_diversion_notice"
+    }
+  ],
+  "planned_facts": [
+    {
+      "id": "BCC-PUSHKIN",
+      "type": "road_restriction_announcement",
+      "source_id": "AZ-BCC-2026-TRAFFIC",
+      "street": "Pushkin Street",
+      "extent": "between Uzeyir Hajibeyli Street and Neftchilar Avenue",
+      "start": "2026-09-19T21:00:00+04:00",
+      "end": null,
+      "end_text": "until the end of the event; exact reopening instant not specified",
+      "vehicle_permissions": "unknown beyond notice text",
+      "operation_observed": false,
+      "directed_edge_mapping": "NOT_STARTED"
+    },
+    {
+      "id": "BCC-CIRCUIT",
+      "type": "road_restriction_announcement",
+      "source_id": "AZ-BCC-2026-TRAFFIC",
+      "extent": "streets along the Baku City Circuit and areas covered by the track; no authoritative directed-edge list in this fact",
+      "start": "2026-09-20T01:00:00+04:00",
+      "end": "2026-09-28T08:00:00+04:00",
+      "exception": "residential access permit; further traffic-corridor exceptions announced for 21-23 September",
+      "operation_observed": false,
+      "directed_edge_mapping": "NOT_STARTED"
+    },
+    {
+      "id": "AYNA-BUS-SEP19-21",
+      "type": "bus_diversion_announcement",
+      "source_id": "AZ-AYNA-2026-BUS",
+      "start": "2026-09-19T21:00:00+04:00",
+      "end": "2026-09-21T00:00:00+04:00",
+      "announced_changed_route_count": 13,
+      "operation_observed": false,
+      "held_out_target_eligible_if_not_ingested": "plan_to_plan_only"
+    },
+    {
+      "id": "AYNA-BUS-SEP21-26",
+      "type": "bus_diversion_announcement",
+      "source_id": "AZ-AYNA-2026-BUS",
+      "date_range_local": "2026-09-21/26",
+      "exact_start_end_instants": null,
+      "announced_changed_route_count": 26,
+      "announced_suspended_route_ids": ["72", "E1"],
+      "operation_observed": false,
+      "held_out_target_eligible_if_not_ingested": "plan_to_plan_only"
+    }
+  ],
+  "claim_ceiling": "dated planned-source transcription only; no edge mapping, actual closure, observed bus operation or measured road effect validated"
+}
