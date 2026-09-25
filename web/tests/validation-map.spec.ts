@@ -30,7 +30,8 @@ test('GIS map shows all three measured road comparison outcomes',async({page})=>
     schema_version:'civiflux-validation-map-v1',event_id:'berlin-marathon-2026',status:'TWO_SNAPSHOT_SPATIAL_COMPARISON',prediction_frozen_at_utc:'2026-09-25T18:20:40Z',
     observation_snapshot:{captured_at_utc:'2026-09-26T04:45:00Z',traffic:{feed_time_stamp:'2026-09-26T04:45:00Z',sha256:'before'}},
     event_snapshot:{traffic:{feed_time_stamp:'2026-09-26T06:30:00Z'}},
-    comparison_metrics:{hit:1,miss:1,false_alarm:1,unscored:0,scored_segments:3,predicted_edge_count:2,predicted_edges_with_viz_match:2,precision:.5,recall:.5},
+    pre_event_coverage:{predicted_edges_with_viz_match:1,predicted_edges_without_viz_match:1,matched_viz_segments:1,scored_matched_viz_segments:1},
+    comparison_metrics:{hit:1,miss:1,false_alarm:1,unscored:0,scored_segments:3,predicted_edge_count:2,predicted_edges_with_viz_match:2,matched_viz_segments:2,scored_matched_viz_segments:2,precision:.5,recall:.5},
     counts:{context_roads:0,predicted_route_impact_edges:2,restriction_input_edges:0,traffic_segments:3,marathon_reports:0},
     layers:{context_roads:collection(),predicted_route_impact:collection([road('p1','predicted_route_impact'),road('p2','predicted_route_impact')]),restriction_inputs:collection(),viz_traffic:collection(),viz_marathon_reports:collection(),observed_change:collection(compared)},
     comparison_note:'synthetic browser fixture',
@@ -39,6 +40,7 @@ test('GIS map shows all three measured road comparison outcomes',async({page})=>
   await page.goto('/validation.html');
   await expect(page.getByRole('status')).toContainText('两次交通快照');
   await expect(page.locator('#summary')).toContainText('命中 1 · 漏报 1 · 误报 1');
+  await expect(page.locator('#summary')).toContainText('赛前可测覆盖：1/2 条插件路段；1 条没有匹配 VIZ 路段');
   await expect(page.getByLabel('Road comparison verdict legend')).toContainText('绿色 命中');
   await expect(page.getByLabel('Road comparison verdict legend')).toContainText('红色 漏报');
   await expect(page.getByLabel('Road comparison verdict legend')).toContainText('紫色 误报');
