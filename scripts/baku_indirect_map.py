@@ -170,6 +170,7 @@ def build(root: Path = ROOT) -> dict:
         "schema_version": "civiflux-baku-indirect-v1",
         "status": output_summary["status"],
         "case_id": case["case_id"],
+        "network_scope": "Motor-drivable OSM/SUMO road network; dedicated cycle-only and pedestrian-only ways are excluded; routing vehicle class is bus",
         "osm_attribution": "© OpenStreetMap contributors; ODbL 1.0; Geofabrik Azerbaijan 2026-09-18 extract",
         "osm_source_sha256": "5134c55378dda62dfe4257b6aa7eec06fe9c67594f7e578bcd6186fbaac5c363",
         "osm_license_url": "https://www.openstreetmap.org/copyright",
