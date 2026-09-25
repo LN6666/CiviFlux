@@ -17,7 +17,8 @@ test('GIS validation map separates frozen plugin output from scenario inputs and
   await expect(page.getByRole('status')).toContainText('已载入赛前地图');
   await expect(page.locator('#summary')).toContainText('插件影响道路：1 条');
   await expect(page.locator('#summary')).toContainText('输入封路候选：1 条');
-  await expect(page.getByLabel('橙色 · 插件预测影响路段')).toBeChecked();
+  await expect(page.locator('input[data-layer="predicted"]')).toBeChecked();
+  await expect(page.locator('fieldset')).toContainText('深橙 / 浅橙 · 插件预测路段有 / 无赛前 VIZ 空间覆盖');
   await page.getByLabel('紫色 · 输入的封路候选').uncheck();
   await expect(page.getByLabel('紫色 · 输入的封路候选')).not.toBeChecked();
   await expect(page.locator('canvas.maplibregl-canvas')).toBeVisible();
