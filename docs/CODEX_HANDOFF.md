@@ -14,6 +14,8 @@
 
 **当前受控检查点：**PR #7 的 `df0978e` 代码树经 [Linux CI 36188723802](https://github.com/LN6666/CiviFlux/actions/runs/36188723802) `core`、`container` 双检查通过；[回执](../evidence/wp7/ci_run_36188723802.json)记录确切合并树匹配、data 69 PASS/1 SKIP、浏览器 15 PASS。柏林赛时比较必须先保存 **26 Sep 07:00 CEST 前**的 ignored 基线包 `data/raw/berlin-validation/sep26-pre-0700-cest-baseline-map.json`，并核对原始 VIZ feed 时间戳与基线对照哈希；事件建图自动读取此文件。具体命令在[地图验证说明](BERLIN_2026_MAP_VALIDATION.md)。赛前与赛时定时采集尚未执行，当前没有真实事件路段命中率或额外降速；不要用 25 Sep 的预检快照代替。严格 release manifest 仍有 2 个 `DEFERRED_USER`、1 个 `BLOCKED_EXTERNAL`，`engineering_complete=false`。
 
+**最新受控检查点：**PR #7 的 `b7bf9e7` 代码树经 [Linux CI 36189858812](https://github.com/LN6666/CiviFlux/actions/runs/36189858812) `core`、`container` 双检查通过；[回执](../evidence/wp7/ci_run_36189858812.json)记录确切树匹配、data 70 PASS/1 SKIP、浏览器 16 PASS。新增[柏林赛前安慰剂](../evidence/events/berlin-2026-pre-onset-placebo.json)以 25 Sep 18:45/21:03 UTC 两份真实 VIZ feed 为输入：在新限制开始前，空间重合的背景变化已有 1 条，邻近变化未重合 13 条，预测重合处无大变化 10 条；对照后降速差中位数 0.0 个百分点。本机 `web/public/validation/berlin-placebo-local.json` 可在 `validation.html?bundle=placebo` 查看，但该 JSON 及原始交通数据被 Git 忽略，公开仓库只含聚合统计与来源哈希。它不能替代 26 Sep 赛前冻结和赛时观测，更不是赛事命中率。两项一次性定时采集仍处于 ACTIVE；生产付费调用保持关闭。
+
 ## 新账户的第一步
 
 1. 在自己的机器执行 `git clone https://github.com/LN6666/CiviFlux.git`，在 Codex 中把克隆出的 `CiviFlux` 目录作为项目打开。公开仓库可匿名克隆；提交 PR 时才需要自己的 GitHub 身份或 fork。接手正在审查的改动时也查看[开放的 PR](https://github.com/LN6666/CiviFlux/pulls)，不要以为未合并分支已经在 `main`。
