@@ -60,7 +60,7 @@ test('Baku map keeps the closure input, computed detour, and announcement separa
   await expect(page.locator('#summary')).toContainText('步行专用候选 1 条、自行车专用候选 1 条');
   await expect(page.locator('#summary')).toContainText('不是实际公交路径或预测准确率');
   await expect(page.locator('#active-summary')).toContainText('步行：0.2 m 缓冲暴露 2 条；15 m 缓冲暴露 6 条');
-  await expect(page.locator('#active-summary')).toContainText('官方公告未确认这些步骑通道关闭');
+  await expect(page.locator('#active-summary')).toContainText('公告没有给出逐段步骑封闭');
   await expect(page.getByLabel('红色 · BCC 普希金街封路输入候选')).toBeChecked();
   await page.getByLabel('青色虚线 · AYNA 改线公告街名候选').uncheck();
   await expect(page.getByLabel('青色虚线 · AYNA 改线公告街名候选')).not.toBeChecked();
