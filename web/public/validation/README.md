@@ -1,0 +1,5 @@
+# Public Baku map extract
+
+`baku-indirect.json` is a small derived GIS extract for the retrospective Baku F1 comparison. Its road geometries come from the Geofabrik Azerbaijan OpenStreetMap extract dated 2026-09-18 (source SHA-256 `5134c55378dda62dfe4257b6aa7eec06fe9c67594f7e578bcd6186fbaac5c363`). Road data: © OpenStreetMap contributors, ODbL 1.0; see <https://www.openstreetmap.org/copyright>. This data attribution and license apply independently of the CiviFlux code license.
+
+The extract can be regenerated with `scripts/baku_indirect_map.py` from the hashed local CityPack and two official announcement pages. All published closure edges are **unreviewed mapping candidates**. AYNA layers reflect announced street names mapped to OSM candidate geometries, not operated bus traces. The extract contains no observed event traffic or measured impact.

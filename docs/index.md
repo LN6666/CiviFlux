@@ -21,6 +21,7 @@
 | 欧盟与伊斯坦布尔大型活动候选、日期和赛前/赛后提醒 | [EVENT_VALIDATION_WATCHLIST](EVENT_VALIDATION_WATCHLIST.md) |
 | 柏林马拉松插件预测与官方交通的 GIS 路段对照 | [BERLIN_2026_MAP_VALIDATION](BERLIN_2026_MAP_VALIDATION.md) |
 | 巴库 2026 F1 的来源、城市 KG 和 V1–V3 证据缺口 | [BAKU_2026_F1_DATA_FEASIBILITY](BAKU_2026_F1_DATA_FEASIBILITY.md) |
+| 巴库 BCC 封路计划、条件绕行与 AYNA 改线公告的间接 GIS 对照 | [BAKU_2026_INDIRECT_GIS_COMPARISON](BAKU_2026_INDIRECT_GIS_COMPARISON.md) |
 | Berlin/Baku 本地 CityPack 与 KG 如何重建 | [data/README](../data/README.md) |
 | SimpleJev 状态、可选 Qwen 比较与付费调用暂缓 | [模型 adapter](../adapters/system_one/README.md) |
 | 当前 checkpoint/必须 gate | [execution/STATE](../execution/STATE.md) 与 `evidence/` |

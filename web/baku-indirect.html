@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CiviFlux · 巴库 F1 间接对照</title>
+</head>
+<body>
+  <header>
+    <div><strong>CiviFlux</strong><span>巴库 F1 · 间接 GIS 对照</span></div>
+    <a href="/">返回插件</a>
+  </header>
+  <main>
+    <section class="sidebar" aria-label="Baku indirect GIS controls">
+      <h1>公告与条件绕行</h1>
+      <p id="status" role="status">正在载入本地数据…</p>
+      <label>可选：导入另一份巴库对照包 JSON<input type="file" id="bundle-file" accept="application/json,.json"></label>
+      <div id="summary"></div>
+      <fieldset>
+        <legend>地图图层</legend>
+        <label><input type="checkbox" data-layer="agreement" checked>绿色 · 与 AYNA 公告街名重合的计算绕行</label>
+        <label><input type="checkbox" data-layer="detour" checked>橙色 · 插件条件绕行新增路段</label>
+        <label><input type="checkbox" data-layer="bcc" checked>红色 · BCC 普希金街封路输入候选</label>
+        <label><input type="checkbox" data-layer="ayna" checked>青色虚线 · AYNA 改线公告街名候选</label>
+        <label><input type="checkbox" data-layer="baseline" checked>蓝色虚线 · 无新增封路的合成基线路由</label>
+        <label><input type="checkbox" data-layer="context" checked>灰色 · 城市道路背景</label>
+      </fieldset>
+      <button id="fit">定位对照范围</button>
+      <section id="details" aria-label="Selected Baku road details">点击地图道路查看类型、街名和 OSM 路段 ID。</section>
+      <p class="source"><strong>比较等级：间接、回溯、合成起终点。</strong>BCC 公告是情景输入；AYNA 公告只在路由计算后按街名对照。绿色仅表示街名与计算绕行重合，不表示该公交线路实地经过，也不表示封路或车速被测量。</p>
+      <p class="source">道路底图：© OpenStreetMap contributors（ODbL）。公告来源：Baku City Circuit 与 Azerbaijan Land Transport Agency。原始页面及大型城市包保存在本机，不随公开仓库发布。</p>
+    </section>
+    <section class="map-wrap" aria-label="Baku indirect GIS map"><div id="map"></div></section>
+  </main>
+  <script type="module" src="/src/baku-indirect.ts"></script>
+</body>
+</html>
