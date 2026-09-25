@@ -16,6 +16,8 @@
 
 **最新受控检查点：**PR #7 的 `b7bf9e7` 代码树经 [Linux CI 36189858812](https://github.com/LN6666/CiviFlux/actions/runs/36189858812) `core`、`container` 双检查通过；[回执](../evidence/wp7/ci_run_36189858812.json)记录确切树匹配、data 70 PASS/1 SKIP、浏览器 16 PASS。新增[柏林赛前安慰剂](../evidence/events/berlin-2026-pre-onset-placebo.json)以 25 Sep 18:45/21:03 UTC 两份真实 VIZ feed 为输入：在新限制开始前，空间重合的背景变化已有 1 条，邻近变化未重合 13 条，预测重合处无大变化 10 条；对照后降速差中位数 0.0 个百分点。本机 `web/public/validation/berlin-placebo-local.json` 可在 `validation.html?bundle=placebo` 查看，但该 JSON 及原始交通数据被 Git 忽略，公开仓库只含聚合统计与来源哈希。它不能替代 26 Sep 赛前冻结和赛时观测，更不是赛事命中率。两项一次性定时采集仍处于 ACTIVE；生产付费调用保持关闭。
 
+**当前受控检查点：**PR #7 的 `867d19b` 代码树经 [Linux CI 36191842277](https://github.com/LN6666/CiviFlux/actions/runs/36191842277) `core`、`container` 双检查通过；[回执](../evidence/wp7/ci_run_36191842277.json)记录确切树匹配、data 73 PASS/1 SKIP、浏览器 17 PASS。新增[柏林公告→道路候选映射审计](../evidence/events/berlin-2026-viz-mapping-audit.json)：已开始的 Straße des 17. Juni 37 条候选有向边中 29 条有同街名 VIZ 计划通报线的足够几何重合、8 条需复核；未开始的 Unter den Linden 35 条候选在本快照无同街名通报。方向核验为 0；全部 72 条保持 `CANDIDATE_UNREVIEWED`。本机生成 `web/public/validation/berlin-mapping-review-local.json`，打开 `validation.html?bundle=mapping` 看紫／红／灰候选分色及蓝色通报线；原始 VIZ/HERE 几何、逐段审计和地图都不进 Git。该审计帮助核查情景**输入映射**，并非插件输出或赛时影响的命中率。真实赛事前后快照与付费分类器仍按原边界处理。
+
 ## 新账户的第一步
 
 1. 在自己的机器执行 `git clone https://github.com/LN6666/CiviFlux.git`，在 Codex 中把克隆出的 `CiviFlux` 目录作为项目打开。公开仓库可匿名克隆；提交 PR 时才需要自己的 GitHub 身份或 fork。接手正在审查的改动时也查看[开放的 PR](https://github.com/LN6666/CiviFlux/pulls)，不要以为未合并分支已经在 `main`。

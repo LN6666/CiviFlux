@@ -15,6 +15,7 @@
 - `events/berlin-2026-pre-onset-placebo.json`：两份真实官方 VIZ feed 的赛前增量安慰剂聚合统计、时间和原始字节哈希。道路级数据与 GIS 包仅存本机 ignored 路径；空间重合不是赛事命中。
 - `events/berlin-2026-viz-mapping-audit.json`：官方封路通报线与 72 条 OSM 输入候选边的街名和几何重合审计，公开哈希与聚合数；方向和现场执行均未核验，逐段详情和地图只留本机 ignored 路径。这不是插件预测影响路段的命中率。
 - `wp7/ci_run_36189858812.json`：当前安慰剂 GIS 代码树的受控 CI 回执，含 16 项浏览器测试、容器复现、确切 Git 树匹配和产物哈希；不把本机原始 VIZ 数据或 26 Sep 赛时结果冒充 CI 内容。
+- `wp7/ci_run_36191842277.json`：公告几何映射审计与 GIS 分色代码树的受控 CI 回执，含 17 项浏览器测试、容器复现、确切 Git 树匹配和产物哈希；1 项 CI data 用例仍因 ignored Helsinki 数据缺失而跳过。
 
 ## 原始工程包参考证据
 
