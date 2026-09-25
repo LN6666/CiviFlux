@@ -1,10 +1,11 @@
 {
-  "schema_version": "civiflux-active-indirect-v1",
+  "schema_version": "civiflux-active-indirect-v2",
   "status": "HYPOTHETICAL_INDIRECT_STRESS_TEST",
   "case_id": "baku-f1-2026-active-corridor-sensitivity",
   "source_osm_sha256": "5134c55378dda62dfe4257b6aa7eec06fe9c67594f7e578bcd6186fbaac5c363",
   "motor_citypack_sha256": "8adba2949ca4d6637b0250ef8eb72fd6833456abcad3674dcfeb3fcfe1577c89",
   "multimodal_citypack_sha256": "c6679caad099a40b1f88bc2c32ff9956afb6e8dbecb9d523c3c89080bc0acf9a",
+  "multimodal_osm_roi_sha256": "ed9ff1c56ddf60e941d28085e770cecfbab97ac5b7790f0bf409ef5a186f86c7",
   "bcc_notice_sha256": "3aeb95b9dc259127ebf17360e8a9dd96a5f6dc90baa3342d3287b139bd03629b",
   "active_case_sha256": "6e63b8e97689a07168d01b1cecf47c62c3ca0fec455ab1a455608862c05b0183",
   "bus_case_sha256": "4c782e44cfdad5129a92a5b31b1182c66bf99ee8396b805f7ba4984dc7a3c673",
@@ -206,6 +207,14 @@
           ],
           "action_replay_verified": true
         }
+      },
+      "pedestrian_area_geometry": {
+        "candidate_polygons_scanned": 60,
+        "invalid_polygons_skipped": 0,
+        "overlapping_polygons": 0,
+        "unique_overlap_area_m2": 0.0,
+        "nearest_polygon_gap_m": 220.28,
+        "interpretation": "OSM pedestrian-area polygon intersection with a hypothetical road buffer; no passage, event closure or impact status inferred"
       }
     },
     {
@@ -397,6 +406,14 @@
           ],
           "action_replay_verified": true
         }
+      },
+      "pedestrian_area_geometry": {
+        "candidate_polygons_scanned": 60,
+        "invalid_polygons_skipped": 0,
+        "overlapping_polygons": 0,
+        "unique_overlap_area_m2": 0.0,
+        "nearest_polygon_gap_m": 205.48,
+        "interpretation": "OSM pedestrian-area polygon intersection with a hypothetical road buffer; no passage, event closure or impact status inferred"
       }
     }
   ],

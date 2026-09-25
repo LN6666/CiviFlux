@@ -11,7 +11,8 @@ type ActiveCounts={walk_only_directed_edges:number;cycle_only_directed_edges:num
 type Summary={input_candidate_directed_edges:number;unique_new_detour_directed_edges:number;indirect_exact_street_name_agreement_edges:number;proxy_new_detour_edge_name_overlap_pct:number|null;indirect_exact_street_name_agreement_names:string[];synthetic_od_routes:Route[];active_mobility_candidate_layers:ActiveCounts};
 type Bundle={schema_version:string;status:string;case_id:string;bbox:[number,number,number,number];summary:Summary;layers:Record<LayerName,FeatureCollection>};
 type ActiveMode={exposed_directed_edges:number;exposed_dedicated_nonmotor_edges:number;baseline_reachable_od:number;conditional_reachable_od:number};
-type ActiveBundle={schema_version:string;status:string;summary:{multimodal_citypack_sha256:string;buffer_results:{buffer_m:number;modes:{pedestrian:ActiveMode;bicycle:ActiveMode}}[];claim_ceiling:string};layers:Record<string,FeatureCollection>};
+type AreaExposure={candidate_polygons_scanned:number;invalid_polygons_skipped:number;overlapping_polygons:number;unique_overlap_area_m2:number;nearest_polygon_gap_m:number|null};
+type ActiveBundle={schema_version:string;status:string;summary:{multimodal_citypack_sha256:string;buffer_results:{buffer_m:number;modes:{pedestrian:ActiveMode;bicycle:ActiveMode};pedestrian_area_geometry:AreaExposure}[];claim_ceiling:string};layers:Record<string,FeatureCollection>};
 const $=<T extends HTMLElement>(selector:string)=>{const value=document.querySelector<T>(selector);if(!value)throw Error(`Missing ${selector}`);return value;};
 const summary=$<HTMLDivElement>('#summary');
 const activeSummary=$<HTMLDivElement>('#active-summary');
@@ -35,6 +36,7 @@ const specs:[string,LayerName,maplibregl.LayerSpecification][]=[
   ['bcc','bcc_pushkin_candidates',{id:'bcc',type:'line',source:'bcc',paint:{'line-color':'#bb333a','line-width':6,'line-opacity':.95,'line-offset':-3}}],
 ];
 const activeSpecs:[string,string,maplibregl.LayerSpecification][]=[
+  ['activeWalkAreaExposure','pedestrian_area_exposure_15m',{id:'activeWalkAreaExposure',type:'fill',source:'activeWalkAreaExposure',paint:{'fill-color':'#51247e','fill-opacity':.7,'fill-outline-color':'#34134f'}}],
   ['activeWalkBaseline','pedestrian_baseline',{id:'activeWalkBaseline',type:'line',source:'activeWalkBaseline',paint:{'line-color':'#634a9d','line-width':3,'line-opacity':.8,'line-dasharray':[1,2]}}],
   ['activeCycleBaseline','bicycle_baseline',{id:'activeCycleBaseline',type:'line',source:'activeCycleBaseline',paint:{'line-color':'#ad286c','line-width':3,'line-opacity':.8,'line-dasharray':[1,2]}}],
   ['activeWalkExposure','pedestrian_exposed_15m',{id:'activeWalkExposure',type:'line',source:'activeWalkExposure',paint:{'line-color':'#5d2a9c','line-width':6,'line-opacity':.85,'line-offset':-2}}],
@@ -54,13 +56,15 @@ let bundle:Bundle|null=null;
 function showActive(value:unknown,base:Bundle){
   if(!value||typeof value!=='object')throw Error('步骑条件探针不是 JSON 对象');
   const next=value as Partial<ActiveBundle>;
-  if(next.schema_version!=='civiflux-active-indirect-v1'||next.status!=='HYPOTHETICAL_INDIRECT_STRESS_TEST'||next.summary?.multimodal_citypack_sha256!==(base.summary as Summary&{multimodal_citypack_sha256:string}).multimodal_citypack_sha256)throw Error('步骑探针与地图来源不匹配');
+  if(next.schema_version!=='civiflux-active-indirect-v2'||next.status!=='HYPOTHETICAL_INDIRECT_STRESS_TEST'||next.summary?.multimodal_citypack_sha256!==(base.summary as Summary&{multimodal_citypack_sha256:string}).multimodal_citypack_sha256)throw Error('步骑探针与地图来源不匹配');
   for(const [name,key] of activeSpecs){const layer=next.layers?.[key];if(layer?.type!=='FeatureCollection'||!Array.isArray(layer.features))throw Error(`缺少 ${key} 条件图层`);(map.getSource(name) as maplibregl.GeoJSONSource).setData(layer);}
   const narrow=next.summary.buffer_results?.find(item=>item.buffer_m===.2);
   const broad=next.summary.buffer_results?.find(item=>item.buffer_m===15);
   if(!narrow||!broad)throw Error('缺少 0.2 m / 15 m 敏感性结果');
+  if(!narrow.pedestrian_area_geometry||!broad.pedestrian_area_geometry)throw Error('缺少步行区域几何暴露指标');
   const line=(mode:'pedestrian'|'bicycle',label:string)=>`${label}：0.2 m 缓冲暴露 ${narrow.modes[mode].exposed_directed_edges} 条；15 m 缓冲暴露 ${broad.modes[mode].exposed_directed_edges} 条，其中无机动车权限通道 ${broad.modes[mode].exposed_dedicated_nonmotor_edges} 条。固定 2 组合成 OD 中，基线可达 ${broad.modes[mode].baseline_reachable_od}，假设受限后可达 ${broad.modes[mode].conditional_reachable_od}。`;
-  activeSummary.textContent=`步骑间接指标 · 假设敏感性（非现场封闭）\n${line('pedestrian','步行')}\n${line('bicycle','骑行')}\n模型速度假设：步行 1.4 m/s、骑行 4.0 m/s；路线时间不是实测。公告没有给出逐段步骑封闭，地图加粗线仅是 15 m 缓冲范围内的潜在暴露，不是赛事影响判定。`;
+  const area=broad.pedestrian_area_geometry;
+  activeSummary.textContent=`步骑间接指标 · 假设敏感性（非现场封闭）\n${line('pedestrian','步行')}\n${line('bicycle','骑行')}\n步行区域面：扫描 ${area.candidate_polygons_scanned} 处 OSM 候选；15 m 走廊有面积交集 ${area.overlapping_polygons} 处，去重相交面积 ${area.unique_overlap_area_m2.toFixed(2)} m²；最近区域到走廊 ${area.nearest_polygon_gap_m?.toFixed(2)??'未知'} m（无效几何跳过 ${area.invalid_polygons_skipped} 处）。\n模型速度假设：步行 1.4 m/s、骑行 4.0 m/s；路线时间不是实测。公告没有给出逐段步骑封闭，地图加粗线和深紫交集面仅是几何暴露，不是赛事影响判定。`;
   activeSummary.style.whiteSpace='pre-wrap';
 }
 function fit(){if(bundle)map.fitBounds([[bundle.bbox[0],bundle.bbox[1]],[bundle.bbox[2],bundle.bbox[3]]],{padding:45,duration:0});}
@@ -80,7 +84,7 @@ function show(next:Bundle){
 
 function inspect(feature:Feature):string{
   const p=feature.properties??{};
-  const label:Record<string,string>={bcc_input:'BCC 封路输入候选（未人工审阅）',baseline:'无封路合成基线路由',conditional_new_detour:'计算绕行新增路段',ayna_plan_street:'AYNA 公告街名的 OSM 候选（范围未核对）',street_name_agreement:'计算绕行与 AYNA 公告的街名重合',context:'OSM 机动车道路背景',walk_only:'步行专用线性候选（无赛事影响判断）',cycle_only:'自行车专用线性候选（无赛事影响判断）',walk_cycle:'步骑共用线性候选（无赛事影响判断）',pedestrian_area:'OSM 步行区域候选（无赛事影响判断）',pedestrian_hypothetical_exposure:'15 m 假设步行通道暴露（非实际封闭）',bicycle_hypothetical_exposure:'15 m 假设骑行通道暴露（非实际封闭）',pedestrian_baseline:'合成 OD 步行基线路由',bicycle_baseline:'合成 OD 骑行基线路由'};
+  const label:Record<string,string>={bcc_input:'BCC 封路输入候选（未人工审阅）',baseline:'无封路合成基线路由',conditional_new_detour:'计算绕行新增路段',ayna_plan_street:'AYNA 公告街名的 OSM 候选（范围未核对）',street_name_agreement:'计算绕行与 AYNA 公告的街名重合',context:'OSM 机动车道路背景',walk_only:'步行专用线性候选（无赛事影响判断）',cycle_only:'自行车专用线性候选（无赛事影响判断）',walk_cycle:'步骑共用线性候选（无赛事影响判断）',pedestrian_area:'OSM 步行区域候选（无赛事影响判断）',pedestrian_area_hypothetical_exposure:'15 m 走廊与步行区域几何交集（非实际封闭）',pedestrian_hypothetical_exposure:'15 m 假设步行通道暴露（非实际封闭）',bicycle_hypothetical_exposure:'15 m 假设骑行通道暴露（非实际封闭）',pedestrian_baseline:'合成 OD 步行基线路由',bicycle_baseline:'合成 OD 骑行基线路由'};
   return `${label[String(p.layer)]??'道路'}\n${p.name||'未命名'}\n有向路段 ID：${p.id}\nOSM 导入来源：${p.source_id}`;
 }
 
@@ -91,7 +95,7 @@ map.on('load',()=>{
     map.setLayoutProperty(box.dataset.layer!,'visibility',box.checked?'visible':'none');
     box.addEventListener('change',()=>map.setLayoutProperty(box.dataset.layer!,'visibility',box.checked?'visible':'none'));
   }
-  const inspectable=['bcc','agreement','detour','baseline','ayna','walk','cycle','walkCycle','walkArea','activeWalkExposure','activeCycleExposure','activeWalkBaseline','activeCycleBaseline'];
+  const inspectable=['bcc','agreement','detour','baseline','ayna','walk','cycle','walkCycle','walkArea','activeWalkAreaExposure','activeWalkExposure','activeCycleExposure','activeWalkBaseline','activeCycleBaseline'];
   map.on('click',event=>{const features=map.queryRenderedFeatures(event.point,{layers:inspectable});if(features.length)details.textContent=inspect(features[0] as Feature);});
   map.on('mouseenter',inspectable,()=>map.getCanvas().style.cursor='pointer');
   map.on('mouseleave',inspectable,()=>map.getCanvas().style.cursor='');

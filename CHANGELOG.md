@@ -23,6 +23,7 @@ The repository has progressed from a specification/reference-test pack to a prod
 - Pinned container build inputs and added an offline Linux CI smoke. Three initial runs exposed missing SUMO native libraries; adding `libxrender1`, `libatomic1` and concise ELF linker diagnostics led to a passing Linux `core`/`container` run. The container report is scoped to a synthetic city and disabled model egress.
 - After PR #1 was squash-merged, moved subsequent work to a fresh branch/PR path. PR branch pushes now run a single pull-request workflow to avoid duplicate failure notifications.
 - Protected `main` now requires both passing `core` and `container` checks before ordinary PR merges.
+- Added an OSM-source-bound pedestrian-area overlap and nearest-gap proxy to the Baku active-mode sensitivity map; its zero-overlap result is retained as a negative geometric finding, without asserting event closure or routability.
 
 ## Source pack — 2026-09-23, handoff-3-operational-ontology
 

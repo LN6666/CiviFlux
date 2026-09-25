@@ -38,16 +38,17 @@ test('Baku map keeps the closure input, computed detour, and announcement separa
   };
   const mode=(exposed:number,dedicated:number,baseline:number,conditional:number)=>({exposed_directed_edges:exposed,exposed_dedicated_nonmotor_edges:dedicated,baseline_reachable_od:baseline,conditional_reachable_od:conditional});
   const active={
-    schema_version:'civiflux-active-indirect-v1',status:'HYPOTHETICAL_INDIRECT_STRESS_TEST',
+    schema_version:'civiflux-active-indirect-v2',status:'HYPOTHETICAL_INDIRECT_STRESS_TEST',
     summary:{multimodal_citypack_sha256:'b'.repeat(64),buffer_results:[
-      {buffer_m:.2,modes:{pedestrian:mode(2,0,1,0),bicycle:mode(1,0,1,0)}},
-      {buffer_m:15,modes:{pedestrian:mode(6,3,1,0),bicycle:mode(4,2,1,0)}},
+      {buffer_m:.2,modes:{pedestrian:mode(2,0,1,0),bicycle:mode(1,0,1,0)},pedestrian_area_geometry:{candidate_polygons_scanned:1,invalid_polygons_skipped:0,overlapping_polygons:0,unique_overlap_area_m2:0,nearest_polygon_gap_m:4}},
+      {buffer_m:15,modes:{pedestrian:mode(6,3,1,0),bicycle:mode(4,2,1,0)},pedestrian_area_geometry:{candidate_polygons_scanned:1,invalid_polygons_skipped:0,overlapping_polygons:1,unique_overlap_area_m2:12.5,nearest_polygon_gap_m:0}},
     ],claim_ceiling:'hypothetical only'},
     layers:{
       pedestrian_exposed_15m:collection(line('w-exposed','pedestrian_hypothetical_exposure','Walk')),
       bicycle_exposed_15m:collection(line('c-exposed','bicycle_hypothetical_exposure','Cycle')),
       pedestrian_baseline:collection(line('w-base','pedestrian_baseline','Walk')),
       bicycle_baseline:collection(line('c-base','bicycle_baseline','Cycle')),
+      pedestrian_area_exposure_15m:collection({type:'Feature',geometry:{type:'Polygon',coordinates:[[[49.853,40.375],[49.854,40.375],[49.854,40.376],[49.853,40.375]]]},properties:{id:'area',layer:'pedestrian_area_hypothetical_exposure',source_id:'fixture'}}),
     },
   };
   await page.route('**/validation/baku-indirect.json',route=>route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(bundle)}));
@@ -60,11 +61,13 @@ test('Baku map keeps the closure input, computed detour, and announcement separa
   await expect(page.locator('#summary')).toContainText('步行专用候选 1 条、自行车专用候选 1 条');
   await expect(page.locator('#summary')).toContainText('不是实际公交路径或预测准确率');
   await expect(page.locator('#active-summary')).toContainText('步行：0.2 m 缓冲暴露 2 条；15 m 缓冲暴露 6 条');
+  await expect(page.locator('#active-summary')).toContainText('15 m 走廊有面积交集 1 处，去重相交面积 12.50 m²');
   await expect(page.locator('#active-summary')).toContainText('公告没有给出逐段步骑封闭');
   await expect(page.getByLabel('红色 · BCC 普希金街封路输入候选')).toBeChecked();
   await page.getByLabel('青色虚线 · AYNA 改线公告街名候选').uncheck();
   await expect(page.getByLabel('青色虚线 · AYNA 改线公告街名候选')).not.toBeChecked();
   await expect(page.getByLabel('紫色细线 · 步行专用候选（未评估扰动）')).toBeChecked();
   await expect(page.getByLabel('深紫粗线 · 15 m 假设步行暴露（非实际封闭）')).toBeChecked();
+  await expect(page.getByLabel('深紫区域 · 15 m 假设走廊与步行区域交集')).toBeChecked();
   await expect(page.locator('canvas.maplibregl-canvas')).toBeVisible();
 });

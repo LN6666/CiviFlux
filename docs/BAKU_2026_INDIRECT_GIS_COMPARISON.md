@@ -4,7 +4,7 @@
 
 ## 地图怎么读
 
-打开 `web/baku-indirect.html`：红色为从[Baku City Circuit 2026 公告](https://www.bakucitycircuit.com/news/additional-traffic-options-to-be-provided-during-formula-1)映射的普希金街封路**候选**；蓝色虚线是无该候选封路的合成路由；橙色是加入候选封路后新出现的路段；青色虚线是[AYNA 2026 公交改线公告](https://www.ayna.gov.az/az/news/formula-1-azerbaycan-qran-prisi-ile-elaqedar-bir-sira-marsrutlarin-hereket-sxemi-deyisdirilir-1229)选出的街名在 OSM 中的候选几何；绿色是橙色路段中与 AYNA **独有街名**精确相同的部分。另有紫色步行专用线、玫红色自行车专用线、粉紫色共用线与淡紫色 OSM `highway=pedestrian + area=yes` 区域，**只表示 18 Sep 快照中的候选几何，不表示赛事造成影响**。新增深紫/深粉粗线是另一个 15 米假设走廊内的步行/骑行暴露候选，虚线为固定合成起终点的基线路径；两者都不是现场测量。点击线段可看图层语义、街名和有向路段 ID；图层可单独开关。
+打开 `web/baku-indirect.html`：红色为从[Baku City Circuit 2026 公告](https://www.bakucitycircuit.com/news/additional-traffic-options-to-be-provided-during-formula-1)映射的普希金街封路**候选**；蓝色虚线是无该候选封路的合成路由；橙色是加入候选封路后新出现的路段；青色虚线是[AYNA 2026 公交改线公告](https://www.ayna.gov.az/az/news/formula-1-azerbaycan-qran-prisi-ile-elaqedar-bir-sira-marsrutlarin-hereket-sxemi-deyisdirilir-1229)选出的街名在 OSM 中的候选几何；绿色是橙色路段中与 AYNA **独有街名**精确相同的部分。另有紫色步行专用线、玫红色自行车专用线、粉紫色共用线与淡紫色 OSM `highway=pedestrian + area=yes` 区域，**只表示 18 Sep 快照中的候选几何，不表示赛事造成影响**。深紫/深粉粗线是另一个 15 米假设走廊内的步行/骑行线性暴露候选，虚线为固定合成起终点的基线路径；深紫填充面专供显示假设走廊与步行区域的实际几何交集。本例交集为空，图层没有要素。这些都不是现场测量。点击线段可看图层语义、街名和有向路段 ID；图层可单独开关。
 
 这张图的预设由[追踪的案例卡](../data/event_cases/baku-f1-2026-indirect-plan-case.json)固定。BCC 公告是唯一的封路情景输入。脚本没有读取 AYNA 街名来选择封路边或起终点，只在路由算完后作对照；但起终点是事件之后人工设定的，并非盲测抽样。普希金街本身和公告中作为边界的 Neftçilər 不计入“AYNA 独有街名”重合。完整赛道封路、其他车种例外与公交路线几何均未录入这个子案例。
 
@@ -23,7 +23,9 @@
 | 0.2 m 窄缓冲 | 11 | 0 | 11 | 0 |
 | 15 m 缓冲 | 60 | 37 | 28 | 5 |
 
-每种方式的两组固定 OD 中，第一组基线可达，在两种假设缓冲下都变为**当前导入图上不可达**；第二组基线就不可达，不能计算新增扰动。步行基线为 212.76 m，按显式假设 **1.4 m/s** 得 151.97 s；骑行基线为 225.16 m，按 **4.0 m/s** 得 56.29 s。先前路由器错误地复用机动车速度，本次改为方式专用的固定速度假设；这些秒数不是实测。骑行第一组终点吸附距离 29.9 m；未审查的过街连接、路边人行道、赛时临时通道、外围网络及 OD 真实性都可能改变可达性。步行区域面仍只是地图几何，不参与路由。[完整逐 OD、来源哈希、ActionRecord 和重放结果](../evidence/events/baku-2026-active-indirect-probe.json)与[地图叠加 GeoJSON](../web/public/validation/baku-active-indirect.json)可复核。**不能从这些数字计算真实命中率。**
+每种方式的两组固定 OD 中，第一组基线可达，在两种假设缓冲下都变为**当前导入图上不可达**；第二组基线就不可达，不能计算新增扰动。步行基线为 212.76 m，按显式假设 **1.4 m/s** 得 151.97 s；骑行基线为 225.16 m，按 **4.0 m/s** 得 56.29 s。先前路由器错误地复用机动车速度，本次改为方式专用的固定速度假设；这些秒数不是实测。骑行第一组终点吸附距离 29.9 m；未审查的过街连接、路边人行道、赛时临时通道、外围网络及 OD 真实性都可能改变可达性。步行区域面不参与路由。
+
+新增的区域面间接指标对固定 OSM ROI 内 **60 处**明确标记的 `highway=pedestrian + area=yes` 候选多边形逐个检查，0 个无效。与 0.2 m / 15 m 假设走廊有正面积交集的均为 **0 处、0 m²**；最近区域距走廊分别为 **220.28 m / 205.48 m**。因此这个限定的普希金街走廊探针不能把步行区域面计入受影响对象。这个负结果不排除赛事其他封路或更远范围内的步行扰动，也不能说明区域实际开放状态。区域面仍是来源绑定的地图候选几何，尚未进入可路由 KG。[完整逐 OD、来源哈希、ActionRecord 和重放结果](../evidence/events/baku-2026-active-indirect-probe.json)与[地图叠加 GeoJSON](../web/public/validation/baku-active-indirect.json)可复核。**不能从这些数字计算真实命中率。**
 
 ## 本机重建
 

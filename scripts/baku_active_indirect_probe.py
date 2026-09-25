@@ -13,7 +13,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from pyproj import Transformer
-from shapely.geometry import LineString
+from shapely.geometry import LineString, mapping, shape
 from shapely.ops import transform, unary_union
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -25,16 +25,20 @@ from urbanimpact.contracts import ActionRequest, CityPack, Scenario
 from urbanimpact.network import ACTIVE_MODE_SPEED_MPS, Router, compile_restrictions
 from urbanimpact.util import digest
 
+from adapters.osm.active_mobility import pedestrian_area_features
+
 CASE = Path("data/event_cases/baku-f1-2026-active-indirect-case.json")
 BUS_CASE = Path("data/event_cases/baku-f1-2026-indirect-plan-case.json")
 MOTOR_CITY = Path("data/citypacks/baku-f1-2026/citypack.json")
 MULTIMODAL_CITY = Path("data/citypacks/baku-f1-2026-multimodal/citypack.json")
+MULTIMODAL_ROI = Path("data/citypacks/baku-f1-2026-multimodal/roads.osm.xml")
 SUMMARY = Path("evidence/events/baku-2026-active-indirect-probe.json")
 MAP = Path("web/public/validation/baku-active-indirect.json")
 MOTOR_CLASSES = frozenset(
     {"passenger", "bus", "emergency", "delivery", "truck", "taxi", "motorcycle"}
 )
 PROJECT = Transformer.from_crs("EPSG:4326", "EPSG:32639", always_xy=True).transform
+UNPROJECT = Transformer.from_crs("EPSG:32639", "EPSG:4326", always_xy=True).transform
 
 
 def _mean(edge) -> tuple[float, float]:
@@ -45,13 +49,18 @@ def _within(point, bbox) -> bool:
     return bbox[0] <= point[0] <= bbox[2] and bbox[1] <= point[1] <= bbox[3]
 
 
-def corridor_candidates(city: CityPack, motor_edges: list, buffer_m: float) -> list:
-    """Find imported lines crossing a declared metric buffer around mapped roads."""
+def corridor_geometry(motor_edges: list, buffer_m: float):
+    """Project one declared road corridor to metres for both line and area probes."""
     if not 0 < buffer_m <= 30 or not motor_edges:
         raise ValueError("Buffer must be in (0, 30] metres with input roads")
-    geometry = unary_union(
+    return unary_union(
         [transform(PROJECT, LineString(edge.geometry)) for edge in motor_edges]
     ).buffer(buffer_m)
+
+
+def corridor_candidates(city: CityPack, motor_edges: list, buffer_m: float) -> list:
+    """Find imported lines crossing a declared metric buffer around mapped roads."""
+    geometry = corridor_geometry(motor_edges, buffer_m)
     lonlat = [p for edge in motor_edges for p in edge.geometry]
     bounds = (
         min(p[0] for p in lonlat) - 0.002,
@@ -74,6 +83,52 @@ def corridor_candidates(city: CityPack, motor_edges: list, buffer_m: float) -> l
         if transform(PROJECT, LineString(edge.geometry)).intersects(geometry):
             selected.append(edge)
     return sorted(selected, key=lambda edge: edge.id)
+
+
+def pedestrian_area_exposure(areas: list[dict], motor_edges: list, buffer_m: float) -> tuple[dict, list[dict]]:
+    """Measure polygon intersection only; never infer access, closure, or routing."""
+    corridor = corridor_geometry(motor_edges, buffer_m)
+    overlaps = []
+    features = []
+    invalid = 0
+    nearest_distance_m = None
+    for feature in areas:
+        polygon = transform(PROJECT, shape(feature["geometry"]))
+        if not polygon.is_valid or polygon.is_empty:
+            invalid += 1
+            continue
+        gap = polygon.distance(corridor)
+        nearest_distance_m = gap if nearest_distance_m is None else min(nearest_distance_m, gap)
+        clipped = polygon.intersection(corridor)
+        if clipped.area <= 1e-6:
+            continue
+        overlaps.append(clipped)
+        features.append(
+            {
+                "type": "Feature",
+                "geometry": mapping(transform(UNPROJECT, clipped)),
+                "properties": {
+                    **feature["properties"],
+                    "layer": "pedestrian_area_hypothetical_exposure",
+                    "buffer_m": buffer_m,
+                    "overlap_area_m2": round(clipped.area, 2),
+                    "evidence_status": "GEOMETRIC_OVERLAP_NOT_OBSERVED_CLOSURE",
+                },
+            }
+        )
+    return (
+        {
+            "candidate_polygons_scanned": len(areas),
+            "invalid_polygons_skipped": invalid,
+            "overlapping_polygons": len(overlaps),
+            "unique_overlap_area_m2": round(unary_union(overlaps).area, 2) if overlaps else 0.0,
+            "nearest_polygon_gap_m": round(nearest_distance_m, 2)
+            if nearest_distance_m is not None
+            else None,
+            "interpretation": "OSM pedestrian-area polygon intersection with a hypothetical road buffer; no passage, event closure or impact status inferred",
+        },
+        features,
+    )
 
 
 def _nearest(nodes: list, coordinate: list[float]) -> tuple[str, float]:
@@ -181,6 +236,12 @@ def build(root: Path = ROOT) -> dict:
     city = CityPack.model_validate_json(multi_path.read_bytes())
     if motor.sources[0].sha256 != city.sources[0].sha256:
         raise ValueError("Motor and active networks use different OSM source snapshots")
+    osm_roi = root / MULTIMODAL_ROI
+    if sha256_file(osm_roi) != bus_case["multimodal_osm_roi_sha256"]:
+        raise ValueError("Multimodal OSM ROI bytes changed")
+    pedestrian_areas = pedestrian_area_features(
+        osm_roi, tuple(city.evidence["bbox"]), city.sources[0].id
+    )
     closure = bus_case["closure_input"]
     source_html = root / "data/raw/baku-f1-2026-circuit-traffic.html"
     if sha256_file(source_html) != closure["source_sha256"]:
@@ -199,12 +260,13 @@ def build(root: Path = ROOT) -> dict:
         raise ValueError("BCC mapped road subset changed")
     edges = {edge.id: edge for edge in city.edges}
     output = {
-        "schema_version": "civiflux-active-indirect-v1",
+        "schema_version": "civiflux-active-indirect-v2",
         "status": "HYPOTHETICAL_INDIRECT_STRESS_TEST",
         "case_id": card["case_id"],
         "source_osm_sha256": city.sources[0].sha256,
         "motor_citypack_sha256": sha256_file(motor_path),
         "multimodal_citypack_sha256": sha256_file(multi_path),
+        "multimodal_osm_roi_sha256": sha256_file(osm_roi),
         "bcc_notice_sha256": sha256_file(source_html),
         "active_case_sha256": sha256_file(root / CASE),
         "bus_case_sha256": sha256_file(root / BUS_CASE),
@@ -219,7 +281,12 @@ def build(root: Path = ROOT) -> dict:
     map_layers: dict[str, dict] = {}
     for buffer_m, label in ((0.2, "colocated"), (15.0, "15m")):
         exposed = corridor_candidates(city, road_candidates, buffer_m)
-        record = {"buffer_m": buffer_m, "modes": {}}
+        area_summary, area_features = pedestrian_area_exposure(
+            pedestrian_areas, road_candidates, buffer_m
+        )
+        record = {"buffer_m": buffer_m, "modes": {}, "pedestrian_area_geometry": area_summary}
+        if label == "15m":
+            map_layers["pedestrian_area_exposure_15m"] = _collection(area_features)
         for mode in card["modes"]:
             affected = [edge for edge in exposed if mode in edge.allowed_vehicle_classes]
             if not affected:
