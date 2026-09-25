@@ -13,17 +13,23 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "core"))
+sys.path.insert(0, str(ROOT))
 
 from urbanimpact.citypack.fetch import sha256_file
 from urbanimpact.contracts import CityPack
 from urbanimpact.network import Router
 
+from adapters.osm.active_mobility import dedicated_active_features, pedestrian_area_features
+
 CASE = ROOT / "data/event_cases/baku-f1-2026-indirect-plan-case.json"
 FACTS = ROOT / "data/event_cases/baku-f1-2026-source-facts.json"
 CITY = ROOT / "data/citypacks/baku-f1-2026/citypack.json"
+MULTIMODAL_CITY = ROOT / "data/citypacks/baku-f1-2026-multimodal/citypack.json"
+MULTIMODAL_ROI = ROOT / "data/citypacks/baku-f1-2026-multimodal/roads.osm.xml"
 SUMMARY = ROOT / "evidence/events/baku-2026-indirect-plan-comparison.json"
 PUBLIC_MAP = ROOT / "web/public/validation/baku-indirect.json"
 DISPLAY_BBOX = (49.845, 40.370, 49.866, 40.383)
+ACTIVE_BBOX = (49.852, 40.372, 49.860, 40.379)
 INPUT_OR_BOUNDARY_NAMES = frozenset({"Puşkin küçəsi", "Neftçilər prospekti"})
 
 
@@ -73,6 +79,17 @@ def build(root: Path = ROOT) -> dict:
         raise ValueError("AYNA holdout must not enter route inputs")
 
     city = CityPack.model_validate_json(city_path.read_bytes())
+    multimodal_path = root / MULTIMODAL_CITY.relative_to(ROOT)
+    if sha256_file(multimodal_path) != case["multimodal_citypack_sha256"]:
+        raise ValueError("Baku multimodal CityPack hash mismatch")
+    multimodal_roi = root / MULTIMODAL_ROI.relative_to(ROOT)
+    if sha256_file(multimodal_roi) != case["multimodal_osm_roi_sha256"]:
+        raise ValueError("Baku multimodal OSM ROI hash mismatch")
+    multimodal = CityPack.model_validate_json(multimodal_path.read_bytes())
+    if multimodal.sources[0].sha256 != city.sources[0].sha256:
+        raise ValueError("Baku motor and multimodal packs use different source snapshots")
+    active_lines = dedicated_active_features(multimodal, ACTIVE_BBOX)
+    active_areas = pedestrian_area_features(multimodal_roi, DISPLAY_BBOX, multimodal.sources[0].id)
     edge_by_id = {edge.id: edge for edge in city.edges}
     closure = case["closure_input"]
     blocked = frozenset(
@@ -131,6 +148,8 @@ def build(root: Path = ROOT) -> dict:
         "status": "RETROSPECTIVE_INDIRECT_PLAN_COMPARISON",
         "case_id": case["case_id"],
         "citypack_sha256": sha256_file(city_path),
+        "multimodal_citypack_sha256": sha256_file(multimodal_path),
+        "multimodal_osm_roi_sha256": sha256_file(multimodal_roi),
         "case_sha256": sha256_file(root / CASE.relative_to(ROOT)),
         "bcc_notice_sha256": closure["source_sha256"],
         "ayna_notice_sha256": case["held_out_announced_detour_streets"]["source_sha256"],
@@ -144,6 +163,14 @@ def build(root: Path = ROOT) -> dict:
         if detour_ids
         else None,
         "indirect_exact_street_name_agreement_names": observed_names,
+        "active_mobility_candidate_layers": {
+            "walk_only_directed_edges": len(active_lines["walk_only"]),
+            "cycle_only_directed_edges": len(active_lines["cycle_only"]),
+            "walk_cycle_directed_edges": len(active_lines["walk_cycle"]),
+            "pedestrian_area_polygons": len(active_areas),
+            "spatial_scope": "central Pushkin map subset for linear links; full displayed Baku map extent for explicit pedestrian area=yes polygons",
+            "event_restrictions_mapped": False,
+        },
         "not_scored": ["actual_bus_path", "actual_road_closure", "speed_change", "prediction_accuracy"],
         "claim_ceiling": case["claim_ceiling"],
     }
@@ -167,10 +194,10 @@ def build(root: Path = ROOT) -> dict:
         if edge.name in announced_names and _inside(_midpoint(edge), DISPLAY_BBOX)
     ]
     map_bundle = {
-        "schema_version": "civiflux-baku-indirect-v1",
+        "schema_version": "civiflux-baku-indirect-v2",
         "status": output_summary["status"],
         "case_id": case["case_id"],
-        "network_scope": "Motor-drivable OSM/SUMO road network; dedicated cycle-only and pedestrian-only ways are excluded; routing vehicle class is bus",
+        "network_scope": "Bus comparison uses frozen motor CityPack; dedicated walking/cycling candidate links come from a separate multimodal CityPack and have no event restrictions or impact score",
         "osm_attribution": "© OpenStreetMap contributors; ODbL 1.0; Geofabrik Azerbaijan 2026-09-18 extract",
         "osm_source_sha256": "5134c55378dda62dfe4257b6aa7eec06fe9c67594f7e578bcd6186fbaac5c363",
         "osm_license_url": "https://www.openstreetmap.org/copyright",
@@ -197,6 +224,10 @@ def build(root: Path = ROOT) -> dict:
             "street_name_agreement": _collection(
                 [feature(eid, "street_name_agreement") for eid in sorted(agreeing_ids)]
             ),
+            "active_walk_only": _collection(active_lines["walk_only"]),
+            "active_cycle_only": _collection(active_lines["cycle_only"]),
+            "active_walk_cycle": _collection(active_lines["walk_cycle"]),
+            "pedestrian_areas": _collection(active_areas),
         },
         "comparison_note": "Retrospective BCC-input synthetic routing versus AYNA announcement street names. Name agreement is neither route-level agreement nor actual observed bus/road impact.",
     }

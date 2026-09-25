@@ -2,7 +2,9 @@
   "status": "RETROSPECTIVE_INDIRECT_PLAN_COMPARISON",
   "case_id": "baku-f1-2026-pushkin-indirect",
   "citypack_sha256": "8adba2949ca4d6637b0250ef8eb72fd6833456abcad3674dcfeb3fcfe1577c89",
-  "case_sha256": "94fe07d8ec24459594bb4eabd43be46a586f088ae254f6848c3a0ef6a6fab475",
+  "multimodal_citypack_sha256": "c6679caad099a40b1f88bc2c32ff9956afb6e8dbecb9d523c3c89080bc0acf9a",
+  "multimodal_osm_roi_sha256": "ed9ff1c56ddf60e941d28085e770cecfbab97ac5b7790f0bf409ef5a186f86c7",
+  "case_sha256": "4c782e44cfdad5129a92a5b31b1182c66bf99ee8396b805f7ba4984dc7a3c673",
   "bcc_notice_sha256": "3aeb95b9dc259127ebf17360e8a9dd96a5f6dc90baa3342d3287b139bd03629b",
   "ayna_notice_sha256": "80eef8066cb08d0c0878849d89761efae83002e709fa3800de26e972d8b4befe",
   "input_candidate_directed_edges": 12,
@@ -49,6 +51,14 @@
     "28 May küçəsi",
     "Azadlıq prospekti"
   ],
+  "active_mobility_candidate_layers": {
+    "walk_only_directed_edges": 422,
+    "cycle_only_directed_edges": 35,
+    "walk_cycle_directed_edges": 0,
+    "pedestrian_area_polygons": 4,
+    "spatial_scope": "central Pushkin map subset for linear links; full displayed Baku map extent for explicit pedestrian area=yes polygons",
+    "event_restrictions_mapped": false
+  },
   "not_scored": [
     "actual_bus_path",
     "actual_road_closure",

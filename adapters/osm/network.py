@@ -128,8 +128,20 @@ def convert_network(
     extraction: dict,
     *,
     source_id: str = "S03-OSM",
+    keep_vehicle_classes: tuple[str, ...] = (
+        "passenger",
+        "bus",
+        "emergency",
+        "delivery",
+        "truck",
+        "taxi",
+        "motorcycle",
+    ),
 ) -> dict:
     import sumolib
+
+    if not keep_vehicle_classes or set(keep_vehicle_classes) - set(VEHICLES):
+        raise ValueError("Unknown or empty OSM network vehicle filter")
 
     command = [
         str(netconvert),
@@ -138,7 +150,7 @@ def convert_network(
         "--output-file",
         str(output),
         "--keep-edges.by-vclass",
-        "passenger,bus,emergency,delivery,truck,taxi,motorcycle",
+        ",".join(keep_vehicle_classes),
         "--output.original-names",
         "true",
         "--geometry.remove",
@@ -153,7 +165,7 @@ def convert_network(
         "42",
     ]
     try:
-        process = subprocess.run(command, capture_output=True, text=True, timeout=180)
+        process = subprocess.run(command, capture_output=True, text=True, timeout=180, check=False)
         log_path.write_text(process.stdout + "\n" + process.stderr)
     except subprocess.TimeoutExpired as exc:
         log_path.write_text(str(exc))
@@ -234,6 +246,11 @@ def convert_network(
             "command": command,
             "exit_code": process.returncode,
             "converter": "SUMO netconvert",
+            **(
+                {"retained_vehicle_classes": list(keep_vehicle_classes)}
+                if "bicycle" in keep_vehicle_classes or "pedestrian" in keep_vehicle_classes
+                else {}
+            ),
             "turns": "SUMO imported OSM restrictions and lane connections; OSM completeness not independently verified",
             "conditional_access": "NOT_VALIDATED",
             "default_speed": "SUMO OSM type defaults where source has no numeric speed",

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Build a frozen, road-only candidate CityPack for an upcoming event.
 
 No network access occurs here. Fetch the registered public extract separately.
@@ -18,12 +17,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "core"))
 sys.path.insert(0, str(ROOT))
 
-from adapters.osm import convert_network, extract_roi
 from urbanimpact.citypack.fetch import sha256_file
 from urbanimpact.citypack.knowledge_graph import export_city_kg
 from urbanimpact.contracts import CityPack
 from urbanimpact.ontology import materialize
 
+from adapters.osm import convert_network, extract_roi
 
 CASES = {
     "berlin-marathon-2026": {
@@ -43,13 +42,13 @@ CASES = {
 }
 
 
-def build(root: Path, case_id: str) -> dict:
+def build(root: Path, case_id: str, *, multimodal: bool = False) -> dict:
     config = CASES[case_id]
     raw = root / "data/raw" / config["raw_filename"]
     metadata = json.loads(raw.with_suffix(raw.suffix + ".source.json").read_text())
     if metadata["status"] != "VERIFIED_BYTES" or sha256_file(raw) != metadata["sha256"]:
         raise ValueError("unverified or changed OSM source bytes")
-    out = root / "data/citypacks" / case_id
+    out = root / "data/citypacks" / (case_id + ("-multimodal" if multimodal else ""))
     out.mkdir(parents=True, exist_ok=True)
     osm_xml = out / "roads.osm.xml"
     extraction = extract_roi(raw, osm_xml, config["bbox"])
@@ -61,18 +60,40 @@ def build(root: Path, case_id: str) -> dict:
         out / "netconvert.log",
         extraction,
         source_id=metadata["id"],
+        **(
+            {
+                "keep_vehicle_classes": (
+                    "passenger",
+                    "bus",
+                    "emergency",
+                    "delivery",
+                    "truck",
+                    "taxi",
+                    "motorcycle",
+                    "bicycle",
+                    "pedestrian",
+                )
+            }
+            if multimodal
+            else {}
+        ),
     )
     source = {k: metadata[k] for k in ("id", "url", "sha256", "retrieved_at", "license")}
     source["path"] = str(raw.relative_to(root))
     identity = hashlib.sha256(
         json.dumps(
-            [metadata["sha256"], config["bbox"], "SUMO1.27.1-motor-drivable-v1", "event-road-only-v1"],
+            [
+                metadata["sha256"],
+                config["bbox"],
+                "SUMO1.27.1-multimodal-candidate-v1" if multimodal else "SUMO1.27.1-motor-drivable-v1",
+                "event-multimodal-linear-v1" if multimodal else "event-road-only-v1",
+            ],
             separators=(",", ":"),
         ).encode()
     ).hexdigest()[:12]
     data = {
         "schema_version": "1.0",
-        "citypack_id": case_id + "-" + identity,
+        "citypack_id": case_id + ("-multimodal" if multimodal else "") + "-" + identity,
         "timezone": config["timezone"],
         "network_temporality": "current_snapshot",
         "transit_temporality": "unavailable",
@@ -81,7 +102,9 @@ def build(root: Path, case_id: str) -> dict:
         "transit": {"routes": []},
         "evidence": {
             "bbox": config["bbox"],
-            "scope": "bounded event-centred motor-road candidate graph",
+            "scope": "bounded event-centred multimodal linear candidate graph"
+            if multimodal
+            else "bounded event-centred motor-road candidate graph",
             "osm_snapshot_last_modified": metadata.get("source_last_modified"),
             "event_window": config["event_window"],
             "historical_network": "NOT_VALIDATED",
@@ -99,17 +122,43 @@ def build(root: Path, case_id: str) -> dict:
             "Event-centred crop excludes some diversion alternatives; boundary sensitivity is untested.",
             "Facility road snaps are candidates, not verified entrances.",
             "No GTFS, measured demand, or independent traffic observations are included.",
+            *(
+                [
+                    "Walking/cycling access and crossings are OSM/SUMO candidates only; pedestrian areas and sidewalks without line geometry are excluded."
+                ]
+                if multimodal
+                else []
+            ),
         ],
     }
     city = CityPack.model_validate(data)
     target = out / "citypack.json"
     pending = target.with_suffix(".pending")
-    pending.write_text(json.dumps(city.model_dump(mode="json"), ensure_ascii=False, separators=(",", ":")) + "\n")
+    pending.write_text(
+        json.dumps(city.model_dump(mode="json"), ensure_ascii=False, separators=(",", ":")) + "\n"
+    )
     pending.replace(target)
     objects, evidence_links = materialize(city)
     kg = export_city_kg(city, objects, evidence_links, out)
+    edges_by_id = {edge.id: edge for edge in city.edges}
+    modal_connections = (
+        {
+            mode: sum(
+                mode
+                in set(connection.allowed_vehicle_classes)
+                & set(edges_by_id[connection.from_edge].allowed_vehicle_classes)
+                & set(edges_by_id[connection.to_edge].allowed_vehicle_classes)
+                for connection in city.connections or ()
+            )
+            for mode in ("bus", "bicycle", "pedestrian")
+        }
+        if multimodal
+        else None
+    )
     audit = {
-        "status": "PASS_CURRENT_ROAD_ONLY_CANDIDATE",
+        "status": "PASS_CURRENT_MULTIMODAL_LINEAR_CANDIDATE"
+        if multimodal
+        else "PASS_CURRENT_ROAD_ONLY_CANDIDATE",
         "case_id": case_id,
         "citypack_id": city.citypack_id,
         "citypack_sha256": sha256_file(target),
@@ -123,15 +172,59 @@ def build(root: Path, case_id: str) -> dict:
             "candidate_facilities": len(city.facilities),
             "ontology_objects": len(objects),
             "evidence_links": len(evidence_links),
+            **(
+                {
+                    "bicycle_permitted_segments": sum(
+                        "bicycle" in edge.allowed_vehicle_classes for edge in city.edges
+                    ),
+                    "pedestrian_permitted_segments": sum(
+                        "pedestrian" in edge.allowed_vehicle_classes for edge in city.edges
+                    ),
+                    "dedicated_nonmotor_segments": sum(
+                        (
+                            "bicycle" in edge.allowed_vehicle_classes
+                            or "pedestrian" in edge.allowed_vehicle_classes
+                        )
+                        and not any(
+                            v in edge.allowed_vehicle_classes
+                            for v in (
+                                "passenger",
+                                "bus",
+                                "emergency",
+                                "delivery",
+                                "truck",
+                                "taxi",
+                                "motorcycle",
+                            )
+                        )
+                        for edge in city.edges
+                    ),
+                }
+                if multimodal
+                else {}
+            ),
         },
         "knowledge_graph": kg,
-        "claim_ceiling": "current ontology-typed road/facility inventory only; no event prediction validated",
+        **({"mode_specific_candidate_turns": modal_connections} if multimodal else {}),
+        "claim_ceiling": "current ontology-typed multimodal linear network candidate inventory only; walking/cycling restriction mapping and event impact not validated"
+        if multimodal
+        else "current ontology-typed road/facility inventory only; no event prediction validated",
         "unresolved": [
             "announced_closure_to_directed_edge_review",
             "actual_closure_operation",
             "independent_measured_event_outcomes",
             "GTFS",
             "boundary_sensitivity",
+            *(
+                [
+                    "pedestrian_area_geometry",
+                    "mode_specific_access_review",
+                    "crossing_connectivity_review",
+                    "mode_specific_validation",
+                ]
+                if multimodal
+                else []
+            ),
         ],
     }
     (out / "build_audit.json").write_text(json.dumps(audit, indent=2) + "\n")
@@ -141,5 +234,10 @@ def build(root: Path, case_id: str) -> dict:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("case_id", choices=CASES)
+    parser.add_argument(
+        "--multimodal",
+        action="store_true",
+        help="Build a separate candidate pack including walk/cycle-only lines",
+    )
     args = parser.parse_args()
-    print(json.dumps(build(ROOT, args.case_id), indent=2))
+    print(json.dumps(build(ROOT, args.case_id, multimodal=args.multimodal), indent=2))

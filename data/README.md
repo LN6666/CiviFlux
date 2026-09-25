@@ -27,7 +27,7 @@ The source-informed road case and street-level fire case are explicit current-ne
 
 ## Berlin 2026 marathon and Baku 2026 F1 city graphs
 
-The event builder imports **dated, pinned Geofabrik OSM PBF bytes** into a bounded road-only CityPack. It then exports ontology-typed objects and directed, vehicle-scoped graph links as deterministic gzip JSONL (`kg_objects.jsonl.gz`, `kg_links.jsonl.gz`). It does not inject announcement facts as actual city state or use Qwen. Both the raw PBF and generated CityPack/KG remain in ignored local directories; tracked source registrations and small audit/candidate records allow another contributor to rebuild them.
+The event builder imports **dated, pinned Geofabrik OSM PBF bytes** into a bounded motor-road CityPack. A separate `--multimodal` variant can add walking and cycling linear ways without changing the frozen motor-only pack. Both export ontology-typed `RoadSegment` objects and directed, vehicle-scoped graph links as deterministic gzip JSONL (`kg_objects.jsonl.gz`, `kg_links.jsonl.gz`). The multimodal variant is an OSM/SUMO candidate topology; it does not infer an event's walking/cycling restrictions, sidewalk geometry or observed impact. Neither builder injects announcement facts as actual city state or uses Qwen. Raw PBF and generated CityPacks/KGs remain ignored; tracked source registrations and small audit/candidate records support rebuilding.
 
 ```sh
 .venv/bin/python scripts/data_pipeline.py fetch --source berlin-osm --allow-egress
@@ -36,6 +36,7 @@ The event builder imports **dated, pinned Geofabrik OSM PBF bytes** into a bound
 
 .venv/bin/python scripts/data_pipeline.py fetch --source baku-osm --allow-egress
 .venv/bin/python scripts/build_event_citypack.py baku-f1-2026
+.venv/bin/python scripts/build_event_citypack.py baku-f1-2026 --multimodal
 ```
 
 The Berlin source registration points to the frozen 22 September extract; its local filename reflects the original 24 September retrieval, not the OSM content date. The Baku source points to the 18 September extract, before the 19 September announced closure onset. Each `.source.json` records byte hash, source time and licence; a mismatch refuses silent replacement. The build audit in `data/citypacks/<case>/build_audit.json` records source and CityPack hashes, feature counts, KG file hashes and unverified boundaries. Rebuilds may change derived hashes if the converter environment changes; preserve an original audit for a frozen experiment.

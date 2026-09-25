@@ -3,6 +3,8 @@
   "case_id": "baku-f1-2026-pushkin-indirect",
   "status": "RETROSPECTIVE_PLAN_TO_PLAN_SUBSET",
   "citypack_sha256": "8adba2949ca4d6637b0250ef8eb72fd6833456abcad3674dcfeb3fcfe1577c89",
+  "multimodal_citypack_sha256": "c6679caad099a40b1f88bc2c32ff9956afb6e8dbecb9d523c3c89080bc0acf9a",
+  "multimodal_osm_roi_sha256": "ed9ff1c56ddf60e941d28085e770cecfbab97ac5b7790f0bf409ef5a186f86c7",
   "closure_input": {
     "source_id": "AZ-BCC-2026-TRAFFIC",
     "source_sha256": "3aeb95b9dc259127ebf17360e8a9dd96a5f6dc90baa3342d3287b139bd03629b",
