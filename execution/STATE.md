@@ -4,7 +4,7 @@
 
 ## 最新工作树检查点：城市 KG 与赛事验证准备
 
-当前开发线为 draft [PR #7](https://github.com/LN6666/CiviFlux/pull/7) 的 `codex/directed-mapping-review`。下文按提交记录列出的早期 CI/哈希是**历史检查点**；新增 Berlin/Baku 城市图、间接 GIS 对照及多方式候选网络，最新受控代码提交 `4cc4f62` 已由 [GitHub CI 36186049667](https://github.com/LN6666/CiviFlux/actions/runs/36186049667) 的 `core`、`container` 双检查核对通过，CI 临时合并提交与开发提交 tree 完全一致，[CI 摘要](../evidence/wp7/ci_run_36186049667.json)留存。当前 release manifest 重新绑定受控输入；它仍保留 2 个 `DEFERRED_USER`、1 个 `BLOCKED_EXTERNAL`，`engineering_complete=false`。新数据与结果的范围如下：
+当前开发线为 draft [PR #7](https://github.com/LN6666/CiviFlux/pull/7) 的 `codex/directed-mapping-review`。下文按提交记录列出的早期 CI/哈希是**历史检查点**；最新受控代码提交 `df0978e` 已由 [GitHub CI 36188723802](https://github.com/LN6666/CiviFlux/actions/runs/36188723802) 的 `core`、`container` 双检查核对通过，CI 临时合并提交与开发提交 tree 完全一致，[CI 摘要](../evidence/wp7/ci_run_36188723802.json)留存。当前 release manifest 重新绑定受控输入；它仍保留 2 个 `DEFERRED_USER`、1 个 `BLOCKED_EXTERNAL`，`engineering_complete=false`。新数据与结果的范围如下：
 
 - Berlin 的固定 Geofabrik OSM 源 SHA-256 为 `ff4ac9a01c7d7c13dc3a9a47e4a5031152c82cfed36720fe2a1bf99543fb1a76`；[城市 KG 审计](../evidence/events/berlin-2026-city-kg-audit.json)记录 153,264 条有向道路、239,430 条转向关系和 153,900 个 ontology objects。9 月 21 日官方公告仅有 2 段街道经算法提出 37/35 条候选有向边，均为 `CANDIDATE_UNREVIEWED`；不能宣称完整封路网络。
 - Berlin [增量条件探针](../evidence/events/berlin-2026-incremental-pre-onset-probe.json)于 `2026-09-25T18:20:40Z` 冻结，早于 26 Sep 07:00 CEST 的**计划**封路起点。相同当前网络、OD 与已知起始候选下，两组东西向 OD 在新增候选封路时不可达，北侧对照 OD 不变。此敏感性是未审阅候选映射上的自由流路径结果；真实道路运行、其他先前封路、需求/拥堵、边界外绕行和独立观测均未验证，不能列为 V2/V3 预测准确性。
@@ -15,6 +15,7 @@
 - Berlin 新增只用赛前 VIZ 字段确定的描述性对照：25 Sep 快照的方法可行性预检为 11 条可评分的预测重合 VIZ 路段各选出 2 条不重复对照，共 22 条；对照避开预测和输入封路候选至少 200 m。选择哈希、方法和计数已写入同一审计，GIS 地图用深蓝虚线显示；26 Sep 的真正赛前快照会重新固定清单，赛时按同一 ID 报告成对额外降速及新增封闭。远离路线不等于不受赛事影响，不能把对照差值当作因果效应或预测命中率。
 - Baku 的[步行区域面间接指标](../docs/BAKU_2026_INDIRECT_GIS_COMPARISON.md)现扫描固定 OSM ROI 内 60 处明确 `area=yes` 候选：0.2 m 和 15 m 假设普希金街走廊的正面积交集均为 0，最近间距分别为 220.28 m 和 205.48 m。这是一个保留的负几何结果，不能把该面算作本探针影响；这些面仍不参与 KG 路由，也不能据此判断全赛事步行扰动。
 - 步行区域面指标代码提交 `d2a5db0` 已由 [GitHub CI 36187455079](https://github.com/LN6666/CiviFlux/actions/runs/36187455079) 的 `core`、`container` 双检查通过；CI 临时合并树与提交树一致。[CI 回执](../evidence/wp7/ci_run_36187455079.json)记录契约 7、fast 211、data 66 PASS/1 SKIP、outcomes 7、SUMO 11、安全 20、浏览器 15 PASS。跳过的 data 用例仍因 CI 缺少 ignored Helsinki 城市包，不能当作该数据验证已通过。严格 release manifest 已重新绑定本代码树，仍有 2 个 `DEFERRED_USER`、1 个 `BLOCKED_EXTERNAL` 和 `engineering_complete=false`。
+- 柏林比较器提交 `df0978e` 把空间覆盖和对照清单固定于赛前 VIZ 几何与已保存的赛前地图；赛时建图必须读取该地图，并核对其建成时间、源/城市/预测哈希、回执与响应正文的 feed 时间戳、路段数和 15 分钟新鲜度。26 Sep 07:00 CEST 前的真实快照及基线包、之后的赛时快照仍待定时采集；25 Sep 的旧快照仅用于可行性预检，不充当增量起点。CI 36188723802 为契约 7、fast 211、data 69 PASS/1 SKIP、outcomes 7、SUMO 11、安全 20、浏览器 15 PASS，容器 PASS；[受控回执](../evidence/wp7/ci_run_36188723802.json)记录确切树匹配。新增数据测试不会替代真实赛时路段结果。
 - 本机完整非 live 产品测试 248 PASS/1 SKIP，Berlin 对照选取/封闭状态反例测试和 Web build 通过。本机 Playwright 无 Chromium 可执行文件；相同 `4cc4f62` tree 的 Linux CI 补齐了浏览器运行：契约 7、fast 211、data 65 PASS/1 SKIP、outcomes 7、SUMO 11、安全 20、浏览器 15 PASS、容器真实 API/合成 SUMO smoke PASS。data 的 1 项跳过因 CI 与本开发工作树未带 ignored Helsinki 城市包，不能视为发布所需真实数据验证通过。城市原始 PBF、VIZ 快照与大型 CityPack/KG 保持 ignored，本仓库只提交脚本、小型来源卡和哈希证据。
 - 上述城市构建和离线验证**不需要 Featherless 订阅**；免费 demo 三次已耗尽，付费生产调用继续 `DEFERRED_USER`。如将来必须付费，先告知用户用途、调用限额和估算费用。
 

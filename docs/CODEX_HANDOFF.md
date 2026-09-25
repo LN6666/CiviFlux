@@ -12,6 +12,8 @@
 
 **后续受控检查点：**PR #7 的 `d2a5db0` 代码树经 [Linux CI 36187455079](https://github.com/LN6666/CiviFlux/actions/runs/36187455079) `core`、`container` 双检查通过；[回执](../evidence/wp7/ci_run_36187455079.json)核对了临时合并树、15 项浏览器测试及容器 smoke。Baku 步骑探针新增步行区域面几何交集及最近距离指标；固定 18 Sep OSM ROI 扫描 60 处，15 m 假设走廊交集为 0 处/0 m²，最近 205.48 m。保留该负结果，面仍不参与路由或 PPR。严格 release manifest 仍有 2 个 `DEFERRED_USER`、1 个 `BLOCKED_EXTERNAL`，`engineering_complete=false`。
 
+**当前受控检查点：**PR #7 的 `df0978e` 代码树经 [Linux CI 36188723802](https://github.com/LN6666/CiviFlux/actions/runs/36188723802) `core`、`container` 双检查通过；[回执](../evidence/wp7/ci_run_36188723802.json)记录确切合并树匹配、data 69 PASS/1 SKIP、浏览器 15 PASS。柏林赛时比较必须先保存 **26 Sep 07:00 CEST 前**的 ignored 基线包 `data/raw/berlin-validation/sep26-pre-0700-cest-baseline-map.json`，并核对原始 VIZ feed 时间戳与基线对照哈希；事件建图自动读取此文件。具体命令在[地图验证说明](BERLIN_2026_MAP_VALIDATION.md)。赛前与赛时定时采集尚未执行，当前没有真实事件路段命中率或额外降速；不要用 25 Sep 的预检快照代替。严格 release manifest 仍有 2 个 `DEFERRED_USER`、1 个 `BLOCKED_EXTERNAL`，`engineering_complete=false`。
+
 ## 新账户的第一步
 
 1. 在自己的机器执行 `git clone https://github.com/LN6666/CiviFlux.git`，在 Codex 中把克隆出的 `CiviFlux` 目录作为项目打开。公开仓库可匿名克隆；提交 PR 时才需要自己的 GitHub 身份或 fork。接手正在审查的改动时也查看[开放的 PR](https://github.com/LN6666/CiviFlux/pulls)，不要以为未合并分支已经在 `main`。
