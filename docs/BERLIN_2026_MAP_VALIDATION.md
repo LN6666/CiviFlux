@@ -48,6 +48,25 @@ npm --prefix web run dev
 
 浏览器打开 `http://127.0.0.1:5173/validation.html?bundle=placebo`；颜色图层在该状态下标为赛前背景变化，不显示赛事精确率/召回率。两份原始快照均位于 ignored `data/raw/berlin-validation/`，仅有聚合证据随 Git 分发。这个安慰剂不替代下面计划中的 26 Sep 赛前冻结与赛时配对。
 
+## 步行与骑行观测覆盖预检
+
+[柏林官方赛事公告](https://www.berlin.de/sen/uvk/presse/pressemitteilungen/2026/pressemitteilung.1716477.php)说明自行车通行会尽可能维持，禁止自行进入封闭比赛区域，步行横穿可使用地铁站通道及列出的指定横穿点。因此机动车封路候选**不能自动写成步行／骑行封闭**。官方[步行路网 WFS](https://daten.berlin.de/datensaetze/fussgangernetz-wfs-f1995e5e)可用于核对路网拓扑，但它是静态路网，不是赛事中的人流观测。
+
+[柏林开放数据目录](https://daten.berlin.de/datensaetze/berlin-zaehlt-mobilitaet)所列的 Berlin zählt Mobilität [按月 CSV 和计数点几何](https://berlin-zaehlt.de/csv/)公开提供 Telraam 步行／骑行计数及 EcoCounter 自行车计数；柏林官方[自行车长期计数数据](https://daten.berlin.de/datensaetze/radzahldaten-in-berlin)目前列出审核过的年度数据至 2025 年，不能据此把镜像站 2026 年实时数据称为已审核。`scripts/berlin_active_observation_coverage.py` 只在本机读取下载到 ignored `data/raw/berlin-active-observation/` 的 2026-09 CSV/GeoJSON，与已冻结的**机动车**预测路段及公告输入候选几何做 UTM 33N 最近距离检查；它不生成步骑预测。公开[覆盖审计](../evidence/events/berlin-2026-active-observation-coverage.json)只保存四份源文件与地图 SHA-256、聚合计数及最近点信息，不提交原始逐时数据。
+
+截至这份赛前源快照，EcoCounter 自行车计数有 23 个与几何匹配且有 9 月样本的点，离冻结机动车预测最近 **1,290.0 m**，数据最新到 **23 Sep 23:00 本地时间**；预测路线 1 km 内没有点。Telraam 有 123 个与几何匹配且有 9 月样本的路段，最近在 Wilhelmstraße、距预测路线 **379.3 m**；500 m 内 1 个、1 km 内 3 个，其中以 24 Sep 00:00 本地时间为近况门槛的有 2 个。最近点数据最新到 **25 Sep 21:00 本地时间**，但其元数据标为**未完成校准**且只开启一个方向的步行计数。它可用于明确缺陷的附近步骑流量趋势观察，不可当作预测路段的直接真值。柏林开放数据目录注明 Telraam 为 CC BY 4.0；使用时保留来源署名。
+
+要验证非机动车扰动，需要先按官方步骑规则与实地横穿状况建立**独立的方式专属情景输入**，冻结步骑 OD、路径和受影响路段，再将同一计数点在赛事小时与可比的历史同星期／同小时及未暴露对照点比较。计数点覆盖不到的边保持“未观测”；零计数不能自动解释为封闭。若要报逐路段命中率，仍需经过许可的实际步骑轨迹、临时通道记录或带位置时间戳的现场核验。当前下载的数据都在赛事新增限制前，尚无赛时步骑命中率。公开 CSV 下载不需要账号；使用该目录列出的 Telraam API 则需要注册取得 Key。
+
+```bash
+mkdir -p data/raw/berlin-active-observation
+curl --fail --location https://berlin-zaehlt.de/csv/bzm_ecocounter_2026_09.csv.gz --output data/raw/berlin-active-observation/bzm_ecocounter_2026_09.csv.gz
+curl --fail --location https://berlin-zaehlt.de/csv/bzm_ecocounter_segments.geojson --output data/raw/berlin-active-observation/bzm_ecocounter_segments.geojson
+curl --fail --location https://berlin-zaehlt.de/csv/bzm_telraam_2026_09.csv.gz --output data/raw/berlin-active-observation/bzm_telraam_2026_09.csv.gz
+curl --fail --location https://berlin-zaehlt.de/csv/bzm_telraam_segments.geojson --output data/raw/berlin-active-observation/bzm_telraam_segments.geojson
+uv run --frozen python scripts/berlin_active_observation_coverage.py
+```
+
 ## 本机运行
 
 ```bash

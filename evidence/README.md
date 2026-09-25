@@ -15,6 +15,7 @@
 - `events/berlin-2026-pre-onset-placebo.json`：两份真实官方 VIZ feed 的赛前增量安慰剂聚合统计、时间和原始字节哈希。道路级数据与 GIS 包仅存本机 ignored 路径；空间重合不是赛事命中。
 - `events/berlin-2026-viz-mapping-audit.json`：官方封路通报线与 72 条 OSM 输入候选边的街名和几何重合审计，公开哈希与聚合数；方向和现场执行均未核验，逐段详情和地图只留本机 ignored 路径。这不是插件预测影响路段的命中率。
 - `events/berlin-2026-mapping-sensitivity.json`：从原始赛前 VIZ 通报重新计算几何支持子集，将 8 条重合不足的已开始限制候选移出后，以原冻结城市包和 3 组 OD 复跑；六个基线/增量路由对象均未改变。仅是局部输入敏感性，不核验真实封路或赛时影响。
+- `events/berlin-2026-active-observation-coverage.json`：Berlin zählt Mobilität 9 月步行／骑行计数 CSV 与计数点几何的来源哈希及对冻结**机动车**预测走廊的空间覆盖审计。最近的 Telraam 路段约 379 m，EcoCounter 自行车计数点约 1.29 km；没有直接覆盖预测路段的点。它只评估非机动车实测对照的可行性，不是步骑预测或赛事命中率。
 - `wp7/ci_run_36189858812.json`：当前安慰剂 GIS 代码树的受控 CI 回执，含 16 项浏览器测试、容器复现、确切 Git 树匹配和产物哈希；不把本机原始 VIZ 数据或 26 Sep 赛时结果冒充 CI 内容。
 - `wp7/ci_run_36191842277.json`：公告几何映射审计与 GIS 分色代码树的受控 CI 回执，含 17 项浏览器测试、容器复现、确切 Git 树匹配和产物哈希；1 项 CI data 用例仍因 ignored Helsinki 数据缺失而跳过。
 - `wp7/ci_run_36192737662.json`：柏林公告映射不确定性复跑代码树的受控 CI 回执，含 17 项浏览器测试、容器复现、确切 Git 树匹配和产物哈希；1 项 CI data 用例仍因 ignored Helsinki 数据缺失而跳过。其结果只验证固定三组 OD 对 8 条候选输入边的敏感性，不构成真实赛事命中率。

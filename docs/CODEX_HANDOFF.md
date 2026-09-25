@@ -22,6 +22,8 @@
 
 **最新受控检查点：**上述敏感性脚本的代码提交 `8c02295` 经 [Linux CI 36192737662](https://github.com/LN6666/CiviFlux/actions/runs/36192737662) `core`、`container` 双检查通过；[回执](../evidence/wp7/ci_run_36192737662.json)核对临时合并树与开发提交树一致、契约 7、fast 211、data 73 PASS/1 SKIP、outcomes 7、SUMO 11、安全 20、浏览器 17 PASS。当前 [release manifest](../evidence/current_product_release.json)绑定此受控代码树，仍有两个付费相关 `DEFERRED_USER` 和一个真实城市 `BLOCKED_EXTERNAL`，`engineering_complete=false`。Berlin 26 Sep 赛时路段命中率仍未获得；25 Sep 的 29/37 是公告输入映射几何支持比例，Baku 的 23/32 是公告街名代理重合比例，两者都不是现场扰动命中率。
 
+**步骑观测预检：**Berlin zählt Mobilität 的 2026-09 Telraam 步骑与 EcoCounter 自行车逐时 CSV/点位几何已在本机 ignored 目录做来源绑定[覆盖审计](../evidence/events/berlin-2026-active-observation-coverage.json)。目前与冻结机动车影响路段没有直接重合的计数点；最近 Telraam 路段 379.3 m、最近 EcoCounter 点 1.29 km。Telraam 最近点未完成校准，步行只记录一个方向。代码 `scripts/berlin_active_observation_coverage.py` 和方法见[柏林验证说明](BERLIN_2026_MAP_VALIDATION.md)。这是可用观测源的覆盖检查，**不是步骑预测**；未来需单独冻结方式专属情景和 OD，再做赛时同点、同小时及远端对照。官方赛事公告说明骑行尽量保持且步行有指定横穿点，不得从机动车封路直接推断步骑封闭。
+
 ## 新账户的第一步
 
 1. 在自己的机器执行 `git clone https://github.com/LN6666/CiviFlux.git`，在 Codex 中把克隆出的 `CiviFlux` 目录作为项目打开。公开仓库可匿名克隆；提交 PR 时才需要自己的 GitHub 身份或 fork。接手正在审查的改动时也查看[开放的 PR](https://github.com/LN6666/CiviFlux/pulls)，不要以为未合并分支已经在 `main`。

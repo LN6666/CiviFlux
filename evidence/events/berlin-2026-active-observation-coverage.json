@@ -1,0 +1,145 @@
+{
+  "schema_version": "1.0",
+  "status": "PRE_ONSET_OBSERVATION_COVERAGE_ONLY",
+  "event_id": "berlin-marathon-2026",
+  "onset_local": "2026-09-26 07:00",
+  "recent_cutoff_local": "2026-09-24 00:00",
+  "timezone": "Europe/Berlin",
+  "map_sha256": "854458d512b6c2bd558883c24b86e9afdc74baf4f3cffa5c8f40be5166598569",
+  "prediction_sha256": "f89fc30b2139bf26b724c88801947466082e5e4561404160b41025522729be0b",
+  "citypack_sha256": "5781a8627f6b7680f70a81892b55dee33049554cb1b38946b86b1f818c1e67a0",
+  "frozen_motor_route_output_edges": 51,
+  "announcement_input_candidate_edges": 72,
+  "distance_crs": "EPSG:25833",
+  "sources": {
+    "ecocounter": {
+      "csv_url": "https://berlin-zaehlt.de/csv/bzm_ecocounter_2026_09.csv.gz",
+      "geometry_url": "https://berlin-zaehlt.de/csv/bzm_ecocounter_segments.geojson",
+      "csv_sha256": "b7a4db759e8013aa66da3376cc287bb21f4b8ea9cd46f61888b16937686659b8",
+      "geometry_sha256": "8f62beeb0f02448128f5c370981b72d21b706e234aed33ca6148b6d241c17d2d",
+      "geometry_features": 24,
+      "stations_with_september_samples": 23,
+      "stations_joined_to_geometry": 23,
+      "stations_with_recent_samples": 0,
+      "latest_sample_local": "2026-09-23 23:00",
+      "coverage": {
+        "frozen_motor_route_output": {
+          "stations_within_m": {
+            "100": 0,
+            "250": 0,
+            "500": 0,
+            "1000": 0
+          },
+          "recent_stations_within_m": {
+            "100": 0,
+            "250": 0,
+            "500": 0,
+            "1000": 0
+          },
+          "nearest": {
+            "segment_id": "100032152",
+            "name": "Invalidenstraße",
+            "distance_m": 1290.0,
+            "latest_sample_local": "2026-09-23 23:00",
+            "counter_quality": []
+          }
+        },
+        "announcement_input_candidates": {
+          "stations_within_m": {
+            "100": 0,
+            "250": 0,
+            "500": 0,
+            "1000": 0
+          },
+          "recent_stations_within_m": {
+            "100": 0,
+            "250": 0,
+            "500": 0,
+            "1000": 0
+          },
+          "nearest": {
+            "segment_id": "100032152",
+            "name": "Invalidenstraße",
+            "distance_m": 1240.8,
+            "latest_sample_local": "2026-09-23 23:00",
+            "counter_quality": []
+          }
+        }
+      }
+    },
+    "telraam": {
+      "csv_url": "https://berlin-zaehlt.de/csv/bzm_telraam_2026_09.csv.gz",
+      "geometry_url": "https://berlin-zaehlt.de/csv/bzm_telraam_segments.geojson",
+      "csv_sha256": "defc732c3156e6ce940f551ac3b9fa0821ef16d9e226f37baca306d13b499043",
+      "geometry_sha256": "5d83800eb40deea73b112832607c09884b1b6810c221714d06d5e1934bc12072",
+      "geometry_features": 291,
+      "stations_with_september_samples": 123,
+      "stations_joined_to_geometry": 123,
+      "stations_with_recent_samples": 109,
+      "latest_sample_local": "2026-09-25 21:00",
+      "coverage": {
+        "frozen_motor_route_output": {
+          "stations_within_m": {
+            "100": 0,
+            "250": 0,
+            "500": 1,
+            "1000": 3
+          },
+          "recent_stations_within_m": {
+            "100": 0,
+            "250": 0,
+            "500": 1,
+            "1000": 2
+          },
+          "nearest": {
+            "segment_id": "9000008514",
+            "name": "Wilhelmstraße",
+            "distance_m": 379.3,
+            "latest_sample_local": "2026-09-25 21:00",
+            "counter_quality": [
+              {
+                "status": "active",
+                "is_calibration_done": "no",
+                "pedestrians_left": false,
+                "pedestrians_right": true,
+                "bikes_left": true,
+                "bikes_right": true
+              }
+            ]
+          }
+        },
+        "announcement_input_candidates": {
+          "stations_within_m": {
+            "100": 0,
+            "250": 0,
+            "500": 1,
+            "1000": 3
+          },
+          "recent_stations_within_m": {
+            "100": 0,
+            "250": 0,
+            "500": 1,
+            "1000": 2
+          },
+          "nearest": {
+            "segment_id": "9000008514",
+            "name": "Wilhelmstraße",
+            "distance_m": 379.3,
+            "latest_sample_local": "2026-09-25 21:00",
+            "counter_quality": [
+              {
+                "status": "active",
+                "is_calibration_done": "no",
+                "pedestrians_left": false,
+                "pedestrians_right": true,
+                "bikes_left": true,
+                "bikes_right": true
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "claim_ceiling": "Station proximity to a frozen motor-route output and announcement input is observation feasibility only. It is not an active-mode prediction, measured closure, event-hour change or segment-level hit rate. Counter data freshness, calibration, mode coverage and spatial representativeness require review before comparison."
+}
