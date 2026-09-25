@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CiviFlux · 柏林道路对照地图</title>
+</head>
+<body>
+  <header>
+    <div><strong>CiviFlux</strong><span>柏林 2026 · 路段对照</span></div>
+    <a href="/">返回插件</a>
+  </header>
+  <main>
+    <section class="sidebar" aria-label="GIS comparison controls">
+      <h1>预测与实际数据对照</h1>
+      <p id="status" role="status">正在载入本地数据…</p>
+      <label>本地验证包 JSON<input type="file" id="bundle-file" accept="application/json,.json"></label>
+      <div id="summary"></div>
+      <fieldset>
+        <legend>地图图层</legend>
+        <label><input type="checkbox" data-layer="predicted" checked>橙色 · 插件预测影响路段</label>
+        <label><input type="checkbox" data-layer="traffic" checked>实时交通 · VIZ 路段状态</label>
+        <label><input type="checkbox" data-layer="changes" checked>红色 · 两快照间实际状态变化</label>
+        <label><input type="checkbox" data-layer="closures" checked>紫色 · 输入的封路候选</label>
+        <label><input type="checkbox" data-layer="reports" checked>蓝色 · 官方封路通报</label>
+        <label><input type="checkbox" data-layer="context" checked>灰色 · 城市道路背景</label>
+      </fieldset>
+      <button id="fit">定位预测范围</button>
+      <section id="details" aria-label="Selected road details">点击地图路段查看 ID、时间、来源和数值。</section>
+      <p class="source">橙色是冻结的插件路由结果；紫色是情景输入，两者不能混作预测。赛时快照接入后，红色表示两次交通快照间新封闭或车速下降至少 30% 的路段。赛事之外的时段变化也可能造成差异。</p>
+      <p class="source">数据：© OpenStreetMap contributors（ODbL）；柏林 VIZ 交通图层由柏林交通部门展示，底层 VMZ Berlin / HERE；本地快照不随开源仓库分发。</p>
+    </section>
+    <section class="map-wrap" aria-label="Berlin GIS comparison map"><div id="map"></div></section>
+  </main>
+  <script type="module" src="/src/validation.ts"></script>
+</body>
+</html>

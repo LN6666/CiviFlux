@@ -12,6 +12,7 @@ runs/
 *.key
 *.pem
 web/dist/
+web/public/validation/*-local.json
 .coverage
 htmlcov/
 .playwright/
