@@ -22,7 +22,7 @@ map.addControl(new maplibregl.AttributionControl({compact:false,customAttributio
 const specs:[string,LayerName,maplibregl.LayerSpecification][]=[
   ['context','context_roads',{id:'context',type:'line',source:'context',paint:{'line-color':'#bac6c0','line-width':1.4,'line-opacity':.65}}],
   ['traffic','viz_traffic',{id:'traffic',type:'line',source:'traffic',paint:{'line-color':['match',['get','los'],1,'#1a9c79',2,'#74a67d',3,'#ecab42',7,'#53616c','#93a49b'],'line-width':3,'line-opacity':.72}}],
-  ['changes','observed_change',{id:'changes',type:'line',source:'changes',filter:['in',['get','change_class'],['literal',['newly_reported_closed','speed_drop_30pct']]],paint:{'line-color':'#ca3439','line-width':6,'line-opacity':.85}}],
+  ['changes','observed_change',{id:'changes',type:'line',source:'changes',filter:['in',['get','verdict'],['literal',['hit','miss','false_alarm']]],paint:{'line-color':['match',['get','verdict'],'hit','#16855a','miss','#c6353e','false_alarm','#9a4ab4','#65776c'],'line-width':6,'line-opacity':.9}}],
   ['reports','viz_marathon_reports',{id:'reports',type:'line',source:'reports',filter:['==',['geometry-type'],'LineString'],paint:{'line-color':'#3474ad','line-width':5,'line-offset':-3,'line-dasharray':[2,2]}}],
   ['predicted','predicted_route_impact',{id:'predicted',type:'line',source:'predicted',paint:{'line-color':'#e56a24','line-width':5,'line-offset':4}}],
   ['closures','restriction_inputs',{id:'closures',type:'line',source:'closures',paint:{'line-color':'#8b55aa','line-width':4,'line-offset':-4,'line-dasharray':[2,2]}}],
